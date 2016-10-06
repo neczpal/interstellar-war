@@ -1,44 +1,48 @@
 package game.server;
 
+import game.Log;
 import game.map.GameMap;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class ServerConnection extends Thread {
 
+	private static int mClientIdCounter = 1;
 	private GameMap mMap;
-
 	private int mPort;
 	private ServerSocket mServerSocket;
-
 	private HashMap <Integer, Client> mClients = new HashMap <> ();
 	private List <Client> mTemporaryClients = new ArrayList <> ();
 	private boolean running = false;
+	private Log log = new Log (this);
 
-	private static int mClientIdCounter = 1;
 
 	public ServerConnection () {
+		super ("ServerConnection");
 		mPort = 23232;
 		try {
 			mServerSocket = new ServerSocket (mPort);
 		} catch (IOException e) {
-			System.err.println ("ServerConnection inicializási bibi: " + e.getMessage ());
+			log.e ("ServerConnection inicializási bibi: " + e.getMessage ());
 		}
 		this.start ();
 	}
 
 	public void run () {
-		System.out.println ("INFO: Sever started.");
+		log.i ("Sever started.");
 		mMap = new GameMap ();
 		running = true;
 		while (running) {
 			try {
 				addClient ();
 			} catch (IOException e) {
-				System.err.println ("ServerConnection futási bibi: " + e.getMessage ());
+				log.e ("ServerConnection futási bibi: " + e.getMessage ());
 			}
 		}
 	}
@@ -67,7 +71,7 @@ public class ServerConnection extends Thread {
 	}
 
 	public void action (Command command, int currentPort) {
-		System.out.println ("Got msg from client: " + command.type.toString () + " : " + currentPort);
+		log.i ("Got msg from client: " + command.type.toString () + " : " + currentPort);
 		switch (command.type) {
 			case ENTER_SERVER:
 				int id = mClientIdCounter++;
@@ -75,7 +79,7 @@ public class ServerConnection extends Thread {
 				mClients.get (id).setClientId (id);
 				mTemporaryClients.remove (findClientByPort (currentPort));
 
-				System.out.println (currentPort + " is connecting to the server, got id:" + id);
+				log.i (currentPort + " is connecting to the server, got id:" + id);
 
 				Player newPlayer = new Player (id);
 				mMap.addPlayer (id, newPlayer);
@@ -84,7 +88,7 @@ public class ServerConnection extends Thread {
 				break;
 			case EXIT_SERVER:
 
-				System.out.println (command.data[0] + " exits the server... PORT:" + currentPort);
+				log.i (command.data[0] + " exits the server... PORT:" + currentPort);
 				mClients.remove (command.data[0]);
 
 				break;
@@ -92,7 +96,7 @@ public class ServerConnection extends Thread {
 
 				Player movingPlayer = mMap.findPlayerById ((int) command.data[0]);
 				movingPlayer.move ((int) command.data[1], (int) command.data[2]);
-				System.out.println (movingPlayer.getId () + " is moving, sending the Map...");
+				log.i (movingPlayer.getId () + " is moving, sending the Map...");
 				Integer[] player_data = new Integer[mMap.getPlayers ().size () * 3 + 1];
 				int i = 0;
 				player_data[i++] = mMap.getPlayers ().size ();
@@ -100,14 +104,14 @@ public class ServerConnection extends Thread {
 					player_data[i++] = player.getId ();
 					player_data[i++] = player.getX ();
 					player_data[i++] = player.getY ();
-					System.out.println ("PLAYER (" + player.getId () + ") position : " +player.getX () + ", " + player.getY () );
+					log.i ("PLAYER (" + player.getId () + ") position : " + player.getX () + ", " + player.getY ());
 				}
 				sendToAll (Command.Type.SYNC_MAP, player_data);
 
 				break;
 			case NEED_SYNC:
 
-				System.out.println (currentPort + " needs sync, sending the MapData");
+				log.i (currentPort + " needs sync, sending the MapData");
 				sendToId (Command.Type.SYNC_MAP, new Serializable[] {mMap.getPlayers ()}, (int) command.data[0]);
 
 				break;

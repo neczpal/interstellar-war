@@ -1,5 +1,7 @@
 package game.server;
 
+import game.Log;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,6 +18,8 @@ public class Client extends Thread {
 	private int mId;
 	private boolean mIsRunning;
 
+	private Log log = new Log (this);
+
 
 	public Client (ServerConnection servet, Socket socket) {
 		this.mSocket = socket;
@@ -27,12 +31,12 @@ public class Client extends Thread {
 			mOut = new ObjectOutputStream (socket.getOutputStream ());
 			mIn = new ObjectInputStream (socket.getInputStream ());
 		} catch (IOException e) {
-			System.err.println ("Client bibi" + e.getMessage ());
+			log.e ("Client bibi" + e.getMessage ());
 		}
 	}
 
 	public void run () {
-		System.out.println ("INFO: Client ready, mPort: " + mPort);
+		log.i ("Client ready, mPort: " + mPort);
 		mIsRunning = true;
 		try {
 			while (mIsRunning) {
@@ -61,8 +65,7 @@ public class Client extends Thread {
 		try {
 			mOut.writeObject (msg);
 		} catch (IOException e) {
-			System.err.println ("Nem sikerült elküldeni ezt: " + msg.type);
-			e.printStackTrace ();
+			log.e ("Nem sikerült elküldeni ezt: " + msg.type + "\n" + e.toString ());
 		}
 	}
 
@@ -70,9 +73,6 @@ public class Client extends Thread {
 	public void close () throws IOException {
 		mSocket.close ();
 	}
-
-
-	//GETTERS SETTERS
 
 	public int getPort () {
 		return mPort;

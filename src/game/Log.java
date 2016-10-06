@@ -1,16 +1,22 @@
 package game;
 
 public class Log {
-	public static void e (Object msg) {
-		System.err.println ("ERROR: " + msg);
+
+	private String mClassName;
+
+	public Log (Object object) {
+		mClassName = object.toString ();
 	}
 
-	public static void i (Object msg) {
-		System.out.println ("INFO: " + msg);
-
-
+	public void e (Object object) {
+		System.err.println (mClassName + ":\tERROR:\t" + object);
 	}
-	public static void w (Object msg) {
-		System.out.println ("WARNING: " + msg);
+
+	public void i (Object object) {
+		System.out.println (mClassName + ":\tINFO:\t" + object);
+	}
+
+	public void w (Object object) {
+		System.out.println (mClassName + ":\tWARNING:\t" + object);
 	}
 }

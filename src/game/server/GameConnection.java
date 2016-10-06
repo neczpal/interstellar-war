@@ -1,7 +1,7 @@
 package game.server;
 
-import game.map.GameMap;
 import game.Log;
+import game.map.GameMap;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -24,7 +24,10 @@ public class GameConnection extends Thread {
 	private ObjectInputStream mIn;
 	private ObjectOutputStream mOut;
 
+	private Log log = new Log (this);
+
 	public GameConnection (String ip) {
+		super ("GameConnection");
 		mIsRunning = false;
 		mMap = new GameMap ();
 		try {
@@ -41,7 +44,7 @@ public class GameConnection extends Thread {
 
 			this.start ();
 		} catch (IOException e) {
-			Log.e ("Hibás ip cím: " + ip);
+			log.e ("Hibás ip cím: " + ip);
 		}
 	}
 
@@ -54,7 +57,7 @@ public class GameConnection extends Thread {
 					Command msg = (Command) mIn.readObject ();
 					action (msg);
 				} catch (ClassNotFoundException | ClassCastException ex) {
-					Log.w (ex.getMessage ());
+					log.w (ex.getMessage ());
 				}
 			}
 		} catch (IOException e) {
@@ -70,7 +73,7 @@ public class GameConnection extends Thread {
 			mIn.close ();
 			mSocket.close ();
 		} catch (IOException e) {
-			System.out.println (e.getMessage ());
+			log.e (e.getMessage ());
 		}
 	}
 
@@ -91,7 +94,7 @@ public class GameConnection extends Thread {
 		try {
 			mOut.writeObject (msg);
 		} catch (IOException e) {
-			Log.e ("Nem sikerült elküldeni(GameConnection):" + msg);
+			log.e ("Nem sikerült elküldeni(GameConnection):" + msg);
 		}
 	}
 
@@ -101,46 +104,17 @@ public class GameConnection extends Thread {
 	 * @param command
 	 */
 	public void action (Command command) {
-		System.out.println ("Got msg from server: " + command.type.toString ());
+		log.i ("Got msg from server: " + command.type.toString ());
 
 		switch (command.type) {
 			case ACCEPT_CONNECTION:
 				mConnectionId = (int) command.data[0];
-				System.out.println ("Connection established with the server... id:" + mConnectionId);
+				log.i ("Connection established with the server... id:" + mConnectionId);
 //				send (Type.NEED_SYNC, new Serializable[] {mConnectionId});
 				break;
-			//			case ENTER_SERVER://#TODO HELYE
-			//				cport = command.data[0];
-			//				if (cport != mSocket.getLocalPort ())
-			//					players.add (new Player (cport));
-			//
-			//				break;
-			//			case MOVE:
-			//				System.out.println ("Player moved, sending the sendMove to the server...");
-			//				Player myPlayer = mMap.findPlayerById (mConnectionId);
-			////				myPlayer.sendMove ((int) command.data[0], (int) command.data[1]);
-			//				sendToId(Type.PLAYER_MOVED, new Serializable[] {mConnectionId, command.data[0], command.data[1]});
-			////				cport = command.data[0];
-			////				if (cport != mSocket.getLocalPort ()) {
-			////					Player p = findPlayerById (cport);
-			////					if (p != null)
-			////						p.sendMove (command.data[1], command.data[2]);
-			////				}
-			//				break;
-			//			case EXIT_SERVER:
-			//				cport = command.data[0];
-			//				int index = findIndexOfPlayerById (cport);
-			//				if (index > -1)
-			//					players.remove (index);
-			//
-			//				break;
-			//			case SYNC_ONE:
-			//				Player me = players.get (0);
-			//				sendToId (Type.SYNC_MAP, new int[] {(int) me.getX (), (int) me.getY (), (int) me.getWidth (), (int) me.getHeight ()});
-			//				break;
 			case SYNC_MAP:
 				mMap.update ((Integer[]) command.data);
-				System.out.println ("Map is syncronised...");
+				log.i ("Map is syncronised...");
 				break;
 		}
 	}
@@ -153,11 +127,11 @@ public class GameConnection extends Thread {
 		send (Command.Type.EXIT_SERVER, new Serializable[] {mConnectionId});
 	}
 
-	private void setGameMap (GameMap map) {
-		mMap = map;
-	}
-
 	public GameMap getGameMap () {
 		return mMap;
+	}
+
+	private void setGameMap (GameMap map) {
+		mMap = map;
 	}
 }
