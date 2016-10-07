@@ -1,44 +1,75 @@
 package game.map;
 
-import game.server.Player;
+import game.server.User;
 
-import java.io.Serializable;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * @author neczpal
  */
-public class GameMap implements Serializable {
-	static final long serialVersionUID = 42L;
+public abstract class GameMap {
 
-	private HashMap <Integer, Player> mPlayers;
+	private HashMap <Integer, User> mUsers;
+	private String mName;
+	private int mMaxUsers;
+	private File mMapFile;
+
 
 	public GameMap () {
-		mPlayers = new HashMap <> ();
+		mUsers = new HashMap <> ();
 	}
 
-
-	public void addPlayer (int id, Player player) {
-		mPlayers.put (id, player);
+	public void addUser (int id, User user) {
+		mUsers.put (id, user);
 	}
 
-	public ArrayList <Player> getPlayers () {
-		return new ArrayList <> (mPlayers.values ());
+	public ArrayList <User> getUsers () {
+		return new ArrayList <> (mUsers.values ());
 	}
 
-	public Player findPlayerById (int id) {
-		return mPlayers.get (id);
+	public User findUserByID (int id) {
+		return mUsers.get (id);
 	}
 
-	public void update (Integer[] player_data) {//#TODO UNDORITO
-		for (int i = 1; i <= player_data[0] * 3; i += 3) {
-			if (mPlayers.containsKey (player_data[i])) {
-				mPlayers.get (player_data[i]).setPosition (player_data[i + 1], player_data[i + 2]);
-			} else {
-				mPlayers.put (player_data[i], new Player (player_data[i], player_data[i + 1], player_data[i + 2]));
-			}
+	public String getName () {
+		return mName;
+	}
+
+	public void setName (String mName) {
+		this.mName = mName;
+	}
+
+	public int getMaxUsers () {
+		return mMaxUsers;
+	}
+
+	public void setMaxUsers (int mMaxUsers) {
+		this.mMaxUsers = mMaxUsers;
+	}
+
+	public File getMapFile () {
+		return mMapFile;
+	}
+
+	public void setMapFile (File mMapFile) {
+		this.mMapFile = mMapFile;
+	}
+
+	public boolean isFull () {
+		return mUsers.size () >= mMaxUsers;
+	}
+
+	public abstract void draw ();
+
+	public abstract void loadMap (String fileName) throws NotValidMapException;
+
+	public static class NotValidMapException extends Exception {
+		public NotValidMapException (String name) {
+			super (name);
 		}
 	}
+
 
 }

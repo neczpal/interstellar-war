@@ -42,7 +42,7 @@ public class Client extends Thread {
 			while (mIsRunning) {
 				try {
 					Command command = (Command) mIn.readObject ();
-					mServerConnection.action (command, mPort);
+					mServerConnection.receive (command, mPort);
 				} catch (ClassNotFoundException ex) {
 					System.err.println (ex.getMessage ());
 				}
@@ -61,11 +61,11 @@ public class Client extends Thread {
 		mIsRunning = false;
 	}
 
-	public void send (Command msg) {
+	public void send (Command command) {
 		try {
-			mOut.writeObject (msg);
+			mOut.writeObject (command);
 		} catch (IOException e) {
-			log.e ("Nem sikerült elküldeni ezt: " + msg.type + "\n" + e.toString ());
+			log.e ("Nem sikerült elküldeni ezt: " + command.type + "\n" + e.toString ());
 		}
 	}
 
@@ -76,13 +76,5 @@ public class Client extends Thread {
 
 	public int getPort () {
 		return mPort;
-	}
-
-	public int getClientId () {
-		return mId;
-	}
-
-	public void setClientId (int i) {
-		mId = i;
 	}
 }

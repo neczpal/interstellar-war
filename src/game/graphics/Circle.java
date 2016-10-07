@@ -20,7 +20,6 @@ public class Circle {
 		this.r = r;
 	}
 
-	//DRAW
 	public void draw () {
 		//        glMatrixMode(GL_MODELVIEW);
 		glPushMatrix ();

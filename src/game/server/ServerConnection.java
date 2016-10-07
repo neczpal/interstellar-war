@@ -2,6 +2,7 @@ package game.server;
 
 import game.Log;
 import game.map.GameMap;
+import game.map.GameMap2D;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -36,7 +37,12 @@ public class ServerConnection extends Thread {
 
 	public void run () {
 		log.i ("Sever started.");
-		mMap = new GameMap ();
+		mMap = new GameMap2D ();
+		try {
+			mMap.loadMap ("map01.txt");
+		} catch (GameMap2D.NotValidMapException e) {
+			log.e (e.getMessage ());
+		}
 		running = true;
 		while (running) {
 			try {
@@ -70,21 +76,27 @@ public class ServerConnection extends Thread {
 		client.start ();
 	}
 
-	public void action (Command command, int currentPort) {
+	public void receive (Command command, int currentPort) {
 		log.i ("Got msg from client: " + command.type.toString () + " : " + currentPort);
 		switch (command.type) {
 			case ENTER_SERVER:
-				int id = mClientIdCounter++;
-				mClients.put (id, mTemporaryClients.get (findClientByPort (currentPort)));
-				mClients.get (id).setClientId (id);
-				mTemporaryClients.remove (findClientByPort (currentPort));
+				int tempIndex = findClientByPort (currentPort);
+				Client client = mTemporaryClients.get (tempIndex);
+				if (mMap.isFull ()) {
+					log.i (currentPort + " is connecting to the server, but its full!");
+					client.send (new Command (Command.Type.DECLINE_CONNECTION));
+				} else {
+					int id = mClientIdCounter++;
+					mClients.put (id, client);
+					mTemporaryClients.remove (tempIndex);
 
-				log.i (currentPort + " is connecting to the server, got id:" + id);
+					log.i (currentPort + " is connecting to the server, got id:" + id);
 
-				Player newPlayer = new Player (id);
-				mMap.addPlayer (id, newPlayer);
-				sendToId (Command.Type.ACCEPT_CONNECTION, new Serializable[] {id}, id);
+					User newUser = new User ((String) command.data[1], id);
+					mMap.addUser (id, newUser);
 
+					client.send (new Command (Command.Type.ACCEPT_CONNECTION, id));
+				}
 				break;
 			case EXIT_SERVER:
 
@@ -92,45 +104,50 @@ public class ServerConnection extends Thread {
 				mClients.remove (command.data[0]);
 
 				break;
-			case MOVE:
+			//			case MOVE:
+			//
+			//				User movingUser = mMap.findPlayerById ((int) command.data[0]);
+			//				movingUser.move ((int) command.data[1], (int) command.data[2]);
+			//				log.i (movingUser.getId () + " is moving, sending the Map...");
+			//				Integer[] player_data = new Integer[mMap.getUsers ().size () * 3 + 1];
+			//				int i = 0;
+			//				player_data[i++] = mMap.getUsers ().size ();
+			//				for (User user : mMap.getUsers ()) {
+			//					player_data[i++] = user.getId ();
+			//					player_data[i++] = user.getX ();
+			//					player_data[i++] = user.getY ();
+			//					log.i ("PLAYER (" + user.getId () + ") position : " + user.getX () + ", " + user.getY ());
+			//				}
+			//				sendToAll (Command.Type.SYNC_MAP, player_data);
+			//
+			//				break;
+			//			case NEED_SYNC:
+			//
+			//				log.i (currentPort + " needs sync, sending the MapData");
+			//				sendToId (Command.Type.SYNC_MAP, new Serializable[] {mMap.getUsers ()}, (int) command.data[0]);
 
-				Player movingPlayer = mMap.findPlayerById ((int) command.data[0]);
-				movingPlayer.move ((int) command.data[1], (int) command.data[2]);
-				log.i (movingPlayer.getId () + " is moving, sending the Map...");
-				Integer[] player_data = new Integer[mMap.getPlayers ().size () * 3 + 1];
-				int i = 0;
-				player_data[i++] = mMap.getPlayers ().size ();
-				for (Player player : mMap.getPlayers ()) {
-					player_data[i++] = player.getId ();
-					player_data[i++] = player.getX ();
-					player_data[i++] = player.getY ();
-					log.i ("PLAYER (" + player.getId () + ") position : " + player.getX () + ", " + player.getY ());
-				}
-				sendToAll (Command.Type.SYNC_MAP, player_data);
-
-				break;
-			case NEED_SYNC:
-
-				log.i (currentPort + " needs sync, sending the MapData");
-				sendToId (Command.Type.SYNC_MAP, new Serializable[] {mMap.getPlayers ()}, (int) command.data[0]);
-
-				break;
+			//				break;
 		}
 	}
 
-	public void sendToId (Command.Type type, Serializable[] data, int id) {
-		sendToId (new Command (type, data), id);
+	public void sendToId (int id, Command.Type type) {
+		sendToId (id, new Command (type));
 	}
 
-	public void sendToId (Command cmd, int id) {
-		mClients.get (id).send (cmd);
+	public void sendToId (int id, Command.Type type, Serializable... data) {
+		sendToId (id, new Command (type, data));
 	}
+
+	public void sendToId (int id, Command command) {
+		mClients.get (id).send (command);
+	}
+
 
 	public void sendToAll (Command.Type type) {
 		sendToAll (new Command (type));
 	}
 
-	public void sendToAll (Command.Type type, Serializable[] data) {
+	public void sendToAll (Command.Type type, Serializable... data) {
 		sendToAll (new Command (type, data));
 	}
 

@@ -2,6 +2,7 @@ package game.server;
 
 import game.Log;
 import game.map.GameMap;
+import game.map.GameMap2D;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,6 +19,7 @@ public class GameConnection extends Thread {
 
 	private GameMap mMap;
 	private int mConnectionId;
+	private String mUserName;
 
 	private boolean mIsRunning;
 	private Socket mSocket;
@@ -26,10 +28,11 @@ public class GameConnection extends Thread {
 
 	private Log log = new Log (this);
 
-	public GameConnection (String ip) {
-		super ("GameConnection");
+	public GameConnection (String ip, String userName) {
+		super ("GameConnection " + userName);
+		mUserName = userName;
 		mIsRunning = false;
-		mMap = new GameMap ();
+		mMap = new GameMap2D ();
 		try {
 			mSocket = new Socket (ip, 23232);
 
@@ -37,10 +40,7 @@ public class GameConnection extends Thread {
 				mIn = new ObjectInputStream (mSocket.getInputStream ());
 				mOut = new ObjectOutputStream (mSocket.getOutputStream ());
 			}
-			//			me = new Player ((int) (Math.random () * 640), (int) (Math.random () * 480), (int) (Math.random () * 50), (int) (Math.random () * 50), mSocket.getPort ());
-
-			//			players.add (me);
-			send (Command.Type.ENTER_SERVER);
+			send (Command.Type.ENTER_SERVER, mConnectionId, mUserName);
 
 			this.start ();
 		} catch (IOException e) {
@@ -55,7 +55,7 @@ public class GameConnection extends Thread {
 			while (mIsRunning) {
 				try {
 					Command msg = (Command) mIn.readObject ();
-					action (msg);
+					receive (msg);
 				} catch (ClassNotFoundException | ClassCastException ex) {
 					log.w (ex.getMessage ());
 				}
@@ -67,7 +67,7 @@ public class GameConnection extends Thread {
 
 	public void close () {
 		mIsRunning = false;
-		sendExit ();
+		send (Command.Type.EXIT_SERVER, mConnectionId);
 		try {
 			mOut.close ();
 			mIn.close ();
@@ -86,15 +86,15 @@ public class GameConnection extends Thread {
 		send (new Command (type));
 	}
 
-	private void send (Command.Type type, Serializable[] data) {
+	private void send (Command.Type type, Serializable... data) {
 		send (new Command (type, data));
 	}
 
-	private void send (Command msg) {
+	private void send (Command command) {
 		try {
-			mOut.writeObject (msg);
+			mOut.writeObject (command);
 		} catch (IOException e) {
-			log.e ("Nem sikerült elküldeni(GameConnection):" + msg);
+			log.e ("Nem sikerült elküldeni:" + command);
 		}
 	}
 
@@ -103,29 +103,27 @@ public class GameConnection extends Thread {
 	 *
 	 * @param command
 	 */
-	public void action (Command command) {
+	public void receive (Command command) {
 		log.i ("Got msg from server: " + command.type.toString ());
 
 		switch (command.type) {
 			case ACCEPT_CONNECTION:
 				mConnectionId = (int) command.data[0];
-				log.i ("Connection established with the server... id:" + mConnectionId);
-//				send (Type.NEED_SYNC, new Serializable[] {mConnectionId});
+				log.i ("Connection succesful id: " + mConnectionId);
+
 				break;
-			case SYNC_MAP:
-				mMap.update ((Integer[]) command.data);
-				log.i ("Map is syncronised...");
-				break;
+			case DECLINE_CONNECTION:
+				log.i ("Connection failed!");
+				//			case SYNC_MAP:
+				//				mMap.update ((Integer[]) command.data);
+				//				log.i ("Map is syncronised...");
+				//				break;
 		}
 	}
 
-	public void sendMove (int dx, int dy) {
-		send (Command.Type.MOVE, new Serializable[] {mConnectionId, dx, dy});
-	}
-
-	private void sendExit () {
-		send (Command.Type.EXIT_SERVER, new Serializable[] {mConnectionId});
-	}
+	//	public void sendMove (int dx, int dy) {
+	////		send (Command.Type.MOVE, new Serializable[] {mConnectionId, dx, dy});
+	//	}
 
 	public GameMap getGameMap () {
 		return mMap;
