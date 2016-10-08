@@ -95,13 +95,14 @@ public class ServerConnection extends Thread {
 					User newUser = new User ((String) command.data[1], id);
 					mMap.addUser (id, newUser);
 
-					client.send (new Command (Command.Type.ACCEPT_CONNECTION, id));
+					client.send (new Command (Command.Type.ACCEPT_CONNECTION, id, mMap.toData ()));
 				}
 				break;
 			case EXIT_SERVER:
 
 				log.i (command.data[0] + " exits the server... PORT:" + currentPort);
 				mClients.remove (command.data[0]);
+				mMap.removeUser ((int) command.data[0]);
 
 				break;
 			//			case MOVE:

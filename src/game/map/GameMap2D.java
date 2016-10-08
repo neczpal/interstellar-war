@@ -1,5 +1,7 @@
 package game.map;
 
+import game.graphics.Point2D;
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -8,10 +10,15 @@ import java.util.ArrayList;
  */
 public class GameMap2D extends GameMap {
 
+	private int mConnectionNumber;
+	private int mPlanetNumber;
+
 	private ArrayList <Planet2D> mPlanets;
+	private ArrayList <Integer[]> mConnections;
 
 	public GameMap2D () {
 		mPlanets = new ArrayList <> ();
+		mConnections = new ArrayList <> ();
 	}
 
 	@Override
@@ -24,22 +31,23 @@ public class GameMap2D extends GameMap {
 		try {
 			File mapFile = new File (System.getProperty ("user.dir") + "/res/maps2d/" + fileName);
 
-			setMapFile (mapFile);
-
 			FileReader fileReader = new FileReader (mapFile);
 			BufferedReader bufferedReader = new BufferedReader (fileReader);
 
 			setName (bufferedReader.readLine ());
 			setMaxUsers (Integer.parseInt (bufferedReader.readLine ()));
 
-			String line;
-			while (!((line = bufferedReader.readLine ()).equals (""))) {
-				String[] params = line.split (" ");
+			mPlanetNumber = Integer.parseInt (bufferedReader.readLine ());
+			mConnectionNumber = Integer.parseInt (bufferedReader.readLine ());
+
+			for (int i = 0; i < mPlanetNumber; i++) {
+				String[] params = bufferedReader.readLine ().split (" ");
+
 				mPlanets.add (new Planet2D (Integer.parseInt (params[0]), Integer.parseInt (params[1]), Integer.parseInt (params[2]), Integer.parseInt (params[3]), Integer.parseInt (params[4])));
 			}
-
-			while (!((line = bufferedReader.readLine ()) != null)) {
-				String[] params = line.split (" ");
+			for (int i = 0; i < mConnectionNumber; i++) {
+				String[] params = bufferedReader.readLine ().split (" ");
+				mConnections.add (new Integer[] {Integer.parseInt (params[0]), Integer.parseInt (params[1])});
 
 				Planet2D from = mPlanets.get (Integer.parseInt (params[0]));
 				Planet2D to = mPlanets.get (Integer.parseInt (params[1]));
@@ -55,5 +63,54 @@ public class GameMap2D extends GameMap {
 			exception.printStackTrace ();
 			throw new NotValidMapException ("Map format is not valid : " + exception.toString ());
 		}
+	}
+
+	@Override
+	public void loadData (Serializable[] data) {
+		int i = 0;
+
+		setName ((String) data[i++]);
+		setMaxUsers ((int) data[i++]);
+
+		mPlanetNumber = (int) data[i++];
+		mConnectionNumber = (int) data[i++];
+
+		for (int j = 0; j < mPlanetNumber; j++) {
+			mPlanets.add (new Planet2D ((int) data[i++], (int) data[i++], (int) data[i++], (int) data[i++], (int) data[i++]));
+		}
+
+		for (int j = 0; j < mConnectionNumber; j++) {
+			Planet2D from = mPlanets.get ((int) data[i++]);
+			Planet2D to = mPlanets.get ((int) data[i++]);
+			from.linkTo (to);
+		}
+	}
+
+	@Override
+	public Serializable[] toData () {
+		ArrayList <Serializable> list = new ArrayList <> ();
+
+		list.add (getName ());
+		list.add (getMaxUsers ());
+		list.add (mPlanetNumber);
+		list.add (mConnectionNumber);
+
+		for (int j = 0; j < mPlanetNumber; j++) {
+			Planet2D planet2D = mPlanets.get (j);
+			Point2D center = planet2D.getCenter ();
+			list.add (center.getX ());
+			list.add (center.getY ());
+			list.add (planet2D.getRadius ());
+			list.add (planet2D.getOwnedBy ());
+			list.add (planet2D.getUnitNumber ());
+		}
+
+		for (int j = 0; j < mConnectionNumber; j++) {
+			Integer[] pair = mConnections.get (j);
+			list.add (pair[0]);
+			list.add (pair[1]);
+		}
+		Serializable[] data = new Serializable[list.size ()];
+		return list.toArray (data);
 	}
 }

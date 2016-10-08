@@ -3,6 +3,7 @@ package game.map;
 import game.server.User;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,6 +26,10 @@ public abstract class GameMap {
 		mUsers.put (id, user);
 	}
 
+	public void removeUser (int id) {
+		mUsers.remove (id);
+	}
+
 	public ArrayList <User> getUsers () {
 		return new ArrayList <> (mUsers.values ());
 	}
@@ -32,6 +37,7 @@ public abstract class GameMap {
 	public User findUserByID (int id) {
 		return mUsers.get (id);
 	}
+
 
 	public String getName () {
 		return mName;
@@ -64,6 +70,11 @@ public abstract class GameMap {
 	public abstract void draw ();
 
 	public abstract void loadMap (String fileName) throws NotValidMapException;
+
+	public abstract void loadData (Serializable[] data);
+
+	public abstract Serializable[] toData ();
+
 
 	public static class NotValidMapException extends Exception {
 		public NotValidMapException (String name) {

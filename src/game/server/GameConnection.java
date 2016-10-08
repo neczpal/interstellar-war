@@ -110,7 +110,8 @@ public class GameConnection extends Thread {
 			case ACCEPT_CONNECTION:
 				mConnectionId = (int) command.data[0];
 				log.i ("Connection succesful id: " + mConnectionId);
-
+				mMap.loadData ((Serializable[]) command.data[1]);
+				log.i ("Map loaded...");
 				break;
 			case DECLINE_CONNECTION:
 				log.i ("Connection failed!");

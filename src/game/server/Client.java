@@ -15,7 +15,6 @@ public class Client extends Thread {
 	private ObjectInputStream mIn;
 
 	private int mPort;
-	private int mId;
 	private boolean mIsRunning;
 
 	private Log log = new Log (this);

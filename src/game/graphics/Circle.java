@@ -9,13 +9,13 @@ public class Circle {
 	private static final int circle_points = 120;
 
 	private Point2D k;
-	private double r;
+	private int r;
 
 	public Circle (int x, int y, int r) {
 		this (new Point2D (x, y), r);
 	}
 
-	public Circle (Point2D k, double r) {
+	public Circle (Point2D k, int r) {
 		this.k = k;
 		this.r = r;
 	}
@@ -55,7 +55,7 @@ public class Circle {
 		return k;
 	}
 
-	public double getRadius () {
+	public int getRadius () {
 		return r;
 	}
 

@@ -24,4 +24,12 @@ public class Planet2D extends Circle {
 		mNeighbors.add (other);
 		other.mNeighbors.add (this);
 	}
+
+	public int getOwnedBy () {
+		return mOwnedBy;
+	}
+
+	public int getUnitNumber () {
+		return mUnitNumber;
+	}
 }
