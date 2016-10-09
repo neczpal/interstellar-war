@@ -1,4 +1,4 @@
-package game.graphics;
+package game.geom;
 
 import static org.lwjgl.opengl.GL11.*;
 

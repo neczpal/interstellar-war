@@ -1,6 +1,7 @@
 package game.map;
 
-import game.graphics.Point2D;
+import game.geom.Line;
+import game.geom.Point2D;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -24,6 +25,12 @@ public class GameMap2D extends GameMap {
 	@Override
 	public void draw () {
 		mPlanets.forEach (Planet2D::draw);
+		for (Integer[] integers : mConnections) {
+			Planet2D planet1 = mPlanets.get (integers[0]);
+			Planet2D planet2 = mPlanets.get (integers[1]);
+			Line line = new Line (planet1.getCenter (), planet2.getCenter ());
+			line.draw ();
+		}
 	}
 
 	@Override
@@ -80,9 +87,12 @@ public class GameMap2D extends GameMap {
 		}
 
 		for (int j = 0; j < mConnectionNumber; j++) {
-			Planet2D from = mPlanets.get ((int) data[i++]);
-			Planet2D to = mPlanets.get ((int) data[i++]);
+			int fromIndex = (int) data[i++];
+			int toIndex = (int) data[i++];
+			Planet2D from = mPlanets.get (fromIndex);
+			Planet2D to = mPlanets.get (toIndex);
 			from.linkTo (to);
+			mConnections.add (new Integer[] {fromIndex, toIndex});
 		}
 	}
 

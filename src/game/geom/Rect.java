@@ -1,4 +1,4 @@
-package game.graphics;
+package game.geom;
 
 import java.io.Serializable;
 

@@ -1,98 +1,38 @@
 package game;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.util.WaveData;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Properties;
-import javax.imageio.ImageIO;
-
-import org.lwjgl.BufferUtils;
 
 import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.opengl.GL11.*;
-
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.util.WaveData;
 
 /**
  * @author Neczpál Ábel
  */
 public final class Loader {
 
-	private static class Textures {
-
-		private ArrayList <String> names;
-		private ArrayList <Integer> textureIDs;
-
-		Textures () {
-			names = new ArrayList <> ();
-			textureIDs = new ArrayList <> ();
-		}
-
-		void add (String s, Integer i) {
-			names.add (s);
-			textureIDs.add (i);
-		}
-
-		boolean contains (String s) {
-			for (int i = 0; i < names.size (); i++) {
-				if (names.get (i).equals (s)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		int getTexture (String s) {
-			return textureIDs.get (names.indexOf (s));
-		}
-	}
-
-	private static class Sounds {
-		private ArrayList <String> names;
-		private ArrayList <Integer> soundSources;
-
-		Sounds () {
-			names = new ArrayList <> ();
-			soundSources = new ArrayList <> ();
-		}
-
-		void add (String s, Integer i) {
-			names.add (s);
-			soundSources.add (i);
-		}
-
-		boolean contains (String s) {
-			for (int i = 0; i < names.size (); i++) {
-				if (names.get (i).equals (s)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		int getSoundSource (String s) {
-			return soundSources.get (names.indexOf (s));
-		}
-	}
-
-	private static Class rootClass = Loader.class;
-
+	private static String mRootFile = System.getProperty ("user.dir");
 	private static Textures textureCache = new Textures ();
 	private static Sounds soundCache = new Sounds ();
 	private static boolean useCache = true;
-
 	private Loader () {
 	}
 
 	/**
-	 * Beállitja honan induljon az elérési út
+	 * Beállitja honnan induljon az elérési út
 	 *
-	 * @param c Gyökér osztály
+	 * @param rootFile Gyökér konyvtar
 	 */
-	public static void setRootClass (Class c) {
-		rootClass = c;
+	public static void setRootClass (String rootFile) {
+		mRootFile = rootFile;
 	}
 
 	/**
@@ -373,38 +313,104 @@ public final class Loader {
 	/**
 	 * Megkapja az inputstream streamet egy filehoz.
 	 *
-	 * @param filename A file ralativ vagy abszulut elérési helye
+	 * @param filename A file relativ elérési helye
 	 * @return
 	 */
 	public static InputStream getInputStream (String filename) {
-		InputStream in = null;
+
 		try {
-			in = new FileInputStream (filename);
-		} catch (Exception ex) {
-			if (in != null) {
-				try {
-					in.close ();
-				} catch (Exception kiv) {
-				}
-				in = null;
-			}
+			return new FileInputStream (mRootFile + "/" + filename);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace ();
+			return null;
 		}
 
-		if (in == null) {
-			try {
-				in = new FileInputStream (new File (rootClass.getResource (filename).toURI ()));
-			} catch (Exception ex) {
-				if (in != null) {
-					try {
-						in.close ();
-					} catch (Exception kiv) {
-					}
 
-					in = null;
+		//		InputStream in = null;
+		//		try {
+		//			in = new FileInputStream (filename);
+		//		} catch (Exception ex) {
+		//			if (in != null) {
+		//				try {
+		//					in.close ();
+		//				} catch (Exception kiv) {
+		//				}
+		//				in = null;
+		//			}
+		//		}
+		//
+		//		if (in == null) {
+		//			try {
+		//				in = new FileInputStream (new File (rootClass.getResource (filename).toURI ()));
+		//			} catch (Exception ex) {
+		//				if (in != null) {
+		//					try {
+		//						in.close ();
+		//					} catch (Exception kiv) {
+		//					}
+		//
+		//					in = null;
+		//				}
+		//			}
+		//		}
+		//		return in;
+	}
+
+	private static class Textures {
+
+		private ArrayList <String> names;
+		private ArrayList <Integer> textureIDs;
+
+		Textures () {
+			names = new ArrayList <> ();
+			textureIDs = new ArrayList <> ();
+		}
+
+		void add (String s, Integer i) {
+			names.add (s);
+			textureIDs.add (i);
+		}
+
+		boolean contains (String s) {
+			for (int i = 0; i < names.size (); i++) {
+				if (names.get (i).equals (s)) {
+					return true;
 				}
 			}
+			return false;
 		}
-		return in;
+
+		int getTexture (String s) {
+			return textureIDs.get (names.indexOf (s));
+		}
+	}
+
+	private static class Sounds {
+		private ArrayList <String> names;
+		private ArrayList <Integer> soundSources;
+
+		Sounds () {
+			names = new ArrayList <> ();
+			soundSources = new ArrayList <> ();
+		}
+
+		void add (String s, Integer i) {
+			names.add (s);
+			soundSources.add (i);
+		}
+
+		boolean contains (String s) {
+			for (int i = 0; i < names.size (); i++) {
+				if (names.get (i).equals (s)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		int getSoundSource (String s) {
+			return soundSources.get (names.indexOf (s));
+		}
 	}
 
 }

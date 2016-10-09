@@ -1,6 +1,9 @@
 package game.map;
 
-import game.graphics.Circle;
+import game.Util;
+import game.geom.Circle;
+import game.geom.Color;
+import game.geom.Point2D;
 
 import java.util.ArrayList;
 
@@ -31,5 +34,13 @@ public class Planet2D extends Circle {
 
 	public int getUnitNumber () {
 		return mUnitNumber;
+	}
+
+	@Override
+	public void draw () {
+		Color.values ()[mOwnedBy].setGLColor ();
+		super.draw ();
+		Point2D center = getCenter ();
+		Util.drawString (Integer.toString (mUnitNumber), center.getX (), center.getY ());
 	}
 }

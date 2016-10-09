@@ -1,4 +1,4 @@
-package game.graphics;
+package game.geom;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -21,7 +21,8 @@ public class Circle {
 	}
 
 	public void draw () {
-		//        glMatrixMode(GL_MODELVIEW);
+		//		        glMatrixMode(GL_MODELVIEW);
+		glDisable (GL_TEXTURE_2D);
 		glPushMatrix ();
 		glLoadIdentity ();
 		glTranslated (k.x, k.y, 0.0d);
@@ -37,6 +38,7 @@ public class Circle {
 		}
 		glEnd ();
 		glPopMatrix ();
+		glEnable (GL_TEXTURE_2D);
 	}
 
 	public void move (int dx, int dy) {
