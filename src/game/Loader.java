@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Loader {
 
-	private static String mRootFile = System.getProperty ("user.dir");
+	private static String mRootDirectory = System.getProperty ("user.dir");
 	private static Textures textureCache = new Textures ();
 	private static Sounds soundCache = new Sounds ();
 	private static boolean useCache = true;
@@ -29,10 +29,10 @@ public final class Loader {
 	/**
 	 * Beállitja honnan induljon az elérési út
 	 *
-	 * @param rootFile Gyökér konyvtar
+	 * @param rootDirectory Gyökér konyvtar
 	 */
-	public static void setRootClass (String rootFile) {
-		mRootFile = rootFile;
+	public static void setRootDirectory (String rootDirectory) {
+		mRootDirectory = rootDirectory;
 	}
 
 	/**
@@ -319,7 +319,7 @@ public final class Loader {
 	public static InputStream getInputStream (String filename) {
 
 		try {
-			return new FileInputStream (mRootFile + "/" + filename);
+			return new FileInputStream (mRootDirectory + "/" + filename);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace ();
 			return null;
