@@ -15,7 +15,7 @@ import java.net.Socket;
  *
  * @author neczpal
  */
-public class GameConnection extends Thread {
+public class GameConnection extends Thread implements Connection {
 
 	private GameMap mMap;
 	private int mConnectionId;
@@ -33,6 +33,7 @@ public class GameConnection extends Thread {
 		mUserName = userName;
 		mIsRunning = false;
 		mMap = new GameMap2D ();
+		mMap.setConnection (this);
 		try {
 			mSocket = new Socket (ip, 23232);
 
@@ -82,15 +83,15 @@ public class GameConnection extends Thread {
 	 *
 	 * @param type
 	 */
-	private void send (Command.Type type) {
+	public void send (Command.Type type) {
 		send (new Command (type));
 	}
 
-	private void send (Command.Type type, Serializable... data) {
+	public void send (Command.Type type, Serializable... data) {
 		send (new Command (type, data));
 	}
 
-	private void send (Command command) {
+	public void send (Command command) {
 		try {
 			mOut.writeObject (command);
 		} catch (IOException e) {
@@ -112,13 +113,19 @@ public class GameConnection extends Thread {
 				log.i ("Connection succesful id: " + mConnectionId);
 				mMap.loadData ((Serializable[]) command.data[1]);
 				log.i ("Map loaded...");
+				send (Command.Type.READY_TO_PLAY, mConnectionId);
 				break;
 			case DECLINE_CONNECTION:
 				log.i ("Connection failed!");
-				//			case SYNC_MAP:
-				//				mMap.update ((Integer[]) command.data);
-				//				log.i ("Map is syncronised...");
-				//				break;
+				break;
+			case IS_READY:
+				log.i (command.data[0] + " is ready to play.");
+				//				mMap.addUser (command.data[0], new User ());
+				mMap.setUserReady ((int) command.data[0]);
+				break;
+			case GAME_DATA:
+				log.i (command.data[0] + " game command received.");
+				mMap.receiveClient (command);
 		}
 	}
 

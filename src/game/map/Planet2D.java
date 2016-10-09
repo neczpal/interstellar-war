@@ -36,11 +36,38 @@ public class Planet2D extends Circle {
 		return mUnitNumber;
 	}
 
+	public boolean isNeighbor (Planet2D planet2D) {
+		return mNeighbors.contains (planet2D);
+	}
+
+	public int getIndex (Planet2D planet2D) {
+		return mNeighbors.indexOf (planet2D);
+	}
+
+	public void moveUnitsTo (Planet2D planet2D) {
+		if (planet2D.mOwnedBy == mOwnedBy) {
+			planet2D.mUnitNumber += mUnitNumber;
+			mUnitNumber = 0;
+		} else {
+			planet2D.mUnitNumber -= mUnitNumber;
+			mUnitNumber = 0;
+			if (planet2D.mUnitNumber < 0) {
+				planet2D.mOwnedBy = mOwnedBy;
+				planet2D.mUnitNumber = Math.abs (planet2D.mUnitNumber);
+			}
+		}
+	}
+
+	public void addUnit () {
+		if (mOwnedBy != 0)
+			mUnitNumber++;
+	}
+
 	@Override
 	public void draw () {
 		Color.values ()[mOwnedBy].setGLColor ();
 		super.draw ();
 		Point2D center = getCenter ();
-		Util.drawString (Integer.toString (mUnitNumber), center.getX (), center.getY ());
+		Util.drawString (Integer.toString (mUnitNumber), center.getX () - Util.DEFAULT_FONTSIZE / 2, center.getY () - Util.DEFAULT_FONTSIZE / 2);
 	}
 }

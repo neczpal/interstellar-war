@@ -13,8 +13,9 @@ import java.io.Serializable;
  */
 public class Command implements Serializable {
 	static final long serialVersionUID = 42L;
-	Type type;
-	Serializable[] data;
+	public Type type;
+	public Serializable[] data;
+
 	public Command (Type type) {
 		this (type, null);
 	}
@@ -25,7 +26,7 @@ public class Command implements Serializable {
 	}
 
 	public enum Type {
-		ENTER_SERVER, EXIT_SERVER, ACCEPT_CONNECTION, DECLINE_CONNECTION, NEED_MAP, SEND_MAP, RDY2PLAY, GAME_START
+		ENTER_SERVER, EXIT_SERVER, ACCEPT_CONNECTION, DECLINE_CONNECTION, READY_TO_PLAY, IS_READY, GAME_DATA
 	}
 
 

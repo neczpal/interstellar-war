@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class ServerConnection extends Thread {
+public class ServerConnection extends Thread implements Connection {
 
 	private static int mClientIdCounter = 1;
 	private GameMap mMap;
@@ -20,7 +20,7 @@ public class ServerConnection extends Thread {
 	private ServerSocket mServerSocket;
 	private HashMap <Integer, Client> mClients = new HashMap <> ();
 	private List <Client> mTemporaryClients = new ArrayList <> ();
-	private boolean running = false;
+	private boolean mIsRunning = false;
 	private Log log = new Log (this);
 
 
@@ -38,13 +38,14 @@ public class ServerConnection extends Thread {
 	public void run () {
 		log.i ("Sever started.");
 		mMap = new GameMap2D ();
+		mMap.setConnection (this);
 		try {
 			mMap.loadMap ("map01.txt");
 		} catch (GameMap2D.NotValidMapException e) {
 			log.e (e.getMessage ());
 		}
-		running = true;
-		while (running) {
+		mIsRunning = true;
+		while (mIsRunning) {
 			try {
 				addClient ();
 			} catch (IOException e) {
@@ -54,7 +55,7 @@ public class ServerConnection extends Thread {
 	}
 
 	public void stopServer () {
-		running = false;
+		mIsRunning = false;
 		try {
 			mServerSocket.close ();
 		} catch (IOException e) {
@@ -105,29 +106,17 @@ public class ServerConnection extends Thread {
 				mMap.removeUser ((int) command.data[0]);
 
 				break;
-			//			case MOVE:
-			//
-			//				User movingUser = mMap.findPlayerById ((int) command.data[0]);
-			//				movingUser.move ((int) command.data[1], (int) command.data[2]);
-			//				log.i (movingUser.getId () + " is moving, sending the Map...");
-			//				Integer[] player_data = new Integer[mMap.getUsers ().size () * 3 + 1];
-			//				int i = 0;
-			//				player_data[i++] = mMap.getUsers ().size ();
-			//				for (User user : mMap.getUsers ()) {
-			//					player_data[i++] = user.getId ();
-			//					player_data[i++] = user.getX ();
-			//					player_data[i++] = user.getY ();
-			//					log.i ("PLAYER (" + user.getId () + ") position : " + user.getX () + ", " + user.getY ());
-			//				}
-			//				sendToAll (Command.Type.SYNC_MAP, player_data);
-			//
-			//				break;
-			//			case NEED_SYNC:
-			//
-			//				log.i (currentPort + " needs sync, sending the MapData");
-			//				sendToId (Command.Type.SYNC_MAP, new Serializable[] {mMap.getUsers ()}, (int) command.data[0]);
-
-			//				break;
+			case READY_TO_PLAY:
+				log.i (command.data[0] + " is ready to play!");
+				mMap.setUserReady ((int) command.data[0]);
+				send (Command.Type.IS_READY, command.data[0]);
+				if (mMap.isMapReady ()) {
+					mMap.setConnection (this);
+					mMap.start ();
+				}
+				break;
+			case GAME_DATA:
+				mMap.receiveServer (command);
 		}
 	}
 
@@ -144,15 +133,15 @@ public class ServerConnection extends Thread {
 	}
 
 
-	public void sendToAll (Command.Type type) {
-		sendToAll (new Command (type));
+	public void send (Command.Type type) {
+		send (new Command (type));
 	}
 
-	public void sendToAll (Command.Type type, Serializable... data) {
-		sendToAll (new Command (type, data));
+	public void send (Command.Type type, Serializable... data) {
+		send (new Command (type, data));
 	}
 
-	public void sendToAll (Command command) {
+	public void send (Command command) {
 		Iterator <HashMap.Entry <Integer, Client>> iterator = mClients.entrySet ().iterator ();
 		while (iterator.hasNext ()) {
 			iterator.next ().getValue ().send (command);

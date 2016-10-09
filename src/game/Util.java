@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Util {
 
-	public static final int DEFAULT_FONTSIZE = 32;
+	public static final int DEFAULT_FONTSIZE = 24;
 	public static final Color DEFAULT_COLOR = Color.WHITE;
 	private static int[] mCharacters;
 

@@ -4,6 +4,7 @@ public class User {
 
 	private int mId;
 	private String mName;
+	private boolean mReadyToPlay;
 
 	public User (String name) {
 		this (name, 0);
@@ -12,6 +13,11 @@ public class User {
 	public User (String name, int id) {
 		mName = name;
 		mId = id;
+		mReadyToPlay = false;
+	}
+
+	public void ready () {
+		mReadyToPlay = true;
 	}
 
 	public int getId () {

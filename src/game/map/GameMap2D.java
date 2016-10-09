@@ -2,9 +2,12 @@ package game.map;
 
 import game.geom.Line;
 import game.geom.Point2D;
+import game.server.Command;
+import org.lwjgl.input.Mouse;
 
 import java.io.*;
 import java.util.ArrayList;
+
 
 /**
  * Created by neczp on 2016. 10. 06..
@@ -17,9 +20,50 @@ public class GameMap2D extends GameMap {
 	private ArrayList <Planet2D> mPlanets;
 	private ArrayList <Integer[]> mConnections;
 
+	private boolean mWasMouseDown = false;
+
+	private Planet2D mSelectedPlanetFrom = null;
+	private Planet2D mSelectedPlanetTo = null;
+
+
 	public GameMap2D () {
 		mPlanets = new ArrayList <> ();
 		mConnections = new ArrayList <> ();
+	}
+
+	public void mouseEvent () {
+		if (Mouse.isButtonDown (0) && !mWasMouseDown) {
+			mWasMouseDown = true;
+			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
+
+			for (Planet2D planet2D : mPlanets) {
+				if (planet2D.isInside (point)) {
+					mSelectedPlanetFrom = planet2D;
+					break;
+				}
+			}
+		} else if (!Mouse.isButtonDown (0) && mWasMouseDown) {
+			mWasMouseDown = false;
+
+			if (mSelectedPlanetFrom != null) {
+				Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
+
+				for (Planet2D planet2D : mPlanets) {
+					if (planet2D.isInside (point) && planet2D.isNeighbor (mSelectedPlanetFrom)) {
+						mSelectedPlanetTo = planet2D;
+						getConection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
+						break;
+					}
+				}
+
+			}
+			mSelectedPlanetFrom = null;
+			mSelectedPlanetTo = null;
+		}
+	}
+
+	public void keyboardEvent () {
+
 	}
 
 	@Override
@@ -41,7 +85,7 @@ public class GameMap2D extends GameMap {
 			FileReader fileReader = new FileReader (mapFile);
 			BufferedReader bufferedReader = new BufferedReader (fileReader);
 
-			setName (bufferedReader.readLine ());
+			setMapName (bufferedReader.readLine ());
 			setMaxUsers (Integer.parseInt (bufferedReader.readLine ()));
 
 			mPlanetNumber = Integer.parseInt (bufferedReader.readLine ());
@@ -76,7 +120,7 @@ public class GameMap2D extends GameMap {
 	public void loadData (Serializable[] data) {
 		int i = 0;
 
-		setName ((String) data[i++]);
+		setMapName ((String) data[i++]);
 		setMaxUsers ((int) data[i++]);
 
 		mPlanetNumber = (int) data[i++];
@@ -100,7 +144,7 @@ public class GameMap2D extends GameMap {
 	public Serializable[] toData () {
 		ArrayList <Serializable> list = new ArrayList <> ();
 
-		list.add (getName ());
+		list.add (getMapName ());
 		list.add (getMaxUsers ());
 		list.add (mPlanetNumber);
 		list.add (mConnectionNumber);
@@ -122,5 +166,43 @@ public class GameMap2D extends GameMap {
 		}
 		Serializable[] data = new Serializable[list.size ()];
 		return list.toArray (data);
+	}
+
+	//ONLY SERVER
+	@Override
+	public void onGameThread () {
+		try {
+			Thread.sleep (1000);
+			getConection ().send (Command.Type.GAME_DATA, GameCommand.SPAWN_UNITS);
+		} catch (InterruptedException e) {
+			e.printStackTrace ();
+		}
+	}
+
+	@Override
+	public void receiveClient (Command command) {
+		switch ((GameCommand) command.data[0]) {
+			case SPAWN_UNITS:
+				for (Planet2D planet2D : mPlanets) {
+					planet2D.addUnit ();
+				}
+				break;
+			case MOVE_UNITS:
+				mPlanets.get ((int) command.data[1]).moveUnitsTo (mPlanets.get ((int) command.data[2]));
+				break;
+		}
+	}
+
+	@Override
+	public void receiveServer (Command command) {
+		switch ((GameCommand) command.data[0]) {
+			case MOVE_UNITS:
+				getConection ().send (command);
+				break;
+		}
+	}
+
+	enum GameCommand {
+		SPAWN_UNITS, MOVE_UNITS
 	}
 }
