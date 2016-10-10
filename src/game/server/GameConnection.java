@@ -129,10 +129,9 @@ public class GameConnection extends Thread implements Connection {
 		}
 	}
 
-	//	public void sendMove (int dx, int dy) {
-	////		send (Command.Type.MOVE, new Serializable[] {mConnectionId, dx, dy});
-	//	}
-
+	public int getConnectionId () {
+		return mConnectionId;
+	}
 	public GameMap getGameMap () {
 		return mMap;
 	}

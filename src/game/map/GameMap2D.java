@@ -3,6 +3,7 @@ package game.map;
 import game.geom.Line;
 import game.geom.Point2D;
 import game.server.Command;
+import game.server.GameConnection;
 import org.lwjgl.input.Mouse;
 
 import java.io.*;
@@ -51,7 +52,10 @@ public class GameMap2D extends GameMap {
 				for (Planet2D planet2D : mPlanets) {
 					if (planet2D.isInside (point) && planet2D.isNeighbor (mSelectedPlanetFrom)) {
 						mSelectedPlanetTo = planet2D;
-						getConection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
+						int id = ((GameConnection) getConection ()).getConnectionId ();
+						if (mSelectedPlanetFrom.getOwnedBy () == id) {
+							getConection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
+						}
 						break;
 					}
 				}
@@ -172,7 +176,7 @@ public class GameMap2D extends GameMap {
 	@Override
 	public void onGameThread () {
 		try {
-			Thread.sleep (1000);
+			Thread.sleep (1500);
 			getConection ().send (Command.Type.GAME_DATA, GameCommand.SPAWN_UNITS);
 		} catch (InterruptedException e) {
 			e.printStackTrace ();
