@@ -3,6 +3,8 @@ package game.server;
 public class User {
 
 	private int mId;
+	private int mRoomId;
+
 	private String mName;
 	private boolean mReadyToPlay;
 

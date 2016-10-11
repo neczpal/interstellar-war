@@ -2,52 +2,48 @@ package game.map;
 
 import game.server.Command;
 import game.server.Connection;
-import game.server.User;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.HashMap;
 
 /**
  * @author neczpal
  */
-public abstract class GameMap extends Thread {
+public abstract class GameMap {
 
-	private HashMap <Integer, User> mUsers;
+	//	private HashMap <Integer, User> mUsers;
 	private String mMapName;
 	private int mMaxUsers;
 	private File mMapFile;
 
-	private int mReadyUserCount;
+	//	private int mReadyUserCount;
 	private Connection mConnection;
-	//ONLY SERVER METHODS!!!
-	private boolean mGameIsRunning = false;
 
 	public GameMap () {
-		mUsers = new HashMap <> ();
-		mReadyUserCount = 0;
+		//		mUsers = new HashMap <> ();
+		//		mReadyUserCount = 0;
 	}
 
-	public void addUser (int id, User user) {
-		mUsers.put (id, user);
-	}
+	//	public void addUser (int id, User user) {
+	//		mUsers.put (id, user);
+	//	}
+	//
+	//	public void removeUser (int id) {
+	//		mUsers.remove (id);
+	//	}
+	//
+	//	public User getUser (int id) {
+	//		return mUsers.get (id);
+	//	}
 
-	public void removeUser (int id) {
-		mUsers.remove (id);
-	}
-
-	public User getUser (int id) {
-		return mUsers.get (id);
-	}
-
-	public void setUserReady (int id) {
-		mReadyUserCount++;
+	//	public void setUserReady (int id) {
+	//		mReadyUserCount++;
 		//		mUsers.get (id).ready ();
-	}
+	//	}
 
-	public boolean isMapReady () {
-		return mReadyUserCount >= mMaxUsers;
-	}
+	//	public boolean isMapReady () {
+	//		return mReadyUserCount >= mMaxUsers;
+	//	}
 
 	public String getMapName () {
 		return mMapName;
@@ -73,9 +69,9 @@ public abstract class GameMap extends Thread {
 		this.mMapFile = mMapFile;
 	}
 
-	public boolean isFull () {
-		return mUsers.size () >= mMaxUsers;
-	}
+	//	public boolean isFull () {
+	//		return mUsers.size () >= mMaxUsers;
+	//	}
 
 	public abstract void mouseEvent ();
 
@@ -97,17 +93,6 @@ public abstract class GameMap extends Thread {
 		return mConnection;
 	}
 
-	@Override
-	public void run () {
-		mGameIsRunning = true;
-		while (mGameIsRunning) {
-			onGameThread ();
-		}
-	}
-
-	public void stopGame () {
-		mGameIsRunning = false;
-	}
 
 	public abstract void onGameThread ();
 

@@ -58,7 +58,7 @@ public class GameConnection extends Thread implements Connection {
 					Command msg = (Command) mIn.readObject ();
 					receive (msg);
 				} catch (ClassNotFoundException | ClassCastException ex) {
-					log.w (ex.getMessage ());
+					log.e (ex.getMessage ());
 				}
 			}
 		} catch (IOException e) {
@@ -111,17 +111,20 @@ public class GameConnection extends Thread implements Connection {
 			case ACCEPT_CONNECTION:
 				mConnectionId = (int) command.data[0];
 				log.i ("Connection succesful id: " + mConnectionId);
-				mMap.loadData ((Serializable[]) command.data[1]);
-				log.i ("Map loaded...");
-				send (Command.Type.READY_TO_PLAY, mConnectionId);
+
+				send (Command.Type.ENTER_ROOM, mConnectionId, 1);// BELEP AZ 1. szobaba
 				break;
 			case DECLINE_CONNECTION:
 				log.i ("Connection failed!");
 				break;
+			case MAP_DATA:
+				log.i ("Map data received");
+				mMap.loadData (command.data);
+				break;
 			case IS_READY:
 				log.i (command.data[0] + " is ready to play.");
 				//				mMap.addUser (command.data[0], new User ());
-				mMap.setUserReady ((int) command.data[0]);
+				//				mMap.setUserReady ((int) command.data[0]);
 				break;
 			case GAME_DATA:
 				log.i (command.data[0] + " game command received.");
@@ -132,6 +135,7 @@ public class GameConnection extends Thread implements Connection {
 	public int getConnectionId () {
 		return mConnectionId;
 	}
+
 	public GameMap getGameMap () {
 		return mMap;
 	}
