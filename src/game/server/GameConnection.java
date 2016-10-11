@@ -19,6 +19,7 @@ public class GameConnection extends Thread implements Connection {
 
 	private GameMap mMap;
 	private int mConnectionId;
+	private int mRoomConnectionId;
 	private String mUserName;
 
 	private boolean mIsRunning;
@@ -41,7 +42,7 @@ public class GameConnection extends Thread implements Connection {
 				mIn = new ObjectInputStream (mSocket.getInputStream ());
 				mOut = new ObjectOutputStream (mSocket.getOutputStream ());
 			}
-			send (Command.Type.ENTER_SERVER, mConnectionId, mUserName);
+			send (Command.Type.ENTER_SERVER);
 
 			this.start ();
 		} catch (IOException e) {
@@ -68,7 +69,7 @@ public class GameConnection extends Thread implements Connection {
 
 	public void close () {
 		mIsRunning = false;
-		send (Command.Type.EXIT_SERVER, mConnectionId);
+		send (Command.Type.EXIT_SERVER);
 		try {
 			mOut.close ();
 			mIn.close ();
@@ -92,6 +93,7 @@ public class GameConnection extends Thread implements Connection {
 	}
 
 	public void send (Command command) {
+		command.addHeader (mConnectionId, mRoomConnectionId);
 		try {
 			mOut.writeObject (command);
 		} catch (IOException e) {
@@ -112,14 +114,15 @@ public class GameConnection extends Thread implements Connection {
 				mConnectionId = (int) command.data[0];
 				log.i ("Connection succesful id: " + mConnectionId);
 
-				send (Command.Type.ENTER_ROOM, mConnectionId, 1);// BELEP AZ 1. szobaba
+				send (Command.Type.ENTER_ROOM, 1);// BELEP AZ 1. szobaba
 				break;
 			case DECLINE_CONNECTION:
 				log.i ("Connection failed!");
 				break;
 			case MAP_DATA:
 				log.i ("Map data received");
-				mMap.loadData (command.data);
+				mRoomConnectionId = (int) command.data[0];
+				mMap.loadData ((Serializable[]) command.data[1]);
 				break;
 			case IS_READY:
 				log.i (command.data[0] + " is ready to play.");

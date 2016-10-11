@@ -17,7 +17,7 @@ public class Command implements Serializable {
 	public Serializable[] data;
 
 	public Command (Type type) {
-		this (type, null);
+		this (type, 0);
 	}
 
 	public Command (Type type, Serializable... data) {
@@ -25,6 +25,12 @@ public class Command implements Serializable {
 		this.data = data;
 	}
 
+	public void addHeader (Serializable... header_data) {
+		Serializable[] tempData = new Serializable[data.length + header_data.length];
+		System.arraycopy (header_data, 0, tempData, 0, header_data.length);
+		System.arraycopy (data, 0, tempData, header_data.length, data.length);
+		this.data = tempData;
+	}
 	public enum Type {
 		ENTER_SERVER, EXIT_SERVER, LIST_ROOMS, MAP_DATA, ACCEPT_CONNECTION, DECLINE_CONNECTION, READY_TO_PLAY, IS_READY, ENTER_ROOM, LEAVE_ROOM, GAME_DATA
 	}

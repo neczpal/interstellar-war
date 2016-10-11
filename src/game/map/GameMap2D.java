@@ -199,9 +199,9 @@ public class GameMap2D extends GameMap {
 
 	@Override
 	public void receiveServer (Command command) {
-		switch ((GameCommand) command.data[0]) {
+		switch ((GameCommand) command.data[2]) {
 			case MOVE_UNITS:
-				getConection ().send (command);
+				getConection ().send (new Command (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, command.data[3], command.data[4]));
 				break;
 		}
 	}

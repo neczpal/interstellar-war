@@ -116,13 +116,14 @@ public class ServerConnection extends Thread {
 			case EXIT_SERVER:
 				log.i (command.data[0] + " exits the server... PORT:" + currentPort);
 				mClients.remove (command.data[0]);
+				mRooms.get (command.data[1]).removeConnection ((int) command.data[0]);
 
 				break;
 			case ENTER_ROOM:
-				RoomConnection room = mRooms.get (command.data[1]);
+				RoomConnection room = mRooms.get (command.data[2]);
 				if (room != null && !room.isFull () && !room.isRunning ()) {
-					log.i (command.data[0] + " is connecting to the room " + command.data[1]);
-					sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getGameMap ().toData ()));
+					log.i (command.data[0] + " is connecting to the room " + command.data[2]);
+					sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getGameMap ().toData ()));
 					room.addConnection ((int) command.data[0]);
 					if (room.isFull ()) {
 						//						room.send (Command.Type.READY_TO_PLAY);
