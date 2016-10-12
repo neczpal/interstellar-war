@@ -11,13 +11,13 @@ public class RoomInfoCellRenderer implements ListCellRenderer {
 
 	public Component getListCellRendererComponent (JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 		JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent (list, value, index, isSelected, cellHasFocus);
-		//
-		//		RoomConnection entry = (RoomConnection) value;
-		//
-		//		if (!isSelected) {
-		//			renderer.setForeground (Color.blue);
-		//		}
-		//		renderer.setText (entry.gameName + ":   " + entry.currentUserCount + "/" + entry.maxUserCount);
+
+		RoomInfo entry = (RoomInfo) value;
+
+		if (!isSelected) {
+			renderer.setForeground (Color.blue);
+		}
+		renderer.setText (entry.mGameName + " (" + entry.mMapName + ") : " + entry.mUserCount + "/" + entry.mMaxUserCount);
 
 		return renderer;
 	}

@@ -43,7 +43,7 @@ public class Client extends Thread {
 					Command command = (Command) mIn.readObject ();
 					mServerConnection.receive (command, mPort);
 				} catch (ClassNotFoundException ex) {
-					System.err.println (ex.getMessage ());
+					log.e (ex.getMessage ());
 				}
 			}
 		} catch (IOException e) {

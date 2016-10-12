@@ -20,7 +20,7 @@ public class RoomConnection extends Thread implements Connection {
 	private ServerConnection mServerConnection;
 	private GameMap mMap;
 
-	private List <Integer> mConnectionIds = new ArrayList <> ();
+	private List <Integer> mConnectionIds = new ArrayList <> ();// #TODO SHOULD BE HASHMAP
 
 	private boolean mGameIsRunning = false;
 

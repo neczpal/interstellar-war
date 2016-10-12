@@ -1,6 +1,7 @@
 package game.ui;
 
 import game.Loader;
+import game.server.GameConnection;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -15,22 +16,18 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * @author neczpal
  */
-public class Window extends Thread {
+public class GameFrame extends Thread {
 
 	private final int width, height;
 	private String name;
-	private Panel cPanel;
+	private GameConnection mConnection;
 
-	public Window (String name, int width, int height) {
+	public GameFrame (String name, int width, int height, GameConnection connection) {
 		super (name);
 		this.name = name;
 		this.width = width;
 		this.height = height;
-		this.cPanel = new Panel ();
-	}
-
-	public static void main (String[] args) {
-		new Window ("Interstellar War", 640, 480).start ();
+		mConnection = connection;
 	}
 
 	@Override
@@ -63,7 +60,7 @@ public class Window extends Thread {
 			Loader.setUseCache (false);
 
 		} catch (LWJGLException ex) {
-			Logger.getLogger (Window.class.getName ()).log (Level.SEVERE, null, ex);
+			Logger.getLogger (GameFrame.class.getName ()).log (Level.SEVERE, null, ex);
 		}
 	}
 
@@ -82,21 +79,20 @@ public class Window extends Thread {
 	}
 
 	private void draw () {
-		cPanel.draw ();
+		mConnection.getGameMap ().draw ();
 	}
 
 	private void mouseEvent () {
 		if (Mouse.isInsideWindow ()) {
-			cPanel.mouseEvent ();
+			mConnection.getGameMap ().mouseEvent ();
 		}
 	}
 
 	private void keyboardEvent () {
-		cPanel.keyboardEvent ();
+		mConnection.getGameMap ().keyboardEvent ();
 	}
 
 	private void clean () {
-		cPanel.mConnection.close ();
 		Display.destroy ();
 		Keyboard.destroy ();
 		Mouse.destroy ();

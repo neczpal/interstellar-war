@@ -3,6 +3,7 @@ package game.server;
 import game.Log;
 import game.map.GameMap;
 import game.map.GameMap2D;
+import game.ui.OpenRoomsFrame;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,10 +18,14 @@ import java.net.Socket;
  */
 public class GameConnection extends Thread implements Connection {
 
+	private OpenRoomsFrame mOpenRoomsFrame;
 	private GameMap mMap;
+
 	private int mConnectionId;
 	private int mRoomConnectionId;
+
 	private int mRoomIndex;
+
 	private String mUserName;
 
 	private boolean mIsRunning;
@@ -30,8 +35,9 @@ public class GameConnection extends Thread implements Connection {
 
 	private Log log = new Log (this);
 
-	public GameConnection (String ip, String userName) {
+	public GameConnection (OpenRoomsFrame openRoomsFrame, String ip, String userName) {
 		super ("GameConnection " + userName);
+		mOpenRoomsFrame = openRoomsFrame;
 		mUserName = userName;
 		mIsRunning = false;
 		mMap = new GameMap2D ();
@@ -61,6 +67,7 @@ public class GameConnection extends Thread implements Connection {
 					receive (msg);
 				} catch (ClassNotFoundException | ClassCastException ex) {
 					log.e (ex.getMessage ());
+					ex.printStackTrace ();
 				}
 			}
 		} catch (IOException e) {
@@ -115,10 +122,14 @@ public class GameConnection extends Thread implements Connection {
 				mConnectionId = (int) command.data[0];
 				log.i ("Connection succesful id: " + mConnectionId);
 
-				send (Command.Type.ENTER_ROOM, 1);// BELEP AZ 1. szobaba
+				//				send (Command.Type.ENTER_ROOM, 1);// BELEP AZ 1. szobaba
 				break;
 			case DECLINE_CONNECTION:
 				log.i ("Connection failed!");
+				break;
+			case LIST_ROOMS:
+				log.i ("Room datas received");
+				mOpenRoomsFrame.loadRoomInfos (command.data);
 				break;
 			case MAP_DATA:
 				log.i ("Map data received");
@@ -126,10 +137,9 @@ public class GameConnection extends Thread implements Connection {
 				mRoomIndex = (int) command.data[1];
 				mMap.loadData ((Serializable[]) command.data[2]);
 				break;
-			case IS_READY:
+			case READY_TO_PLAY:
 				log.i (command.data[0] + " is ready to play.");
-				//				mMap.addUser (command.data[0], new User ());
-				//				mMap.setUserReady ((int) command.data[0]);
+				mOpenRoomsFrame.startGame ();
 				break;
 			case GAME_DATA:
 				log.i (command.data[0] + " game command received.");

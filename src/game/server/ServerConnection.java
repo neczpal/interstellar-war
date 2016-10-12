@@ -41,6 +41,7 @@ public class ServerConnection extends Thread {
 	public void run () {
 		log.i ("Sever started.");
 		addRoom ("2DGAME", "map01.txt");
+		addRoom ("2DGAME", "map01.txt");
 		mIsRunning = true;
 		while (mIsRunning) {
 			try {
@@ -126,7 +127,7 @@ public class ServerConnection extends Thread {
 					room.addConnection ((int) command.data[0]);
 					sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getConnectionIndex ((int) command.data[0]), room.getGameMap ().toData ()));
 					if (room.isFull ()) {
-						//						room.send (Command.Type.READY_TO_PLAY);
+						room.send (Command.Type.READY_TO_PLAY);
 						room.start ();
 					} else {
 						//						room.send(); #TODO SEND ROOM DATAs +1 man
