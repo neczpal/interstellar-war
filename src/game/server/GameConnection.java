@@ -20,6 +20,7 @@ public class GameConnection extends Thread implements Connection {
 	private GameMap mMap;
 	private int mConnectionId;
 	private int mRoomConnectionId;
+	private int mRoomIndex;
 	private String mUserName;
 
 	private boolean mIsRunning;
@@ -122,7 +123,8 @@ public class GameConnection extends Thread implements Connection {
 			case MAP_DATA:
 				log.i ("Map data received");
 				mRoomConnectionId = (int) command.data[0];
-				mMap.loadData ((Serializable[]) command.data[1]);
+				mRoomIndex = (int) command.data[1];
+				mMap.loadData ((Serializable[]) command.data[2]);
 				break;
 			case IS_READY:
 				log.i (command.data[0] + " is ready to play.");
@@ -139,6 +141,10 @@ public class GameConnection extends Thread implements Connection {
 		return mConnectionId;
 	}
 
+	public int getRoomIndex () {
+		return mRoomIndex;
+	}
+
 	public GameMap getGameMap () {
 		return mMap;
 	}
@@ -146,4 +152,6 @@ public class GameConnection extends Thread implements Connection {
 	private void setGameMap (GameMap map) {
 		mMap = map;
 	}
+
+
 }

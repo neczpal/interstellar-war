@@ -52,7 +52,7 @@ public class GameMap2D extends GameMap {
 				for (Planet2D planet2D : mPlanets) {
 					if (planet2D.isInside (point) && planet2D.isNeighbor (mSelectedPlanetFrom)) {
 						mSelectedPlanetTo = planet2D;
-						int id = ((GameConnection) getConection ()).getConnectionId ();
+						int id = ((GameConnection) getConection ()).getRoomIndex ();
 						if (mSelectedPlanetFrom.getOwnedBy () == id) {
 							getConection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
 						}

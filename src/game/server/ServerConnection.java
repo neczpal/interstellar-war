@@ -123,8 +123,8 @@ public class ServerConnection extends Thread {
 				RoomConnection room = mRooms.get (command.data[2]);
 				if (room != null && !room.isFull () && !room.isRunning ()) {
 					log.i (command.data[0] + " is connecting to the room " + command.data[2]);
-					sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getGameMap ().toData ()));
 					room.addConnection ((int) command.data[0]);
+					sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getConnectionIndex ((int) command.data[0]), room.getGameMap ().toData ()));
 					if (room.isFull ()) {
 						//						room.send (Command.Type.READY_TO_PLAY);
 						room.start ();

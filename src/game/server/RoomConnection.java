@@ -111,4 +111,8 @@ public class RoomConnection extends Thread implements Connection {
 	public int getUserCount () {
 		return mConnectionIds.size ();
 	}
+
+	public int getConnectionIndex (Integer id) {
+		return mConnectionIds.indexOf (id) + 1;
+	}
 }
