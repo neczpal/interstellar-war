@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by neczp on 2016. 10. 11..
@@ -16,6 +17,7 @@ public class OpenRoomsFrame {
 
 	private GameConnection mConnection;
 	private DefaultListModel <RoomInfo> listModel = new DefaultListModel ();
+	private ArrayList <RoomInfo> mRoomInfoList = new ArrayList <> ();
 	private GameFrame gameFrame;
 	private JFrame jFrame;
 
@@ -54,15 +56,33 @@ public class OpenRoomsFrame {
 	}
 
 	public void loadRoomInfos (Serializable[] data) {
-		listModel.clear ();
+		ArrayList <RoomInfo> newRoomInfoList = new ArrayList <> ();
 		int i = 0;
+		int listIndex = 0;
+		boolean changed = false;
 		while (i < data.length) {
 			int id = (int) data[i++];
 			String game = (String) data[i++];
 			String map = (String) data[i++];
 			int user = (int) data[i++];
 			int maxuser = (int) data[i++];
-			listModel.addElement (new RoomInfo (id, game, map, user, maxuser));
+			if (mRoomInfoList.size () < listIndex + 1) {
+				changed = true;
+			} else {
+				RoomInfo roomInfo = mRoomInfoList.get (listIndex);
+				if ((id != roomInfo.mRoomId) || !game.equals (roomInfo.mGameName) || !map.equals (roomInfo.mMapName) || user != roomInfo.mUserCount || maxuser != roomInfo.mMaxUserCount) {
+					changed = true;
+				}
+			}
+			newRoomInfoList.add (new RoomInfo (id, game, map, user, maxuser));
+			listIndex++;
+		}
+		if (changed) {
+			mRoomInfoList = newRoomInfoList;
+			listModel.clear ();
+			for (RoomInfo roomInfo : newRoomInfoList) {
+				listModel.addElement (roomInfo);
+			}
 		}
 	}
 
