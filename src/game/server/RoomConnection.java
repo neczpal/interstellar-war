@@ -1,7 +1,7 @@
 package game.server;
 
 import game.map.GameMap;
-import game.map.GameMap2D;
+import game.map.interstellarwar.InterstellarWar;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -27,8 +27,8 @@ public class RoomConnection extends Thread implements Connection {
 	public RoomConnection (ServerConnection serverConnection, String gameName, String mapName) throws GameMap.NotValidMapException {
 		mServerConnection = serverConnection;
 		mGameName = gameName;
-		if (gameName == "2DGAME") {
-			mMap = new GameMap2D ();
+		if (gameName.equals (InterstellarWar.GAME_NAME)) {
+			mMap = new InterstellarWar ();
 		}
 		mMap.loadMap (mapName);
 		mMapName = mapName;

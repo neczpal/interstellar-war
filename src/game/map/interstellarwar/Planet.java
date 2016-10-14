@@ -1,4 +1,4 @@
-package game.map;
+package game.map.interstellarwar;
 
 import game.Util;
 import game.geom.Circle;
@@ -10,20 +10,20 @@ import java.util.ArrayList;
 /**
  * Created by neczp on 2016. 10. 06..
  */
-public class Planet2D extends Circle {
+public class Planet extends Circle {
 
 	private int mOwnedBy;
 	private int mUnitNumber;
-	private ArrayList <Planet2D> mNeighbors;
+	private ArrayList <Planet> mNeighbors;
 
-	public Planet2D (int x, int y, int radius, int ownedBy, int unitNumber) {
+	public Planet (int x, int y, int radius, int ownedBy, int unitNumber) {
 		super (x, y, radius);
 		mUnitNumber = unitNumber;
 		mOwnedBy = ownedBy;
 		mNeighbors = new ArrayList <> ();
 	}
 
-	public void linkTo (Planet2D other) {
+	public void linkTo (Planet other) {
 		mNeighbors.add (other);
 		other.mNeighbors.add (this);
 	}
@@ -36,24 +36,24 @@ public class Planet2D extends Circle {
 		return mUnitNumber;
 	}
 
-	public boolean isNeighbor (Planet2D planet2D) {
-		return mNeighbors.contains (planet2D);
+	public boolean isNeighbor (Planet planet) {
+		return mNeighbors.contains (planet);
 	}
 
-	public int getIndex (Planet2D planet2D) {
-		return mNeighbors.indexOf (planet2D);
+	public int getIndex (Planet planet) {
+		return mNeighbors.indexOf (planet);
 	}
 
-	public void moveUnitsTo (Planet2D planet2D) {
-		if (planet2D.mOwnedBy == mOwnedBy) {
-			planet2D.mUnitNumber += mUnitNumber;
+	public void moveUnitsTo (Planet planet) {
+		if (planet.mOwnedBy == mOwnedBy) {
+			planet.mUnitNumber += mUnitNumber;
 			mUnitNumber = 0;
 		} else {
-			planet2D.mUnitNumber -= mUnitNumber;
+			planet.mUnitNumber -= mUnitNumber;
 			mUnitNumber = 0;
-			if (planet2D.mUnitNumber < 0) {
-				planet2D.mOwnedBy = mOwnedBy;
-				planet2D.mUnitNumber = Math.abs (planet2D.mUnitNumber);
+			if (planet.mUnitNumber < 0) {
+				planet.mOwnedBy = mOwnedBy;
+				planet.mUnitNumber = Math.abs (planet.mUnitNumber);
 			}
 		}
 	}

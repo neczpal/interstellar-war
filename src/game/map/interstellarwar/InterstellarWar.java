@@ -1,7 +1,8 @@
-package game.map;
+package game.map.interstellarwar;
 
 import game.geom.Line;
 import game.geom.Point2D;
+import game.map.GameMap;
 import game.server.Command;
 import game.server.GameConnection;
 import org.lwjgl.input.Mouse;
@@ -13,21 +14,22 @@ import java.util.ArrayList;
 /**
  * Created by neczp on 2016. 10. 06..
  */
-public class GameMap2D extends GameMap {
+public class InterstellarWar extends GameMap {
+	public static final String GAME_NAME = "Interstellar War";
 
 	private int mPlanetNumber;
 	private int mConnectionNumber;
 
-	private ArrayList <Planet2D> mPlanets;
+	private ArrayList <Planet> mPlanets;
 	private ArrayList <Integer[]> mConnections;
 
 	private boolean mWasMouseDown = false;
 
-	private Planet2D mSelectedPlanetFrom = null;
-	private Planet2D mSelectedPlanetTo = null;
+	private Planet mSelectedPlanetFrom = null;
+	private Planet mSelectedPlanetTo = null;
 
 
-	public GameMap2D () {
+	public InterstellarWar () {
 		mPlanets = new ArrayList <> ();
 		mConnections = new ArrayList <> ();
 	}
@@ -37,9 +39,9 @@ public class GameMap2D extends GameMap {
 			mWasMouseDown = true;
 			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
 
-			for (Planet2D planet2D : mPlanets) {
-				if (planet2D.isInside (point)) {
-					mSelectedPlanetFrom = planet2D;
+			for (Planet planet : mPlanets) {
+				if (planet.isInside (point)) {
+					mSelectedPlanetFrom = planet;
 					break;
 				}
 			}
@@ -49,12 +51,12 @@ public class GameMap2D extends GameMap {
 			if (mSelectedPlanetFrom != null) {
 				Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
 
-				for (Planet2D planet2D : mPlanets) {
-					if (planet2D.isInside (point) && planet2D.isNeighbor (mSelectedPlanetFrom)) {
-						mSelectedPlanetTo = planet2D;
-						int id = ((GameConnection) getConection ()).getRoomIndex ();
+				for (Planet planet : mPlanets) {
+					if (planet.isInside (point) && planet.isNeighbor (mSelectedPlanetFrom)) {
+						mSelectedPlanetTo = planet;
+						int id = ((GameConnection) getConnection ()).getRoomIndex ();
 						if (mSelectedPlanetFrom.getOwnedBy () == id) {
-							getConection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
+							getConnection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
 						}
 						break;
 					}
@@ -72,10 +74,10 @@ public class GameMap2D extends GameMap {
 
 	@Override
 	public void draw () {
-		mPlanets.forEach (Planet2D::draw);
+		mPlanets.forEach (Planet::draw);
 		for (Integer[] integers : mConnections) {
-			Planet2D planet1 = mPlanets.get (integers[0]);
-			Planet2D planet2 = mPlanets.get (integers[1]);
+			Planet planet1 = mPlanets.get (integers[0]);
+			Planet planet2 = mPlanets.get (integers[1]);
 			Line line = new Line (planet1.getCenter (), planet2.getCenter ());
 			line.draw ();
 		}
@@ -100,14 +102,14 @@ public class GameMap2D extends GameMap {
 			for (int i = 0; i < mPlanetNumber; i++) {
 				String[] params = bufferedReader.readLine ().split (" ");
 
-				mPlanets.add (new Planet2D (Integer.parseInt (params[0]), Integer.parseInt (params[1]), Integer.parseInt (params[2]), Integer.parseInt (params[3]), Integer.parseInt (params[4])));
+				mPlanets.add (new Planet (Integer.parseInt (params[0]), Integer.parseInt (params[1]), Integer.parseInt (params[2]), Integer.parseInt (params[3]), Integer.parseInt (params[4])));
 			}
 			for (int i = 0; i < mConnectionNumber; i++) {
 				String[] params = bufferedReader.readLine ().split (" ");
 				mConnections.add (new Integer[] {Integer.parseInt (params[0]), Integer.parseInt (params[1])});
 
-				Planet2D from = mPlanets.get (Integer.parseInt (params[0]));
-				Planet2D to = mPlanets.get (Integer.parseInt (params[1]));
+				Planet from = mPlanets.get (Integer.parseInt (params[0]));
+				Planet to = mPlanets.get (Integer.parseInt (params[1]));
 
 				from.linkTo (to);
 			}
@@ -135,14 +137,14 @@ public class GameMap2D extends GameMap {
 		mConnectionNumber = (int) data[i++];
 
 		for (int j = 0; j < mPlanetNumber; j++) {
-			mPlanets.add (new Planet2D ((int) data[i++], (int) data[i++], (int) data[i++], (int) data[i++], (int) data[i++]));
+			mPlanets.add (new Planet ((int) data[i++], (int) data[i++], (int) data[i++], (int) data[i++], (int) data[i++]));
 		}
 
 		for (int j = 0; j < mConnectionNumber; j++) {
 			int fromIndex = (int) data[i++];
 			int toIndex = (int) data[i++];
-			Planet2D from = mPlanets.get (fromIndex);
-			Planet2D to = mPlanets.get (toIndex);
+			Planet from = mPlanets.get (fromIndex);
+			Planet to = mPlanets.get (toIndex);
 			from.linkTo (to);
 			mConnections.add (new Integer[] {fromIndex, toIndex});
 		}
@@ -158,13 +160,13 @@ public class GameMap2D extends GameMap {
 		list.add (mConnectionNumber);
 
 		for (int j = 0; j < mPlanetNumber; j++) {
-			Planet2D planet2D = mPlanets.get (j);
-			Point2D center = planet2D.getCenter ();
+			Planet planet = mPlanets.get (j);
+			Point2D center = planet.getCenter ();
 			list.add (center.getX ());
 			list.add (center.getY ());
-			list.add (planet2D.getRadius ());
-			list.add (planet2D.getOwnedBy ());
-			list.add (planet2D.getUnitNumber ());
+			list.add (planet.getRadius ());
+			list.add (planet.getOwnedBy ());
+			list.add (planet.getUnitNumber ());
 		}
 
 		for (int j = 0; j < mConnectionNumber; j++) {
@@ -181,7 +183,7 @@ public class GameMap2D extends GameMap {
 	public void onGameThread () {
 		try {
 			Thread.sleep (1500);
-			getConection ().send (Command.Type.GAME_DATA, GameCommand.SPAWN_UNITS);
+			getConnection ().send (Command.Type.GAME_DATA, GameCommand.SPAWN_UNITS);
 		} catch (InterruptedException e) {
 			e.printStackTrace ();
 		}
@@ -191,8 +193,8 @@ public class GameMap2D extends GameMap {
 	public void receiveClient (Command command) {
 		switch ((GameCommand) command.data[0]) {
 			case SPAWN_UNITS:
-				for (Planet2D planet2D : mPlanets) {
-					planet2D.addUnit ();
+				for (Planet planet : mPlanets) {
+					planet.addUnit ();
 				}
 				break;
 			case MOVE_UNITS:
@@ -205,7 +207,7 @@ public class GameMap2D extends GameMap {
 	public void receiveServer (Command command) {
 		switch ((GameCommand) command.data[2]) {
 			case MOVE_UNITS:
-				getConection ().send (new Command (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, command.data[3], command.data[4]));
+				getConnection ().send (new Command (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, command.data[3], command.data[4]));
 				break;
 		}
 	}

@@ -2,6 +2,7 @@ package game.server;
 
 import game.Log;
 import game.map.GameMap;
+import game.map.interstellarwar.InterstellarWar;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -16,7 +17,7 @@ public class ServerConnection extends Thread {
 
 	private ServerSocket mServerSocket;
 
-	private HashMap <Integer, Integer> mUserToRoomConnections = new HashMap <> ();
+	private HashMap <Integer, Integer> mUserToRoomHashMap = new HashMap <> ();
 
 	private HashMap <Integer, RoomConnection> mRooms = new HashMap <> ();
 	private RoomServer mRoomServer;
@@ -42,11 +43,11 @@ public class ServerConnection extends Thread {
 
 	public void run () {
 		log.i ("Sever started.");
-		addRoom ("2DGAME", "map01");
-		addRoom ("2DGAME", "map02");
-		addRoom ("2DGAME", "map03");
-		addRoom ("2DGAME", "map04");
-		addRoom ("2DGAME", "map05");
+		addRoom (InterstellarWar.GAME_NAME, "map01");
+		addRoom (InterstellarWar.GAME_NAME, "map02");
+		addRoom (InterstellarWar.GAME_NAME, "map03");
+		addRoom (InterstellarWar.GAME_NAME, "map04");
+		addRoom (InterstellarWar.GAME_NAME, "map05");
 		mRoomServer.start ();
 		mIsRunning = true;
 		while (mIsRunning) {
@@ -93,8 +94,8 @@ public class ServerConnection extends Thread {
 	}
 
 	public void removeClient (int id) {
-		leaveRoom (id, mUserToRoomConnections.get (id));
-		mUserToRoomConnections.remove (id);
+		leaveRoom (id, mUserToRoomHashMap.get (id));
+		mUserToRoomHashMap.remove (id);
 
 		log.i ("User (" + id + ") disconnected from the server");
 		mClients.remove (id);
@@ -121,7 +122,7 @@ public class ServerConnection extends Thread {
 		int id = mClientIdCounter++;
 		mClients.put (id, client);
 		mTemporaryClients.remove (tempIndex);
-		mUserToRoomConnections.put (id, 0);
+		mUserToRoomHashMap.put (id, 0);
 		client.send (new Command (Command.Type.ACCEPT_CONNECTION, id));
 	}
 
@@ -134,7 +135,7 @@ public class ServerConnection extends Thread {
 	private void leaveRoom (int userId, int roomId) {
 		if (roomId != 0) {
 			log.i ("User (" + userId + ") is leaving the Room (" + roomId + ")");
-			mUserToRoomConnections.put (userId, 0);
+			mUserToRoomHashMap.put (userId, 0);
 			RoomConnection leaveRoom = mRooms.get (roomId);
 			leaveRoom.removeConnection (userId);
 			if (leaveRoom.isEmpty () && leaveRoom.isRunning ()) {
@@ -151,7 +152,7 @@ public class ServerConnection extends Thread {
 		RoomConnection room = mRooms.get (command.data[2]);
 		if (room != null && !room.isFull () && !room.isRunning ()) {
 			log.i ("User (" + command.data[0] + ") is connecting to the Room (" + command.data[2] + ")");
-			mUserToRoomConnections.put ((int) command.data[0], (int) command.data[2]);
+			mUserToRoomHashMap.put ((int) command.data[0], (int) command.data[2]);
 			room.addConnection ((int) command.data[0]);
 			sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getConnectionIndex ((int) command.data[0]), room.getGameMap ().toData ()));
 			if (room.isFull ()) {

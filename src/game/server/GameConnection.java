@@ -2,7 +2,7 @@ package game.server;
 
 import game.Log;
 import game.map.GameMap;
-import game.map.GameMap2D;
+import game.map.interstellarwar.InterstellarWar;
 import game.ui.OpenRoomsFrame;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class GameConnection extends Thread implements Connection {
 		mOpenRoomsFrame = openRoomsFrame;
 		mUserName = userName;
 		mIsRunning = false;
-		mMap = new GameMap2D ();// #TODO other maps
+		mMap = new InterstellarWar ();// #TODO other maps
 		mMap.setConnection (this);
 		try {
 			mSocket = new Socket (ip, 23232);
