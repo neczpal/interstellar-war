@@ -75,6 +75,14 @@ public class RoomConnection extends Thread implements Connection {
 		}
 	}
 
+	public boolean isInside (int id) {
+		return mConnectionIds.contains (id);
+	}
+
+	public boolean isEmpty () {
+		return mConnectionIds.isEmpty ();
+	}
+
 	public boolean isFull () {
 		return mConnectionIds.size () >= mMaxUserCount;
 	}

@@ -40,7 +40,7 @@ public class GameConnection extends Thread implements Connection {
 		mOpenRoomsFrame = openRoomsFrame;
 		mUserName = userName;
 		mIsRunning = false;
-		mMap = new GameMap2D ();
+		mMap = new GameMap2D ();// #TODO other maps
 		mMap.setConnection (this);
 		try {
 			mSocket = new Socket (ip, 23232);
@@ -71,7 +71,7 @@ public class GameConnection extends Thread implements Connection {
 				}
 			}
 		} catch (IOException e) {
-
+			log.e ("gameconnection bibi" + e.getMessage ());
 		}
 	}
 
@@ -163,5 +163,13 @@ public class GameConnection extends Thread implements Connection {
 		mMap = map;
 	}
 
+	public void showMenu () {
+		mOpenRoomsFrame.showMenu ();
+	}
 
+	public void leaveRoom () {
+		send (Command.Type.LEAVE_ROOM);
+		showMenu ();
+		mRoomConnectionId = 0;
+	}
 }
