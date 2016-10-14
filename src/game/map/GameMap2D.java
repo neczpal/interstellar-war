@@ -15,8 +15,8 @@ import java.util.ArrayList;
  */
 public class GameMap2D extends GameMap {
 
-	private int mConnectionNumber;
 	private int mPlanetNumber;
+	private int mConnectionNumber;
 
 	private ArrayList <Planet2D> mPlanets;
 	private ArrayList <Integer[]> mConnections;
@@ -83,6 +83,8 @@ public class GameMap2D extends GameMap {
 
 	@Override
 	public void loadMap (String fileName) throws NotValidMapException {
+		mPlanets = new ArrayList <> ();
+		mConnections = new ArrayList <> ();
 		try {
 			File mapFile = new File (System.getProperty ("user.dir") + "/res/maps2d/" + fileName);
 
@@ -122,6 +124,8 @@ public class GameMap2D extends GameMap {
 
 	@Override
 	public void loadData (Serializable[] data) {
+		mPlanets = new ArrayList <> ();
+		mConnections = new ArrayList <> ();
 		int i = 0;
 
 		setMapName ((String) data[i++]);

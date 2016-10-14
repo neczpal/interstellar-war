@@ -1,6 +1,7 @@
 package game.ui;
 
 import game.Loader;
+import game.Util;
 import game.server.GameConnection;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -34,7 +35,7 @@ public class GameFrame extends Thread {
 	public void run () {
 		initDisplay ();
 		initGL ();
-
+		Util.loadDefaultTextures ();
 
 		while (!Display.isCloseRequested ()) {
 			glClear (GL_COLOR_BUFFER_BIT);
@@ -93,6 +94,7 @@ public class GameFrame extends Thread {
 	}
 
 	private void clean () {
+		mConnection.leaveRoom ();
 		Display.destroy ();
 		Keyboard.destroy ();
 		Mouse.destroy ();

@@ -4,8 +4,7 @@ import game.map.GameMap;
 import game.map.GameMap2D;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * Created by neczp on 2016. 10. 11..
@@ -20,7 +19,8 @@ public class RoomConnection extends Thread implements Connection {
 	private ServerConnection mServerConnection;
 	private GameMap mMap;
 
-	private List <Integer> mConnectionIds = new ArrayList <> ();// #TODO SHOULD BE HASHMAP
+	private HashMap <Integer, Integer> mConnectionIds = new HashMap <> ();
+	private int mIndexes;
 
 	private boolean mGameIsRunning = false;
 
@@ -35,6 +35,7 @@ public class RoomConnection extends Thread implements Connection {
 		mMaxUserCount = mMap.getMaxUsers ();
 		mMap.setConnection (this);
 		mRoomConnectionId = 0;
+		mIndexes = 1;
 	}
 
 	public int getRoomId () {
@@ -70,13 +71,13 @@ public class RoomConnection extends Thread implements Connection {
 
 	@Override
 	public void send (Command command) {
-		for (Integer connectionId : mConnectionIds) {
+		for (Integer connectionId : mConnectionIds.keySet ()) {
 			mServerConnection.sendToId (connectionId, command);
 		}
 	}
 
 	public boolean isInside (int id) {
-		return mConnectionIds.contains (id);
+		return mConnectionIds.containsKey (id);
 	}
 
 	public boolean isEmpty () {
@@ -92,7 +93,7 @@ public class RoomConnection extends Thread implements Connection {
 	}
 
 	public void addConnection (Integer id) {
-		mConnectionIds.add (id);
+		mConnectionIds.put (id, mIndexes++);
 	}
 
 	public void removeConnection (Integer id) {
@@ -121,6 +122,6 @@ public class RoomConnection extends Thread implements Connection {
 	}
 
 	public int getConnectionIndex (Integer id) {
-		return mConnectionIds.indexOf (id) + 1;
+		return mConnectionIds.get (id);
 	}
 }

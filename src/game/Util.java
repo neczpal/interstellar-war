@@ -11,9 +11,10 @@ public class Util {
 
 	public static final int DEFAULT_FONTSIZE = 24;
 	public static final Color DEFAULT_COLOR = Color.WHITE;
+	public static final Color DEFAULT_FONT_COLOR = Color.BLACK;
 	private static int[] mCharacters;
 
-	static {
+	public static void loadDefaultTextures () {
 		mCharacters = Loader.loadTextures ("res/pictures/font64.png", 64, 64);
 	}
 
@@ -22,6 +23,11 @@ public class Util {
 	}
 
 	public static void drawString (String string, int x, int y, int fontSize) {
+		drawString (string, x, y, fontSize, DEFAULT_FONT_COLOR);
+	}
+
+	public static void drawString (String string, int x, int y, int fontSize, Color color) {
+		color.setGLColor ();
 		for (int i = 0; i < string.length (); i++) {
 			drawRect (x + i * fontSize, y, fontSize, fontSize, mCharacters[string.charAt (i)]);
 		}

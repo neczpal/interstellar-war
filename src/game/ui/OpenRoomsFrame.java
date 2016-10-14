@@ -17,14 +17,15 @@ public class OpenRoomsFrame {
 	private GameConnection mConnection;
 	private DefaultListModel <RoomInfo> listModel = new DefaultListModel ();
 	private GameFrame gameFrame;
+	private JFrame jFrame;
 
 	public OpenRoomsFrame () {
 		mConnection = new GameConnection (this, "localhost", "petike");
 
 		String title = "Open Rooms";
 
-		JFrame f = new JFrame (title);
-		f.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+		jFrame = new JFrame (title);
+		jFrame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
 
 		JList list = new JList (listModel);
 		ListCellRenderer renderer = new RoomInfoCellRenderer ();
@@ -41,11 +42,11 @@ public class OpenRoomsFrame {
 
 		JScrollPane scrollPane = new JScrollPane (list);
 
-		Container contentPane = f.getContentPane ();
+		Container contentPane = jFrame.getContentPane ();
 		contentPane.add (scrollPane, BorderLayout.CENTER);
 
-		f.setSize (640, 480);
-		f.setVisible (true);
+		jFrame.setSize (640, 480);
+		jFrame.setVisible (true);
 	}
 
 	public static void main (String args[]) {
@@ -68,10 +69,10 @@ public class OpenRoomsFrame {
 	public void startGame () {
 		gameFrame = new GameFrame ("valami", 640, 480, mConnection);
 		gameFrame.start ();
+		jFrame.setVisible (false);
 	}
 
-	@Override
-	protected void finalize () throws Throwable {
-		mConnection.close ();
+	public void showMenu () {
+		jFrame.setVisible (true);
 	}
 }

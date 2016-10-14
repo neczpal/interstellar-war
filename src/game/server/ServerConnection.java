@@ -6,10 +6,7 @@ import game.map.GameMap;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ServerConnection extends Thread {
 
@@ -18,6 +15,8 @@ public class ServerConnection extends Thread {
 	private int mPort;
 
 	private ServerSocket mServerSocket;
+
+	private HashMap <Integer, Integer> mUserToRoomConnections = new HashMap <> ();
 
 	private HashMap <Integer, RoomConnection> mRooms = new HashMap <> ();
 	private RoomServer mRoomServer;
@@ -43,8 +42,11 @@ public class ServerConnection extends Thread {
 
 	public void run () {
 		log.i ("Sever started.");
-		addRoom ("2DGAME", "map01.txt");
-		addRoom ("2DGAME", "map01.txt");
+		addRoom ("2DGAME", "map01");
+		addRoom ("2DGAME", "map02");
+		addRoom ("2DGAME", "map03");
+		addRoom ("2DGAME", "map04");
+		addRoom ("2DGAME", "map05");
 		mRoomServer.start ();
 		mIsRunning = true;
 		while (mIsRunning) {
@@ -91,7 +93,10 @@ public class ServerConnection extends Thread {
 	}
 
 	public void removeClient (int id) {
-		log.i ("Client (" + id + ") disconnected from the server");
+		leaveRoom (id, mUserToRoomConnections.get (id));
+		mUserToRoomConnections.remove (id);
+
+		log.i ("User (" + id + ") disconnected from the server");
 		mClients.remove (id);
 	}
 
@@ -116,6 +121,7 @@ public class ServerConnection extends Thread {
 		int id = mClientIdCounter++;
 		mClients.put (id, client);
 		mTemporaryClients.remove (tempIndex);
+		mUserToRoomConnections.put (id, 0);
 		client.send (new Command (Command.Type.ACCEPT_CONNECTION, id));
 	}
 
@@ -125,25 +131,27 @@ public class ServerConnection extends Thread {
 		mRooms.get (command.data[1]).removeConnection ((int) command.data[0]);
 	}
 
-	private void leaveRoom (Command command) {
-		if ((int) command.data[1] != 0) {
-			log.i ("User (" + command.data[0] + ") is leaving the Room (" + command.data[1] + ")");
-			RoomConnection leaveRoom = mRooms.get (command.data[1]);
-			leaveRoom.removeConnection ((int) command.data[0]);
+	private void leaveRoom (int userId, int roomId) {
+		if (roomId != 0) {
+			log.i ("User (" + userId + ") is leaving the Room (" + roomId + ")");
+			mUserToRoomConnections.put (userId, 0);
+			RoomConnection leaveRoom = mRooms.get (roomId);
+			leaveRoom.removeConnection (userId);
 			if (leaveRoom.isEmpty () && leaveRoom.isRunning ()) {
 				leaveRoom.stopGame ();
 				mRooms.remove (leaveRoom.getRoomId ());
 			}
 		} else {
-			log.i ("User (" + command.data[0] + ") is not in a room");
+			log.i ("User (" + userId + ") is not in a room");
 		}
 	}
 
 	private void enterRoom (Command command) {
-		leaveRoom (command);
+		leaveRoom ((int) command.data[0], (int) command.data[1]);
 		RoomConnection room = mRooms.get (command.data[2]);
 		if (room != null && !room.isFull () && !room.isRunning ()) {
 			log.i ("User (" + command.data[0] + ") is connecting to the Room (" + command.data[2] + ")");
+			mUserToRoomConnections.put ((int) command.data[0], (int) command.data[2]);
 			room.addConnection ((int) command.data[0]);
 			sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getConnectionIndex ((int) command.data[0]), room.getGameMap ().toData ()));
 			if (room.isFull ()) {
@@ -169,7 +177,7 @@ public class ServerConnection extends Thread {
 				exitServer (command);
 				break;
 			case LEAVE_ROOM:
-				leaveRoom (command);
+				leaveRoom ((int) command.data[0], (int) command.data[1]);
 				break;
 			case ENTER_ROOM:
 				enterRoom (command);
@@ -199,7 +207,9 @@ public class ServerConnection extends Thread {
 	}
 
 	public void sendToId (int id, Command command) {
-		mClients.get (id).send (command);
+		if (!mClients.get (id).send (command)) {
+			removeClient (id);
+		}
 	}
 
 
@@ -213,8 +223,15 @@ public class ServerConnection extends Thread {
 
 	public void send (Command command) {
 		Iterator <HashMap.Entry <Integer, Client>> iterator = mClients.entrySet ().iterator ();
+		ArrayList <Integer> toBeDeleted = new ArrayList <> ();
 		while (iterator.hasNext ()) {
-			iterator.next ().getValue ().send (command);
+			Map.Entry <Integer, Client> next = iterator.next ();
+			if (!next.getValue ().send (command)) {
+				toBeDeleted.add (next.getKey ());
+			}
+		}
+		for (Integer index : toBeDeleted) {
+			removeClient (index);
 		}
 	}
 

@@ -60,12 +60,18 @@ public class Client extends Thread {
 		mIsRunning = false;
 	}
 
-	public void send (Command command) {
+	public boolean send (Command command) {
 		try {
-			mOut.writeObject (command);
+			if (!mSocket.isClosed ()) {
+				mOut.writeObject (command);
+				return true;
+			} else {
+				log.w ("Socket is closed cannot send " + command.type);
+			}
 		} catch (IOException e) {
 			log.e ("Nem sikerült elküldeni ezt: " + command.type + "\n" + e.toString ());
 		}
+		return false;
 	}
 
 
