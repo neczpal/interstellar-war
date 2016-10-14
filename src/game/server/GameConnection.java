@@ -138,8 +138,8 @@ public class GameConnection extends Thread implements Connection {
 				mMap.loadData ((Serializable[]) command.data[2]);
 				break;
 			case READY_TO_PLAY:
-				log.i (command.data[0] + " is ready to play.");
-				mOpenRoomsFrame.startGame ();
+				log.i (command.data[0] + " (" + command.data[1] + ") is ready to play.");
+				mOpenRoomsFrame.startGame ((String) command.data[0], (String) command.data[1]);
 				break;
 			case GAME_DATA:
 				log.i (command.data[0] + " game command received.");

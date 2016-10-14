@@ -86,8 +86,8 @@ public class OpenRoomsFrame {
 		}
 	}
 
-	public void startGame () {
-		gameFrame = new GameFrame ("valami", 640, 480, mConnection);
+	public void startGame (String gameName, String mapName) {
+		gameFrame = new GameFrame (gameName + " : " + mapName, 640, 480, mConnection);
 		gameFrame.start ();
 		jFrame.setVisible (false);
 	}

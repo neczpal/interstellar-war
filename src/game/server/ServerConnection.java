@@ -108,7 +108,7 @@ public class ServerConnection extends Thread {
 			RoomConnection connection = iterator.next ().getValue ();
 			roomData[i++] = connection.getRoomId ();
 			roomData[i++] = connection.getGameName ();
-			roomData[i++] = connection.getMapName ();
+			roomData[i++] = connection.getMapFantasyName ();
 			roomData[i++] = connection.getUserCount ();
 			roomData[i++] = connection.getMaxUserCount ();
 		}
@@ -155,8 +155,9 @@ public class ServerConnection extends Thread {
 			room.addConnection ((int) command.data[0]);
 			sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getConnectionIndex ((int) command.data[0]), room.getGameMap ().toData ()));
 			if (room.isFull ()) {
-				room.send (Command.Type.READY_TO_PLAY);
+				room.send (Command.Type.READY_TO_PLAY, room.getGameName (), room.getMapFantasyName ());
 				room.start ();
+				addRoom (room.getGameName (), room.getMapName ());
 			} else {
 				send (Command.Type.LIST_ROOMS, getRoomData ());
 			}

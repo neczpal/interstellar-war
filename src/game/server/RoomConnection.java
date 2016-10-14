@@ -27,11 +27,11 @@ public class RoomConnection extends Thread implements Connection {
 	public RoomConnection (ServerConnection serverConnection, String gameName, String mapName) throws GameMap.NotValidMapException {
 		mServerConnection = serverConnection;
 		mGameName = gameName;
-		mMapName = mapName;
 		if (gameName == "2DGAME") {
 			mMap = new GameMap2D ();
 		}
 		mMap.loadMap (mapName);
+		mMapName = mapName;
 		mMaxUserCount = mMap.getMaxUsers ();
 		mMap.setConnection (this);
 		mRoomConnectionId = 0;
@@ -111,6 +111,10 @@ public class RoomConnection extends Thread implements Connection {
 
 	public String getMapName () {
 		return mMapName;
+	}
+
+	public String getMapFantasyName () {
+		return mMap.getMapName ();
 	}
 
 	public int getMaxUserCount () {
