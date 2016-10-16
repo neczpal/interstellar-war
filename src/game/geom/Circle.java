@@ -10,6 +10,7 @@ public class Circle {
 
 	private Point2D k;
 	private int r;
+	private int mTexture = -1;
 
 	public Circle (int x, int y, int r) {
 		this (new Point2D (x, y), r);
@@ -21,26 +22,29 @@ public class Circle {
 	}
 
 	public void draw () {
-		//		        glMatrixMode(GL_MODELVIEW);
-		glDisable (GL_TEXTURE_2D);
-		glPushMatrix ();
-		glLoadIdentity ();
-		glTranslated (k.x, k.y, 0.0d);
-		final double angle = 2.0 * Math.PI / circle_points;
+		glBindTexture (GL_TEXTURE_2D, mTexture);
 
 		glBegin (GL_POLYGON);
-		double angle1 = 0.0;
-		glVertex2d (r * Math.cos (0.0), r * Math.sin (0.0));
-		int i;
-		for (i = 0; i < circle_points; i++) {
-			glVertex2d (r * Math.cos (angle1), r * Math.sin (angle1));
-			angle1 += angle;
+
+		for (float angle = 0.0f; angle < 360.0f; angle += 2.0f) {
+			float radian = (float) (angle * (Math.PI / 180.0f));
+
+			float xcos = (float) Math.cos (radian);
+			float ysin = (float) Math.sin (radian);
+			float x = xcos * r + k.x;
+			float y = ysin * r + k.y;
+			float tx = xcos * 0.5f + 0.5f;
+			float ty = ysin * 0.5f + 0.5f;
+			glTexCoord2d (tx, ty);
+			glVertex2d (x, y);
 		}
+
 		glEnd ();
-		glPopMatrix ();
-		glEnable (GL_TEXTURE_2D);
 	}
 
+	public void setTexture (int texture) {
+		mTexture = texture;
+	}
 	public void move (int dx, int dy) {
 		k.move (dx, dy);
 	}

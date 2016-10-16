@@ -128,7 +128,7 @@ public final class Loader {
 		if (useCache) {
 			mTextureCache.put (name, textureID - 1);
 		}
-		return textureID - 1;
+		return textureID;
 	}
 
 	public static BufferedImage loadImage (String filepath) {

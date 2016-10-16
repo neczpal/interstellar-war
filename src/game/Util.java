@@ -12,10 +12,12 @@ public class Util {
 	public static final int DEFAULT_FONTSIZE = 24;
 	public static final Color DEFAULT_COLOR = Color.WHITE;
 	public static final Color DEFAULT_FONT_COLOR = Color.BLACK;
+	public static int mTry;
 	private static int[] mCharacters;
 
 	public static void loadTextures () {
 		mCharacters = Loader.loadTextures ("res/pictures/font64.png", 64, 64);
+		mTry = Loader.loadTexture ("res/interstellarwar/planet1.png");
 	}
 
 	public static void drawString (String string, int x, int y) {
