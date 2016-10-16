@@ -37,7 +37,7 @@ public class OpenRoomsFrame {
 				JList list = (JList) evt.getSource ();
 				if (evt.getClickCount () == 2) {
 					int index = list.locationToIndex (evt.getPoint ());
-					mConnection.send (Command.Type.ENTER_ROOM, listModel.getElementAt (index).mRoomId);
+					mConnection.send (Command.Type.ENTER_ROOM, listModel.getElementAt (index).mRoomId);//#TODO MI VAN HA ELTUNIK KOZBEN?
 				}
 			}
 		});

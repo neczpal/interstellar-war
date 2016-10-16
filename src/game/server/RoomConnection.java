@@ -47,7 +47,9 @@ public class RoomConnection extends Thread implements Connection {
 	public void run () {
 		mGameIsRunning = true;
 		while (mGameIsRunning) {
-			mMap.onGameThread ();
+			if (!mMap.onGameThread ()) {
+				stopGame ();
+			}
 		}
 	}
 
@@ -95,6 +97,7 @@ public class RoomConnection extends Thread implements Connection {
 
 	public void removeConnection (Integer id) {
 		mConnectionIds.remove (id);
+		mIndexes--;
 	}
 
 	public GameMap getGameMap () {

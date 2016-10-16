@@ -54,8 +54,8 @@ public class InterstellarWar extends GameMap {
 				for (Planet planet : mPlanets) {
 					if (planet.isInside (point) && planet.isNeighbor (mSelectedPlanetFrom)) {
 						mSelectedPlanetTo = planet;
-						int id = ((GameConnection) getConnection ()).getRoomIndex ();
-						if (mSelectedPlanetFrom.getOwnedBy () == id) {
+						int index = ((GameConnection) getConnection ()).getRoomIndex ();
+						if (mSelectedPlanetFrom.getOwnedBy () == index) {
 							getConnection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
 						}
 						break;
@@ -180,7 +180,7 @@ public class InterstellarWar extends GameMap {
 
 	//ONLY SERVER
 	@Override
-	public void onGameThread () {
+	public boolean onGameThread () {
 		try {
 			Thread.sleep (1500);
 			for (Planet planet : mPlanets) {
@@ -190,6 +190,7 @@ public class InterstellarWar extends GameMap {
 		} catch (InterruptedException e) {
 			e.printStackTrace ();
 		}
+		return true;
 	}
 
 	@Override

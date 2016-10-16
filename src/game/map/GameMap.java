@@ -61,7 +61,7 @@ public abstract class GameMap {
 		mConnection = connection;
 	}
 
-	public abstract void onGameThread ();
+	public abstract boolean onGameThread ();
 
 	public abstract void receiveClient (Command command);
 
