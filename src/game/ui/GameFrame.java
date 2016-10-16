@@ -35,7 +35,7 @@ public class GameFrame extends Thread {
 	public void run () {
 		initDisplay ();
 		initGL ();
-		Util.loadDefaultTextures ();
+		Util.loadTextures ();
 
 		while (!Display.isCloseRequested ()) {
 			glClear (GL_COLOR_BUFFER_BIT);
@@ -59,6 +59,7 @@ public class GameFrame extends Thread {
 			Keyboard.create ();
 			Mouse.create ();
 			Loader.setUseCache (false);
+
 
 		} catch (LWJGLException ex) {
 			Logger.getLogger (GameFrame.class.getName ()).log (Level.SEVERE, null, ex);

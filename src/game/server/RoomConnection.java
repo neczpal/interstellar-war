@@ -1,7 +1,6 @@
 package game.server;
 
 import game.map.GameMap;
-import game.map.interstellarwar.InterstellarWar;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -27,9 +26,7 @@ public class RoomConnection extends Thread implements Connection {
 	public RoomConnection (ServerConnection serverConnection, String gameName, String mapName) throws GameMap.NotValidMapException {
 		mServerConnection = serverConnection;
 		mGameName = gameName;
-		if (gameName.equals (InterstellarWar.GAME_NAME)) {
-			mMap = new InterstellarWar ();
-		}
+		mMap = GameMap.createGameMap (gameName);
 		mMap.loadMap (mapName);
 		mMapName = mapName;
 		mMaxUserCount = mMap.getMaxUsers ();

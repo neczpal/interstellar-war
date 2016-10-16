@@ -3,6 +3,7 @@ package game.server;
 import game.Log;
 import game.map.GameMap;
 import game.map.interstellarwar.InterstellarWar;
+import game.map.rockpaperscissors.RockPaperScissors;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -48,6 +49,7 @@ public class ServerConnection extends Thread {
 		addRoom (InterstellarWar.GAME_NAME, "map03");
 		addRoom (InterstellarWar.GAME_NAME, "map04");
 		addRoom (InterstellarWar.GAME_NAME, "map05");
+		addRoom (RockPaperScissors.GAME_NAME, "");
 		mRoomServer.start ();
 		mIsRunning = true;
 		while (mIsRunning) {
@@ -154,13 +156,13 @@ public class ServerConnection extends Thread {
 			log.i ("User (" + command.data[0] + ") is connecting to the Room (" + command.data[2] + ")");
 			mUserToRoomHashMap.put ((int) command.data[0], (int) command.data[2]);
 			room.addConnection ((int) command.data[0]);
-			sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getConnectionIndex ((int) command.data[0]), room.getGameMap ().toData ()));
+			sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getConnectionIndex ((int) command.data[0]), room.getGameName (), room.getGameMap ().toData ()));
 			if (room.isFull ()) {
 				room.send (Command.Type.READY_TO_PLAY, room.getGameName (), room.getMapFantasyName ());
 				room.start ();
 				addRoom (room.getGameName (), room.getMapName ());
 			} else {
-				send (Command.Type.LIST_ROOMS, getRoomData ());
+				//				send (Command.Type.LIST_ROOMS, getRoomData ());
 			}
 		} else {
 			log.i (command.data[0] + " is connecting to the Room (" + command.data[2] + "), but its full/running/not existing!");

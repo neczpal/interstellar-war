@@ -1,5 +1,7 @@
 package game.map;
 
+import game.map.interstellarwar.InterstellarWar;
+import game.map.rockpaperscissors.RockPaperScissors;
 import game.server.Command;
 import game.server.Connection;
 
@@ -13,9 +15,16 @@ public abstract class GameMap {
 	private int mMaxUsers;
 	private Connection mConnection;
 
-	public GameMap () {
-
+	public static GameMap createGameMap (String gameName) {
+		GameMap gameMap = null;
+		if (gameName.equals (InterstellarWar.GAME_NAME)) {
+			gameMap = new InterstellarWar ();
+		} else if (gameName.equals (RockPaperScissors.GAME_NAME)) {
+			gameMap = new RockPaperScissors ();
+		}
+		return gameMap;
 	}
+
 	public String getMapName () {
 		return mMapName;
 	}

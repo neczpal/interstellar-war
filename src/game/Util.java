@@ -14,7 +14,7 @@ public class Util {
 	public static final Color DEFAULT_FONT_COLOR = Color.BLACK;
 	private static int[] mCharacters;
 
-	public static void loadDefaultTextures () {
+	public static void loadTextures () {
 		mCharacters = Loader.loadTextures ("res/pictures/font64.png", 64, 64);
 	}
 
@@ -35,8 +35,6 @@ public class Util {
 
 	public static void drawRect (int x, int y, int w, int h, int tex) {
 		int wx = w + x, hy = h + y;
-
-		DEFAULT_COLOR.setGLColor ();
 
 		glBindTexture (GL_TEXTURE_2D, tex);
 		glBegin (GL_QUADS);

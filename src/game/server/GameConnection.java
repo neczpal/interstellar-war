@@ -2,7 +2,6 @@ package game.server;
 
 import game.Log;
 import game.map.GameMap;
-import game.map.interstellarwar.InterstellarWar;
 import game.ui.OpenRoomsFrame;
 
 import java.io.IOException;
@@ -40,8 +39,6 @@ public class GameConnection extends Thread implements Connection {
 		mOpenRoomsFrame = openRoomsFrame;
 		mUserName = userName;
 		mIsRunning = false;
-		mMap = new InterstellarWar ();// #TODO other maps
-		mMap.setConnection (this);
 		try {
 			mSocket = new Socket (ip, 23232);
 
@@ -135,7 +132,9 @@ public class GameConnection extends Thread implements Connection {
 				log.i ("Map data received");
 				mRoomConnectionId = (int) command.data[0];
 				mRoomIndex = (int) command.data[1];
-				mMap.loadData ((Serializable[]) command.data[2]);
+				mMap = GameMap.createGameMap ((String) command.data[2]);
+				mMap.setConnection (this);
+				mMap.loadData ((Serializable[]) command.data[3]);
 				break;
 			case READY_TO_PLAY:
 				log.i (command.data[0] + " (" + command.data[1] + ") is ready to play.");

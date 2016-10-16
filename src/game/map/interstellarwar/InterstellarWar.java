@@ -88,7 +88,7 @@ public class InterstellarWar extends GameMap {
 		mPlanets = new ArrayList <> ();
 		mConnections = new ArrayList <> ();
 		try {
-			File mapFile = new File (System.getProperty ("user.dir") + "/res/maps2d/" + fileName);
+			File mapFile = new File (System.getProperty ("user.dir") + "/res/interstellarwar/" + fileName);
 
 			FileReader fileReader = new FileReader (mapFile);
 			BufferedReader bufferedReader = new BufferedReader (fileReader);
@@ -183,6 +183,9 @@ public class InterstellarWar extends GameMap {
 	public void onGameThread () {
 		try {
 			Thread.sleep (1500);
+			for (Planet planet : mPlanets) {
+				planet.addUnit ();
+			}
 			getConnection ().send (Command.Type.GAME_DATA, GameCommand.SPAWN_UNITS);
 		} catch (InterruptedException e) {
 			e.printStackTrace ();
@@ -207,6 +210,7 @@ public class InterstellarWar extends GameMap {
 	public void receiveServer (Command command) {
 		switch ((GameCommand) command.data[2]) {
 			case MOVE_UNITS:
+				mPlanets.get ((int) command.data[3]).moveUnitsTo (mPlanets.get ((int) command.data[4]));
 				getConnection ().send (new Command (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, command.data[3], command.data[4]));
 				break;
 		}

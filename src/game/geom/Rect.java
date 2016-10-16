@@ -1,8 +1,9 @@
 package game.geom;
 
+import game.Util;
+
 import java.io.Serializable;
 
-import static org.lwjgl.opengl.GL11.*;
 /**
  * Created by neczp on 2016. 10. 06..
  */
@@ -10,23 +11,32 @@ public class Rect implements Serializable {
 
 	private int x, y;
 	private int width, height;
+	private Color color;
+	private int mTexture = -1;
 
 	public Rect (int x, int y, int w, int h) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
 		this.height = h;
+		this.color = Color.WHITE;
 	}
 
 	public void draw () {
-		glBegin (GL_QUADS);
-		{
-			glVertex2i (x, y);
-			glVertex2i (x, y + height);
-			glVertex2i (x + width, y + height);
-			glVertex2i (x + width, y);
-		}
-		glEnd ();
+		color.setGLColor ();
+		Util.drawRect (x, y, width, height, mTexture);
+	}
+
+	public boolean isInside (Point2D point) {
+		return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
+	}
+
+	public void setColor (Color color) {
+		this.color = color;
+	}
+
+	public void setTexture (int texture) {
+		this.mTexture = texture;
 	}
 
 	public int getX () {
