@@ -20,8 +20,8 @@ import static org.lwjgl.opengl.GL11.*;
 public final class Loader {
 
 	private static String mRootDirectory = System.getProperty ("user.dir");
-	private static HashMap <String, Integer> mTextureCache;
-	private static HashMap <String, Integer> mSoundCache;
+	private static HashMap <String, Integer> mTextureCache = new HashMap <> ();
+	private static HashMap <String, Integer> mSoundCache = new HashMap <> ();
 	private static boolean useCache = true;
 
 	private Loader () {
