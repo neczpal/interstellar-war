@@ -8,7 +8,10 @@ import game.map.rockpaperscissors.RockPaperScissors;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class ServerConnection extends Thread {
 
@@ -211,7 +214,8 @@ public class ServerConnection extends Thread {
 	}
 
 	public void sendToId (int id, Command command) {
-		if (!mClients.get (id).send (command)) {
+		Client client = mClients.get (id);
+		if (client != null && !client.send (command)) {
 			removeClient (id);
 		}
 	}
@@ -227,15 +231,12 @@ public class ServerConnection extends Thread {
 
 	public void send (Command command) {
 		Iterator <HashMap.Entry <Integer, Client>> iterator = mClients.entrySet ().iterator ();
-		ArrayList <Integer> toBeDeleted = new ArrayList <> ();
 		while (iterator.hasNext ()) {
-			Map.Entry <Integer, Client> next = iterator.next ();
-			if (!next.getValue ().send (command)) {
-				toBeDeleted.add (next.getKey ());
+			HashMap.Entry <Integer, Client> entry = iterator.next ();
+			if (!entry.getValue ().send (command)) {
+				iterator.remove ();
+				removeClient (entry.getKey ());
 			}
-		}
-		for (Integer index : toBeDeleted) {
-			removeClient (index);
 		}
 	}
 

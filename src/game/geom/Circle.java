@@ -42,6 +42,9 @@ public class Circle {
 		glEnd ();
 	}
 
+	public int getTexture () {
+		return mTexture;
+	}
 	public void setTexture (int texture) {
 		mTexture = texture;
 	}

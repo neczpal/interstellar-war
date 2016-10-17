@@ -1,6 +1,6 @@
 package game.ui;
 
-import game.Loader;
+import game.Textures;
 import game.Util;
 import game.server.GameConnection;
 import org.lwjgl.LWJGLException;
@@ -36,6 +36,8 @@ public class GameFrame extends Thread {
 		initDisplay ();
 		initGL ();
 		Util.loadTextures ();
+		Textures.loadTextures ();
+		mConnection.getGameMap ().initTextures ();
 
 		while (!Display.isCloseRequested ()) {
 			glClear (GL_COLOR_BUFFER_BIT);
@@ -58,8 +60,6 @@ public class GameFrame extends Thread {
 			Display.create ();
 			Keyboard.create ();
 			Mouse.create ();
-			Loader.setUseCache (false);
-
 
 		} catch (LWJGLException ex) {
 			Logger.getLogger (GameFrame.class.getName ()).log (Level.SEVERE, null, ex);

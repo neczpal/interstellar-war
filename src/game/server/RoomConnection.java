@@ -48,7 +48,7 @@ public class RoomConnection extends Thread implements Connection {
 		mGameIsRunning = true;
 		while (mGameIsRunning) {
 			if (!mMap.onGameThread ()) {
-				stopGame ();
+				//				stopGame ();
 			}
 		}
 	}

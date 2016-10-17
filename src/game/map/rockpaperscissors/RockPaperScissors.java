@@ -1,5 +1,6 @@
 package game.map.rockpaperscissors;
 
+import game.Textures;
 import game.geom.Color;
 import game.geom.Point2D;
 import game.geom.Rect;
@@ -35,10 +36,19 @@ public class RockPaperScissors extends GameMap {
 		mRockButtonP1 = new Rect (200, 100, 50, 50);
 		mPaperButtonP1 = new Rect (300, 100, 50, 50);
 		mScissorButtonP1 = new Rect (400, 100, 50, 50);
-
 		mRockButtonP2 = new Rect (200, 300, 50, 50);
 		mPaperButtonP2 = new Rect (300, 300, 50, 50);
 		mScissorButtonP2 = new Rect (400, 300, 50, 50);
+	}
+
+	public void initTextures () {
+		mRockButtonP1.setTexture (Textures.RockPaperScissors.rock);
+		mPaperButtonP1.setTexture (Textures.RockPaperScissors.paper);
+		mScissorButtonP1.setTexture (Textures.RockPaperScissors.scissors);
+
+		mRockButtonP2.setTexture (Textures.RockPaperScissors.rock);
+		mPaperButtonP2.setTexture (Textures.RockPaperScissors.paper);
+		mScissorButtonP2.setTexture (Textures.RockPaperScissors.scissors);
 	}
 
 	@Override

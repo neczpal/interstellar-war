@@ -22,7 +22,7 @@ public final class Loader {
 	private static String mRootDirectory = System.getProperty ("user.dir");
 	private static HashMap <String, Integer> mTextureCache = new HashMap <> ();
 	private static HashMap <String, Integer> mSoundCache = new HashMap <> ();
-	private static boolean useCache = true;
+	private static boolean useCache = false;
 
 	private Loader () {
 	}
@@ -126,7 +126,7 @@ public final class Loader {
 	private static int loadTexture (BufferedImage image, String name) {
 		int textureID = loadTexture (image);
 		if (useCache) {
-			mTextureCache.put (name, textureID - 1);
+			mTextureCache.put (name, textureID);
 		}
 		return textureID;
 	}
