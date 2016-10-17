@@ -47,6 +47,7 @@ public class OpenRoomsFrame {
 		Container contentPane = jFrame.getContentPane ();
 		contentPane.add (scrollPane, BorderLayout.CENTER);
 
+		jFrame.setLocationByPlatform (true);
 		jFrame.setSize (640, 480);
 		jFrame.setVisible (true);
 	}
@@ -66,13 +67,13 @@ public class OpenRoomsFrame {
 			String map = (String) data[i++];
 			int user = (int) data[i++];
 			int maxuser = (int) data[i++];
-			if (mRoomInfoList.size () < listIndex + 1) {
-				changed = true;
-			} else {
+			if (listIndex < mRoomInfoList.size ()) {
 				RoomInfo roomInfo = mRoomInfoList.get (listIndex);
 				if ((id != roomInfo.mRoomId) || !game.equals (roomInfo.mGameName) || !map.equals (roomInfo.mMapName) || user != roomInfo.mUserCount || maxuser != roomInfo.mMaxUserCount) {
 					changed = true;
 				}
+			} else {
+				changed = true;
 			}
 			newRoomInfoList.add (new RoomInfo (id, game, map, user, maxuser));
 			listIndex++;

@@ -35,13 +35,16 @@ public class Circle {
 			float y = ysin * r + k.y;
 			float tx = xcos * 0.5f + 0.5f;
 			float ty = ysin * 0.5f + 0.5f;
-			glTexCoord2d (tx, ty);
-			glVertex2d (x, y);
+			glTexCoord2f (tx, ty);
+			glVertex2f (x, y);
 		}
 
 		glEnd ();
 	}
 
+	public int getTexture () {
+		return mTexture;
+	}
 	public void setTexture (int texture) {
 		mTexture = texture;
 	}

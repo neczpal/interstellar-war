@@ -65,9 +65,11 @@ public class Planet extends Circle {
 
 	@Override
 	public void draw () {
-		Color.values ()[mOwnedBy].setGLColor ();
-		super.draw ();
 		Point2D center = getCenter ();
-		Util.drawString (Integer.toString (mUnitNumber), center.getX () - Util.DEFAULT_FONTSIZE / 2, center.getY () - Util.DEFAULT_FONTSIZE / 2);
+		Color.values ()[mOwnedBy].setGLColor ();
+		Util.drawCircle (center.getX (), center.getY (), getRadius () + 3);
+		Util.DEFAULT_COLOR.setGLColor ();
+		super.draw ();
+		Util.drawString (Integer.toString (mUnitNumber), center.getX () - Util.DEFAULT_FONTSIZE / 2, center.getY () - Util.DEFAULT_FONTSIZE / 2, Util.DEFAULT_FONTSIZE, Color.values ()[mOwnedBy]);
 	}
 }

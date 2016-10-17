@@ -1,5 +1,6 @@
 package game.map.interstellarwar;
 
+import game.Textures;
 import game.geom.Line;
 import game.geom.Point2D;
 import game.map.GameMap;
@@ -20,18 +21,18 @@ public class InterstellarWar extends GameMap {
 	private int mPlanetNumber;
 	private int mConnectionNumber;
 
-	private ArrayList <Planet> mPlanets;
-	private ArrayList <Integer[]> mConnections;
+	private ArrayList <Planet> mPlanets = new ArrayList <> ();
+	private ArrayList <Integer[]> mConnections = new ArrayList <> ();
 
 	private boolean mWasMouseDown = false;
 
 	private Planet mSelectedPlanetFrom = null;
 	private Planet mSelectedPlanetTo = null;
 
-
-	public InterstellarWar () {
-		mPlanets = new ArrayList <> ();
-		mConnections = new ArrayList <> ();
+	public void initTextures () {
+		for (Planet planet : mPlanets) {
+			planet.setTexture (Textures.InterstellarWar.planet[(planet.getCenter ().getX () + planet.getCenter ().getY ()) % 9]);
+		}
 	}
 
 	public void mouseEvent () {

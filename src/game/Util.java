@@ -9,15 +9,13 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Util {
 
-	public static final int DEFAULT_FONTSIZE = 24;
+	public static final int DEFAULT_FONTSIZE = 14;
 	public static final Color DEFAULT_COLOR = Color.WHITE;
-	public static final Color DEFAULT_FONT_COLOR = Color.BLACK;
-	public static int mTry;
+	public static final Color DEFAULT_FONT_COLOR = Color.WHITE;
 	private static int[] mCharacters;
 
 	public static void loadTextures () {
 		mCharacters = Loader.loadTextures ("res/pictures/font64.png", 64, 64);
-		mTry = Loader.loadTexture ("res/interstellarwar/planet1.png");
 	}
 
 	public static void drawString (String string, int x, int y) {
@@ -33,6 +31,7 @@ public class Util {
 		for (int i = 0; i < string.length (); i++) {
 			drawRect (x + i * fontSize, y, fontSize, fontSize, mCharacters[string.charAt (i)]);
 		}
+		DEFAULT_COLOR.setGLColor ();
 	}
 
 	public static void drawRect (int x, int y, int w, int h, int tex) {
@@ -51,5 +50,21 @@ public class Util {
 			glVertex2i (x, hy);
 		}
 		glEnd ();
+	}
+
+	public static void drawCircle (int x, int y, int r) {
+		glDisable (GL_TEXTURE_2D);
+		glBegin (GL_POLYGON);
+
+		for (float angle = 0.0f; angle < 360.0f; angle += 2.0f) {
+			float radian = (float) (angle * (Math.PI / 180.0f));
+
+			float xcos = (float) Math.cos (radian);
+			float ysin = (float) Math.sin (radian);
+			glVertex2f (xcos * r + x, ysin * r + y);
+		}
+
+		glEnd ();
+		glEnable (GL_TEXTURE_2D);
 	}
 }

@@ -41,6 +41,8 @@ public abstract class GameMap {
 		this.mMaxUsers = mMaxUsers;
 	}
 
+	public abstract void initTextures ();
+
 	public abstract void mouseEvent ();
 
 	public abstract void keyboardEvent ();
