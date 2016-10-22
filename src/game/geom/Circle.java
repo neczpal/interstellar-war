@@ -42,12 +42,18 @@ public class Circle {
 		glEnd ();
 	}
 
+	public double distance (Circle other) {
+		return getCenter ().distance (other.getCenter ());
+	}
+
 	public int getTexture () {
 		return mTexture;
 	}
+
 	public void setTexture (int texture) {
 		mTexture = texture;
 	}
+
 	public void move (int dx, int dy) {
 		k.move (dx, dy);
 	}

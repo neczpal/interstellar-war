@@ -1,6 +1,7 @@
 package game.map.interstellarwar;
 
 import game.Textures;
+import game.geom.Color;
 import game.geom.Line;
 import game.geom.Point2D;
 import game.map.GameMap;
@@ -22,19 +23,24 @@ public class InterstellarWar extends GameMap {
 	private int mConnectionNumber;
 
 	private ArrayList <Planet> mPlanets = new ArrayList <> ();
+	private ArrayList <SpaceShip> mSpaceShips = new ArrayList <> ();
 	private ArrayList <Integer[]> mConnections = new ArrayList <> ();
 
 	private boolean mWasMouseDown = false;
 
 	private Planet mSelectedPlanetFrom = null;
 	private Planet mSelectedPlanetTo = null;
+	//ONLY SERVER
+	private int tickNummber = 0;
 
+	@Override
 	public void initTextures () {
 		for (Planet planet : mPlanets) {
 			planet.setTexture (Textures.InterstellarWar.planet[(planet.getCenter ().getX () + planet.getCenter ().getY ()) % 9]);
 		}
 	}
 
+	@Override
 	public void mouseEvent () {
 		if (Mouse.isButtonDown (0) && !mWasMouseDown) {
 			mWasMouseDown = true;
@@ -57,7 +63,7 @@ public class InterstellarWar extends GameMap {
 						mSelectedPlanetTo = planet;
 						int index = ((GameConnection) getConnection ()).getRoomIndex ();
 						if (mSelectedPlanetFrom.getOwnedBy () == index) {
-							getConnection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
+							getConnection ().send (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
 						}
 						break;
 					}
@@ -69,6 +75,7 @@ public class InterstellarWar extends GameMap {
 		}
 	}
 
+	@Override
 	public void keyboardEvent () {
 
 	}
@@ -80,8 +87,10 @@ public class InterstellarWar extends GameMap {
 			Planet planet1 = mPlanets.get (integers[0]);
 			Planet planet2 = mPlanets.get (integers[1]);
 			Line line = new Line (planet1.getCenter (), planet2.getCenter ());
+			Color.WHITE.setGLColor ();
 			line.draw ();
 		}
+		mSpaceShips.forEach (SpaceShip::draw);
 	}
 
 	@Override
@@ -179,15 +188,27 @@ public class InterstellarWar extends GameMap {
 		return list.toArray (data);
 	}
 
-	//ONLY SERVER
 	@Override
 	public boolean onGameThread () {
 		try {
-			Thread.sleep (1500);
-			for (Planet planet : mPlanets) {
-				planet.addUnit ();
+			Thread.sleep (50);
+			tickNummber++;
+			ArrayList <SpaceShip> toDel = new ArrayList <> ();
+			for (SpaceShip spaceShip : mSpaceShips) {
+				if (spaceShip.tick ()) {
+					spaceShip.moveUnitsTo (mPlanets.get (spaceShip.getToPlanet ()));
+					toDel.add (spaceShip);
+				}
 			}
-			getConnection ().send (Command.Type.GAME_DATA, GameCommand.SPAWN_UNITS);
+			mSpaceShips.removeAll (toDel);
+			getConnection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS);
+
+			if (tickNummber % 32 == 0) {
+				for (Planet planet : mPlanets) {
+					planet.addUnit ();
+				}
+				getConnection ().send (Command.Type.GAME_DATA, GameCommand.SPAWN_UNITS);
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace ();
 		}
@@ -202,8 +223,19 @@ public class InterstellarWar extends GameMap {
 					planet.addUnit ();
 				}
 				break;
+			case START_MOVE_UNITS:
+				addSpaceShip (mPlanets.get ((int) command.data[1]), mPlanets.get ((int) command.data[2]));
+				//				mPlanets.get ((int) command.data[1]).moveUnitsTo (mPlanets.get ((int) command.data[2]));
+				break;
 			case MOVE_UNITS:
-				mPlanets.get ((int) command.data[1]).moveUnitsTo (mPlanets.get ((int) command.data[2]));
+				ArrayList <SpaceShip> toDel = new ArrayList <> ();
+				for (SpaceShip spaceShip : mSpaceShips) {
+					if (spaceShip.tick ()) {
+						spaceShip.moveUnitsTo (mPlanets.get (spaceShip.getToPlanet ()));
+						toDel.add (spaceShip);
+					}
+				}
+				mSpaceShips.removeAll (toDel);
 				break;
 		}
 	}
@@ -211,14 +243,32 @@ public class InterstellarWar extends GameMap {
 	@Override
 	public void receiveServer (Command command) {
 		switch ((GameCommand) command.data[2]) {
-			case MOVE_UNITS:
-				mPlanets.get ((int) command.data[3]).moveUnitsTo (mPlanets.get ((int) command.data[4]));
-				getConnection ().send (new Command (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS, command.data[3], command.data[4]));
+			case START_MOVE_UNITS:
+				addSpaceShip (mPlanets.get ((int) command.data[3]), mPlanets.get ((int) command.data[4]));
+				//				mPlanets.get ((int) command.data[3]).moveUnitsTo (mPlanets.get ((int) command.data[4]));
+				getConnection ().send (new Command (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, command.data[3], command.data[4]));
 				break;
 		}
 	}
 
+	private void addSpaceShip (Planet from, Planet to) {
+		double length = from.distance (to);
+		int lx = to.getCenter ().getX () - from.getCenter ().getX ();
+		int ly = to.getCenter ().getY () - from.getCenter ().getY ();
+		int hx = (int) ((double) lx / length * SpaceShip.SPACE_SHIP_SIZE);
+		int hy = (int) ((double) ly / length * SpaceShip.SPACE_SHIP_SIZE);
+
+		Point2D a = new Point2D (from.getCenter ().getX () + hx, from.getCenter ().getY () + hy);
+		Point2D b = new Point2D (from.getCenter ().getX () + hx / 2, from.getCenter ().getY () + hy / 2);
+		Point2D c = new Point2D (from.getCenter ().getX () + hx / 2, from.getCenter ().getY () + hy / 2);
+		b.rotate (from.getCenter (), -90);
+		c.rotate (from.getCenter (), 90);
+
+		mSpaceShips.add (new SpaceShip (a, b, c, from.getOwnedBy (), from.getUnitNumber (), (int) (2 * length / SpaceShip.SPACE_SHIP_SIZE), hx / 2, hy / 2, mPlanets.indexOf (to)));
+		from.setUnitNumber (0);
+	}
+
 	enum GameCommand {
-		SPAWN_UNITS, MOVE_UNITS
+		SPAWN_UNITS, START_MOVE_UNITS, MOVE_UNITS
 	}
 }

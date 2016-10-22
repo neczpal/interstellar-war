@@ -32,8 +32,16 @@ public class Planet extends Circle {
 		return mOwnedBy;
 	}
 
+	public void setOwnedBy (int ownedBy) {
+		this.mOwnedBy = ownedBy;
+	}
+
 	public int getUnitNumber () {
 		return mUnitNumber;
+	}
+
+	public void setUnitNumber (int unitNumber) {
+		this.mUnitNumber = unitNumber;
 	}
 
 	public boolean isNeighbor (Planet planet) {
@@ -71,5 +79,9 @@ public class Planet extends Circle {
 		Util.DEFAULT_COLOR.setGLColor ();
 		super.draw ();
 		Util.drawString (Integer.toString (mUnitNumber), center.getX () - Util.DEFAULT_FONTSIZE / 2, center.getY () - Util.DEFAULT_FONTSIZE / 2, Util.DEFAULT_FONTSIZE, Color.values ()[mOwnedBy]);
+	}
+
+	public void addUnit (int mUnitsNum) {
+		mUnitNumber += mUnitsNum;
 	}
 }

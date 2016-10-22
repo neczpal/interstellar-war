@@ -4,6 +4,7 @@ import game.map.GameMap;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Created by neczp on 2016. 10. 11..
@@ -70,8 +71,16 @@ public class RoomConnection extends Thread implements Connection {
 
 	@Override
 	public void send (Command command) {
-		for (Integer connectionId : mConnectionIds.keySet ()) {
-			mServerConnection.sendToId (connectionId, command);
+		HashMap <Integer, Client> clients = mServerConnection.getClients ();
+		Iterator <HashMap.Entry <Integer, Client>> iterator = clients.entrySet ().iterator ();
+		while (iterator.hasNext ()) {
+			HashMap.Entry <Integer, Client> entry = iterator.next ();
+			if (mConnectionIds.containsKey (entry.getKey ())) {
+				if (!entry.getValue ().send (command)) {
+					iterator.remove ();
+					mServerConnection.removeClient (entry.getKey ());
+				}
+			}
 		}
 	}
 

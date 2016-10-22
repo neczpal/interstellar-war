@@ -240,4 +240,7 @@ public class ServerConnection extends Thread {
 		}
 	}
 
+	public HashMap <Integer, Client> getClients () {
+		return mClients;
+	}
 }
