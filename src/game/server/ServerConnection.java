@@ -199,7 +199,7 @@ public class ServerConnection extends Thread {
 				//				}
 				break;
 			case GAME_DATA:
-				log.i ("User (" + command.data[0] + ") in the Room (" + command.data[2] + ") sent GAME_DATA " + command.data[2]);
+				log.i ("User (" + command.data[0] + ") in the Room (" + command.data[1] + ") sent GAME_DATA " + command.data[2]);
 				mRooms.get (command.data[1]).getGameMap ().receiveServer (command);
 				break;
 		}

@@ -6,7 +6,9 @@ import static org.lwjgl.opengl.GL11.*;
  * Created by neczp on 2016. 10. 21..
  */
 public class Triangle {
-	private Point2D a, b, c;
+	private Point2D a;
+	private Point2D b;
+	private Point2D c;
 
 	public Triangle (Point2D a, Point2D b, Point2D c) {
 		this.a = a;
@@ -36,6 +38,18 @@ public class Triangle {
 		a.rotate (p, angle);
 		b.rotate (p, angle);
 		c.rotate (p, angle);
+	}
+
+	public Point2D getA () {
+		return a;
+	}
+
+	public Point2D getB () {
+		return b;
+	}
+
+	public Point2D getC () {
+		return c;
 	}
 
 }

@@ -1,6 +1,7 @@
 package game.map.interstellarwar;
 
 import game.Textures;
+import game.Util;
 import game.geom.Color;
 import game.geom.Line;
 import game.geom.Point2D;
@@ -47,33 +48,52 @@ public class InterstellarWar extends GameMap {
 			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
 
 			for (Planet planet : mPlanets) {
-				if (planet.isInside (point)) {
+				if (planet.isInside (point) && ((GameConnection) getConnection ()).getRoomIndex () == planet.getOwnedBy ()) {
 					mSelectedPlanetFrom = planet;
 					break;
 				}
 			}
-		} else if (!Mouse.isButtonDown (0) && mWasMouseDown) {
-			mWasMouseDown = false;
+		} else if (Mouse.isButtonDown (0) && mWasMouseDown) {
+			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
 
-			if (mSelectedPlanetFrom != null) {
-				Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
-
-				for (Planet planet : mPlanets) {
-					if (planet.isInside (point) && planet.isNeighbor (mSelectedPlanetFrom)) {
-						mSelectedPlanetTo = planet;
-						int index = ((GameConnection) getConnection ()).getRoomIndex ();
-						if (mSelectedPlanetFrom.getOwnedBy () == index) {
-							getConnection ().send (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
-						}
-						break;
-					}
+			boolean isThere = false;
+			for (Planet planet : mPlanets) {
+				if (planet.isInside (point) && planet.isNeighbor (mSelectedPlanetFrom)) {
+					mSelectedPlanetTo = planet;
+					isThere = true;
+					break;
 				}
-
 			}
-			mSelectedPlanetFrom = null;
-			mSelectedPlanetTo = null;
+			if (!isThere) {
+				mSelectedPlanetTo = null;
+			}
+		} else if (!Mouse.isButtonDown (0)) {
+
+			if (mWasMouseDown) {
+				mWasMouseDown = false;
+
+				if (mSelectedPlanetFrom != null) {
+					Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
+
+					for (Planet planet : mPlanets) {
+						if (planet.isInside (point) && planet.isNeighbor (mSelectedPlanetFrom)) {
+							mSelectedPlanetTo = planet;
+							int index = ((GameConnection) getConnection ()).getRoomIndex ();
+							if (mSelectedPlanetFrom.getOwnedBy () == index) {
+								getConnection ().send (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
+							}
+							break;
+						}
+					}
+
+				}
+			} else {
+				mSelectedPlanetFrom = null;
+				mSelectedPlanetTo = null;
+			}
 		}
 	}
+
 
 	@Override
 	public void keyboardEvent () {
@@ -82,6 +102,15 @@ public class InterstellarWar extends GameMap {
 
 	@Override
 	public void draw () {
+		if (mSelectedPlanetFrom != null) {
+			Point2D center1 = mSelectedPlanetFrom.getCenter ();
+			Util.drawCircle (center1.getX (), center1.getY (), mSelectedPlanetFrom.getRadius () + 5, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+		}
+		if (mSelectedPlanetTo != null) {
+			Point2D center2 = mSelectedPlanetTo.getCenter ();
+			Util.drawCircle (center2.getX (), center2.getY (), mSelectedPlanetTo.getRadius () + 5, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+		}
+
 		mPlanets.forEach (Planet::draw);
 		for (Integer[] integers : mConnections) {
 			Planet planet1 = mPlanets.get (integers[0]);
@@ -252,6 +281,9 @@ public class InterstellarWar extends GameMap {
 	}
 
 	private void addSpaceShip (Planet from, Planet to) {
+		if (from.getUnitNumber () == 0)
+			return;
+
 		double length = from.distance (to);
 		double lx = to.getCenter ().getX () - from.getCenter ().getX ();
 		double ly = to.getCenter ().getY () - from.getCenter ().getY ();

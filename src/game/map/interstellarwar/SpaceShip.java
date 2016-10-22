@@ -1,5 +1,6 @@
 package game.map.interstellarwar;
 
+import game.Util;
 import game.geom.Color;
 import game.geom.Point2D;
 import game.geom.Triangle;
@@ -8,7 +9,7 @@ import game.geom.Triangle;
  * Created by neczp on 2016. 10. 21..
  */
 public class SpaceShip extends Triangle {
-	public static final int SPACE_SHIP_SIZE = 10;
+	public static final int SPACE_SHIP_SIZE = 12;
 
 	private int mUnitsNum;
 	private int mOwnedBy;
@@ -38,6 +39,8 @@ public class SpaceShip extends Triangle {
 	public void draw () {
 		Color.values ()[mOwnedBy].setGLColor ();
 		super.draw ();
+		Point2D top = getA ();
+		Util.drawString (Integer.toString (mUnitsNum), top.getX () + vx, top.getY () + vy, 10, Color.values ()[mOwnedBy]);
 	}
 
 	public int getUnitsNum () {
