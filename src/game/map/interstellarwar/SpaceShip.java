@@ -14,10 +14,10 @@ public class SpaceShip extends Triangle {
 	private int mOwnedBy;
 	private int mMaxTick;
 	private int mCurrentTick;
-	private int vx, vy;
+	private double vx, vy;
 	private int mToPlanet;
 
-	public SpaceShip (Point2D a, Point2D b, Point2D c, int ownedBy, int unitNum, int maxtick, int vx, int vy, int to) {
+	public SpaceShip (Point2D a, Point2D b, Point2D c, int ownedBy, int unitNum, int maxtick, double vx, double vy, int to) {
 		super (a, b, c);
 		mUnitsNum = unitNum;
 		mOwnedBy = ownedBy;
@@ -40,11 +40,11 @@ public class SpaceShip extends Triangle {
 		super.draw ();
 	}
 
-	public int getmUnitsNum () {
+	public int getUnitsNum () {
 		return mUnitsNum;
 	}
 
-	public int getmOwnedBy () {
+	public int getOwnedBy () {
 		return mOwnedBy;
 	}
 

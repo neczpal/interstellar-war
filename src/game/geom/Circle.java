@@ -9,14 +9,14 @@ public class Circle {
 	private static final int circle_points = 120;
 
 	private Point2D k;
-	private int r;
+	private double r;
 	private int mTexture = -1;
 
-	public Circle (int x, int y, int r) {
+	public Circle (double x, double y, double r) {
 		this (new Point2D (x, y), r);
 	}
 
-	public Circle (Point2D k, int r) {
+	public Circle (Point2D k, double r) {
 		this.k = k;
 		this.r = r;
 	}
@@ -27,16 +27,16 @@ public class Circle {
 		glBegin (GL_POLYGON);
 
 		for (float angle = 0.0f; angle < 360.0f; angle += 2.0f) {
-			float radian = (float) (angle * (Math.PI / 180.0f));
+			double radian = angle * (Math.PI / 180.0f);
 
-			float xcos = (float) Math.cos (radian);
-			float ysin = (float) Math.sin (radian);
-			float x = xcos * r + k.x;
-			float y = ysin * r + k.y;
-			float tx = xcos * 0.5f + 0.5f;
-			float ty = ysin * 0.5f + 0.5f;
-			glTexCoord2f (tx, ty);
-			glVertex2f (x, y);
+			double xcos = Math.cos (radian);
+			double ysin = Math.sin (radian);
+			double x = xcos * r + k.x;
+			double y = ysin * r + k.y;
+			double tx = xcos * 0.5 + 0.5;
+			double ty = ysin * 0.5 + 0.5;
+			glTexCoord2d (tx, ty);
+			glVertex2d (x, y);
 		}
 
 		glEnd ();
@@ -54,7 +54,7 @@ public class Circle {
 		mTexture = texture;
 	}
 
-	public void move (int dx, int dy) {
+	public void move (double dx, double dy) {
 		k.move (dx, dy);
 	}
 
@@ -70,15 +70,15 @@ public class Circle {
 		return k;
 	}
 
-	public int getRadius () {
+	public double getRadius () {
 		return r;
 	}
 
-	public void setRadius (int radius) {
+	public void setRadius (double radius) {
 		this.r = radius;
 	}
 
-	public void setPosition (int x, int y) {
+	public void setPosition (double x, double y) {
 		k.setPosition (x, y);
 	}
 }

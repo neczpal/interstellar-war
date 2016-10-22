@@ -16,7 +16,7 @@ public class Planet extends Circle {
 	private int mUnitNumber;
 	private ArrayList <Planet> mNeighbors;
 
-	public Planet (int x, int y, int radius, int ownedBy, int unitNumber) {
+	public Planet (double x, double y, double radius, int ownedBy, int unitNumber) {
 		super (x, y, radius);
 		mUnitNumber = unitNumber;
 		mOwnedBy = ownedBy;
@@ -50,20 +50,6 @@ public class Planet extends Circle {
 
 	public int getIndex (Planet planet) {
 		return mNeighbors.indexOf (planet);
-	}
-
-	public void moveUnitsTo (Planet planet) {
-		if (planet.mOwnedBy == mOwnedBy) {
-			planet.mUnitNumber += mUnitNumber;
-			mUnitNumber = 0;
-		} else {
-			planet.mUnitNumber -= mUnitNumber;
-			mUnitNumber = 0;
-			if (planet.mUnitNumber < 0) {
-				planet.mOwnedBy = mOwnedBy;
-				planet.mUnitNumber = Math.abs (planet.mUnitNumber);
-			}
-		}
 	}
 
 	public void addUnit () {

@@ -6,13 +6,13 @@ import static org.lwjgl.opengl.GL11.*;
  * Created by neczp on 2016. 10. 06..
  */
 public class Point2D {
-	int x, y;
+	double x, y;
 
 	public Point2D () {
 		this (0, 0);
 	}
 
-	public Point2D (int x, int y) {
+	public Point2D (double x, double y) {
 		setPosition (x, y);
 	}
 
@@ -24,7 +24,7 @@ public class Point2D {
 		glEnd ();
 	}
 
-	public void move (int dx, int dy) {
+	public void move (double dx, double dy) {
 		x += dx;
 		y += dy;
 	}
@@ -43,23 +43,23 @@ public class Point2D {
 		return Math.sqrt (Math.pow (p.x - x, 2) + Math.pow (p.y - y, 2));
 	}
 
-	public int getX () {
+	public double getX () {
 		return x;
 	}
 
-	public void setX (int x) {
+	public void setX (double x) {
 		this.x = x;
 	}
 
-	public int getY () {
+	public double getY () {
 		return y;
 	}
 
-	public void setY (int y) {
+	public void setY (double y) {
 		this.y = y;
 	}
 
-	public final void setPosition (int x, int y) {
+	public final void setPosition (double x, double y) {
 		setX (x);
 		setY (y);
 	}

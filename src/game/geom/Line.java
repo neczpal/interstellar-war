@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class Line {
 	private Point2D a, b;
 
-	public Line (int a1, int a2, int b1, int b2) {
+	public Line (double a1, double a2, double b1, double b2) {
 		this (new Point2D (a1, a2), new Point2D (b1, b2));
 	}
 

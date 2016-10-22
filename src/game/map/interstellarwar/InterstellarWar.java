@@ -36,7 +36,7 @@ public class InterstellarWar extends GameMap {
 	@Override
 	public void initTextures () {
 		for (Planet planet : mPlanets) {
-			planet.setTexture (Textures.InterstellarWar.planet[(planet.getCenter ().getX () + planet.getCenter ().getY ()) % 9]);
+			planet.setTexture (Textures.InterstellarWar.planet[(int) (planet.getCenter ().getX () + planet.getCenter ().getY ()) % 9]);
 		}
 	}
 
@@ -112,7 +112,7 @@ public class InterstellarWar extends GameMap {
 			for (int i = 0; i < mPlanetNumber; i++) {
 				String[] params = bufferedReader.readLine ().split (" ");
 
-				mPlanets.add (new Planet (Integer.parseInt (params[0]), Integer.parseInt (params[1]), Integer.parseInt (params[2]), Integer.parseInt (params[3]), Integer.parseInt (params[4])));
+				mPlanets.add (new Planet (Double.parseDouble (params[0]), Double.parseDouble (params[1]), Double.parseDouble (params[2]), Integer.parseInt (params[3]), Integer.parseInt (params[4])));
 			}
 			for (int i = 0; i < mConnectionNumber; i++) {
 				String[] params = bufferedReader.readLine ().split (" ");
@@ -147,7 +147,7 @@ public class InterstellarWar extends GameMap {
 		mConnectionNumber = (int) data[i++];
 
 		for (int j = 0; j < mPlanetNumber; j++) {
-			mPlanets.add (new Planet ((int) data[i++], (int) data[i++], (int) data[i++], (int) data[i++], (int) data[i++]));
+			mPlanets.add (new Planet ((double) data[i++], (double) data[i++], (double) data[i++], (int) data[i++], (int) data[i++]));
 		}
 
 		for (int j = 0; j < mConnectionNumber; j++) {
@@ -253,10 +253,10 @@ public class InterstellarWar extends GameMap {
 
 	private void addSpaceShip (Planet from, Planet to) {
 		double length = from.distance (to);
-		int lx = to.getCenter ().getX () - from.getCenter ().getX ();
-		int ly = to.getCenter ().getY () - from.getCenter ().getY ();
-		int hx = (int) ((double) lx / length * SpaceShip.SPACE_SHIP_SIZE);
-		int hy = (int) ((double) ly / length * SpaceShip.SPACE_SHIP_SIZE);
+		double lx = to.getCenter ().getX () - from.getCenter ().getX ();
+		double ly = to.getCenter ().getY () - from.getCenter ().getY ();
+		double hx = lx / length * SpaceShip.SPACE_SHIP_SIZE;
+		double hy = ly / length * SpaceShip.SPACE_SHIP_SIZE;
 
 		Point2D a = new Point2D (from.getCenter ().getX () + hx, from.getCenter ().getY () + hy);
 		Point2D b = new Point2D (from.getCenter ().getX () + hx / 2, from.getCenter ().getY () + hy / 2);

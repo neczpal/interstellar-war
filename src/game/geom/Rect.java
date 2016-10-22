@@ -9,12 +9,12 @@ import java.io.Serializable;
  */
 public class Rect implements Serializable {
 
-	private int x, y;
-	private int width, height;
+	private double x, y;
+	private double width, height;
 	private Color color;
 	private int mTexture = -1;
 
-	public Rect (int x, int y, int w, int h) {
+	public Rect (double x, double y, double w, double h) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
@@ -39,39 +39,39 @@ public class Rect implements Serializable {
 		this.mTexture = texture;
 	}
 
-	public int getX () {
+	public double getX () {
 		return x;
 	}
 
-	public void setX (int x) {
+	public void setX (double x) {
 		this.x = x;
 	}
 
-	public int getY () {
+	public double getY () {
 		return y;
 	}
 
-	public void setY (int y) {
+	public void setY (double y) {
 		this.y = y;
 	}
 
-	public int getWidth () {
+	public double getWidth () {
 		return width;
 	}
 
-	public void setWidth (int width) {
+	public void setWidth (double width) {
 		this.width = width;
 	}
 
-	public int getHeight () {
+	public double getHeight () {
 		return height;
 	}
 
-	public void setHeight (int height) {
+	public void setHeight (double height) {
 		this.height = height;
 	}
 
-	public void setPosition (int x, int y) {
+	public void setPosition (double x, double y) {
 		setX (x);
 		setY (y);
 	}

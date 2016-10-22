@@ -18,15 +18,15 @@ public class Triangle {
 		glDisable (GL_TEXTURE_2D);
 		glBegin (GL_TRIANGLES);
 		{
-			glVertex2f (a.getX (), a.getY ());
-			glVertex2f (b.getX (), b.getY ());
-			glVertex2f (c.getX (), c.getY ());
+			glVertex2d (a.getX (), a.getY ());
+			glVertex2d (b.getX (), b.getY ());
+			glVertex2d (c.getX (), c.getY ());
 		}
 		glEnd ();
 		glEnable (GL_TEXTURE_2D);
 	}
 
-	public void move (int dx, int dy) {
+	public void move (double dx, double dy) {
 		a.move (dx, dy);
 		b.move (dx, dy);
 		c.move (dx, dy);
