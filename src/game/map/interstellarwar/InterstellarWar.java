@@ -271,11 +271,11 @@ public class InterstellarWar extends GameMap {
 
 	@Override
 	public void receiveServer (Command command) {
-		switch ((GameCommand) command.data[2]) {
+		switch ((GameCommand) command.data[1]) {
 			case START_MOVE_UNITS:
-				addSpaceShip (mPlanets.get ((int) command.data[3]), mPlanets.get ((int) command.data[4]));
+				addSpaceShip (mPlanets.get ((int) command.data[2]), mPlanets.get ((int) command.data[3]));
 				//				mPlanets.get ((int) command.data[3]).moveUnitsTo (mPlanets.get ((int) command.data[4]));
-				getConnection ().send (new Command (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, command.data[3], command.data[4]));
+				getConnection ().send (new Command (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, command.data[2], command.data[3]));
 				break;
 		}
 	}

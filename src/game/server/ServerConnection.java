@@ -21,13 +21,13 @@ public class ServerConnection extends Thread {
 
 	private ServerSocket mServerSocket;
 
-	private HashMap <Integer, Integer> mUserToRoomHashMap = new HashMap <> ();
-
-	private HashMap <Integer, RoomConnection> mRooms = new HashMap <> ();
+	private HashMap <Integer, Room> mRooms = new HashMap <> ();
 	private RoomServer mRoomServer;
 
 	private HashMap <Integer, Client> mClients = new HashMap <> ();
 	private List <Client> mTemporaryClients = new ArrayList <> ();
+
+	private HashMap <Integer, User> mUsers = new HashMap <> ();
 
 	private boolean mIsRunning = false;
 	private Log log = new Log (this);
@@ -75,9 +75,9 @@ public class ServerConnection extends Thread {
 
 	public void addRoom (String gameName, String mapName) {
 		try {
-			RoomConnection roomConnection = new RoomConnection (this, gameName, mapName);
-			roomConnection.setRoomId (mRoomIdCounter);
-			mRooms.put (mRoomIdCounter++, roomConnection);
+			Room room = new Room (this, gameName, mapName);
+			room.setRoomId (mRoomIdCounter);
+			mRooms.put (mRoomIdCounter++, room);
 		} catch (GameMap.NotValidMapException e) {
 			log.e (gameName + " : " + mapName + " is not a valid map. :" + e.getMessage ());
 		}
@@ -99,19 +99,19 @@ public class ServerConnection extends Thread {
 	}
 
 	public void removeClient (int id) {
-		leaveRoom (id, mUserToRoomHashMap.get (id));
-		mUserToRoomHashMap.remove (id);
+		User user = mUsers.get (id);
+		leaveRoom (user);
 
-		log.i ("User (" + id + ") disconnected from the server");
+		log.i ("User (" + user + ") disconnected from the server");
 		mClients.remove (id);
 	}
 
 	public Serializable[] getRoomData () {
 		int i = 0;
 		Serializable[] roomData = new Serializable[mRooms.size () * 5];
-		Iterator <HashMap.Entry <Integer, RoomConnection>> iterator = mRooms.entrySet ().iterator ();
+		Iterator <HashMap.Entry <Integer, Room>> iterator = mRooms.entrySet ().iterator ();
 		while (iterator.hasNext ()) {
-			RoomConnection connection = iterator.next ().getValue ();
+			Room connection = iterator.next ().getValue ();
 			roomData[i++] = connection.getRoomId ();
 			roomData[i++] = connection.getGameName ();
 			roomData[i++] = connection.getMapFantasyName ();
@@ -121,45 +121,50 @@ public class ServerConnection extends Thread {
 		return roomData;
 	}
 
-	private void enterServer (Command command, int port) {
+	private void enterServer (String name, int port) {
 		int tempIndex = findClientByPort (port);
 		Client client = mTemporaryClients.get (tempIndex);
 		int id = mClientIdCounter++;
 		mClients.put (id, client);
 		mTemporaryClients.remove (tempIndex);
-		mUserToRoomHashMap.put (id, 0);
-		client.send (new Command (Command.Type.ACCEPT_CONNECTION, id));
+
+		User newUser = new User (name, id);
+		mUsers.put (id, newUser);
+
+		sendToId (id, new Command (Command.Type.ACCEPT_CONNECTION, id));
 	}
 
-	private void exitServer (Command command) {
-		log.i ("User (" + command.data[0] + ") exits the server.");
-		mClients.remove (command.data[0]);
-		mRooms.get (command.data[1]).removeConnection ((int) command.data[0]);
+	private void exitServer (User user) {
+		log.i ("User (" + user.getId () + ") exits the server.");
+		leaveRoom (user);
+		mUsers.remove (user.getId ());
+		mClients.remove (user.getId ());
 	}
 
-	private void leaveRoom (int userId, int roomId) {
+	private void leaveRoom (User user) {
+		int userId = user.getId ();
+		int roomId = user.getRoomId ();
 		if (roomId != 0) {
-			log.i ("User (" + userId + ") is leaving the Room (" + roomId + ")");
-			mUserToRoomHashMap.put (userId, 0);
-			RoomConnection leaveRoom = mRooms.get (roomId);
-			leaveRoom.removeConnection (userId);
-			if (leaveRoom.isEmpty () && leaveRoom.isRunning ()) {
-				leaveRoom.stopGame ();
-				mRooms.remove (leaveRoom.getRoomId ());
+			Room room = mRooms.get (roomId);
+			log.i ("User (" + user + ") is leaving the Room (" + room + ")");
+			room.removeUser (user);
+			if (room.isEmpty () && room.isRunning ()) {
+				room.stopGame ();
+				mRooms.remove (roomId);
 			}
+			user.setRoomId (0);
 		} else {
 			log.i ("User (" + userId + ") is not in a room");
 		}
 	}
 
-	private void enterRoom (Command command) {
-		leaveRoom ((int) command.data[0], (int) command.data[1]);
-		RoomConnection room = mRooms.get (command.data[2]);
+	private void enterRoom (User user, Room room) {
+		leaveRoom (user);
 		if (room != null && !room.isFull () && !room.isRunning ()) {
-			log.i ("User (" + command.data[0] + ") is connecting to the Room (" + command.data[2] + ")");
-			mUserToRoomHashMap.put ((int) command.data[0], (int) command.data[2]);
-			room.addConnection ((int) command.data[0]);
-			sendToId ((int) command.data[0], new Command (Command.Type.MAP_DATA, room.getRoomId (), room.getConnectionIndex ((int) command.data[0]), room.getGameName (), room.getGameMap ().toData ()));
+			log.i ("User (" + user + ") is connecting to the Room (" + room + ")");
+			user.setRoomId (room.getRoomId ());
+			room.addUser (user);
+			sendToId (user.getId (), new Command (Command.Type.MAP_DATA, user.getRoomIndex (), room.getGameName (), room.getGameMap ().toData ()));
 			if (room.isFull ()) {
 				room.send (Command.Type.READY_TO_PLAY, room.getGameName (), room.getMapFantasyName ());
 				room.start ();
@@ -168,39 +173,33 @@ public class ServerConnection extends Thread {
 				//				send (Command.Type.LIST_ROOMS, getRoomData ());
 			}
 		} else {
-			log.i (command.data[0] + " is connecting to the Room (" + command.data[2] + "), but its full/running/not existing!");
-
-			//					sendToId (Command.Type.)); #TODO CANNOT CONNECT TO ROOM
+			log.i (user + " is connecting to the Room (" + room + "), but its full/running/not existing!");
 		}
+	}
+
+	public void gameCommand (User user, Command command) {
+		Room room = mRooms.get (user.getRoomId ());
+		log.i ("User (" + user + ") in the Room (" + room + ") sent GAME_DATA " + command.data[1]);
+		room.receive (command);
 	}
 
 	public void receive (Command command, int currentPort) {
 		log.i ("Got msg from client: " + command.type.toString () + " : " + currentPort);
 		switch (command.type) {
 			case ENTER_SERVER:
-				enterServer (command, currentPort);
+				enterServer ((String) command.data[1], currentPort);
 				break;
 			case EXIT_SERVER:
-				exitServer (command);
+				exitServer (mUsers.get (command.data[0]));
 				break;
 			case LEAVE_ROOM:
-				leaveRoom ((int) command.data[0], (int) command.data[1]);
+				leaveRoom (mUsers.get (command.data[0]));
 				break;
 			case ENTER_ROOM:
-				enterRoom (command);
-				break;
-			case READY_TO_PLAY:
-				//				log.i (command.data[0] + " is ready to play!");
-				//				mMap.setUserReady ((int) command.data[0]);
-				//				send (Command.Type.IS_READY, command.data[0]);
-				//				if (mMap.isMapReady ()) {
-				//					mMap.setConnection (this);
-				//					mMap.start ();
-				//				}
+				enterRoom (mUsers.get (command.data[0]), mRooms.get (command.data[1]));
 				break;
 			case GAME_DATA:
-				log.i ("User (" + command.data[0] + ") in the Room (" + command.data[1] + ") sent GAME_DATA " + command.data[2]);
-				mRooms.get (command.data[1]).getGameMap ().receiveServer (command);
+				gameCommand (mUsers.get (command.data[0]), command);
 				break;
 		}
 	}

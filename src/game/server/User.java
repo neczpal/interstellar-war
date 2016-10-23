@@ -4,9 +4,9 @@ public class User {
 
 	private int mId;
 	private int mRoomId;
+	private int mRoomIndex;
 
 	private String mName;
-	private boolean mReadyToPlay;
 
 	public User (String name) {
 		this (name, 0);
@@ -15,11 +15,8 @@ public class User {
 	public User (String name, int id) {
 		mName = name;
 		mId = id;
-		mReadyToPlay = false;
-	}
-
-	public void ready () {
-		mReadyToPlay = true;
+		mRoomId = 0;
+		mRoomIndex = 0;
 	}
 
 	public int getId () {
@@ -30,4 +27,24 @@ public class User {
 		mId = id;
 	}
 
+	public int getRoomId () {
+		return mRoomId;
+	}
+
+	public void setRoomId (int mRoomId) {
+		this.mRoomId = mRoomId;
+	}
+
+	public int getRoomIndex () {
+		return mRoomIndex;
+	}
+
+	public void setRoomIndex (int mRoomIndex) {
+		this.mRoomIndex = mRoomIndex;
+	}
+
+	@Override
+	public String toString () {
+		return mName + " (" + mId + ") [" + mRoomIndex + "]";
+	}
 }

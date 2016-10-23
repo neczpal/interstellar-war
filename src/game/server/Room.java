@@ -9,9 +9,9 @@ import java.util.Iterator;
 /**
  * Created by neczp on 2016. 10. 11..
  */
-public class RoomConnection extends Thread implements Connection {
+public class Room extends Thread implements Connection {
 
-	private int mRoomConnectionId;
+	private int mRoomId;
 	private String mGameName;
 	private String mMapName;
 	private int mMaxUserCount;
@@ -24,7 +24,7 @@ public class RoomConnection extends Thread implements Connection {
 
 	private boolean mGameIsRunning = false;
 
-	public RoomConnection (ServerConnection serverConnection, String gameName, String mapName) throws GameMap.NotValidMapException {
+	public Room (ServerConnection serverConnection, String gameName, String mapName) throws GameMap.NotValidMapException {
 		mServerConnection = serverConnection;
 		mGameName = gameName;
 		mMap = GameMap.createGameMap (gameName);
@@ -32,16 +32,16 @@ public class RoomConnection extends Thread implements Connection {
 		mMapName = mapName;
 		mMaxUserCount = mMap.getMaxUsers ();
 		mMap.setConnection (this);
-		mRoomConnectionId = 0;
+		mRoomId = 0;
 		mIndexes = 1;
 	}
 
 	public int getRoomId () {
-		return mRoomConnectionId;
+		return mRoomId;
 	}
 
 	public void setRoomId (int id) {
-		mRoomConnectionId = id;
+		mRoomId = id;
 	}
 
 	@Override
@@ -54,10 +54,18 @@ public class RoomConnection extends Thread implements Connection {
 		}
 	}
 
+	@Override
+	public String toString () {
+		return mGameName + " (" + mMapName + ")" + getUserCount () + " / " + getMaxUserCount () + " [" + mRoomId + "] ";
+	}
+
 	public void stopGame () {
 		mGameIsRunning = false;
 	}
 
+	public void receive (Command command) {
+		mMap.receiveServer (command);
+	}
 
 	@Override
 	public void send (Command.Type type) {
@@ -100,19 +108,21 @@ public class RoomConnection extends Thread implements Connection {
 		return mGameIsRunning;
 	}
 
-	public void addConnection (Integer id) {
-		mConnectionIds.put (id, mIndexes++);
+	public void addUser (User user) {
+		mConnectionIds.put (user.getId (), mIndexes);
+		user.setRoomIndex (mIndexes);
+		mIndexes++;
 	}
 
-	public void removeConnection (Integer id) {
-		mConnectionIds.remove (id);
+	public void removeUser (User user) {
+		mConnectionIds.remove (user.getId ());
+		user.setRoomIndex (0);
 		mIndexes--;
 	}
 
 	public GameMap getGameMap () {
 		return mMap;
 	}
-
 
 	public String getGameName () {
 		return mGameName;
@@ -132,9 +142,5 @@ public class RoomConnection extends Thread implements Connection {
 
 	public int getUserCount () {
 		return mConnectionIds.size ();
-	}
-
-	public int getConnectionIndex (Integer id) {
-		return mConnectionIds.get (id);
 	}
 }
