@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Loader {
 
-	private static String mRootDirectory = System.getProperty ("user.dir");
+	private static String mRootDirectory = new File ("").getAbsolutePath ();
 	private static HashMap <String, Integer> mTextureCache = new HashMap <> ();
 	private static HashMap <String, Integer> mSoundCache = new HashMap <> ();
 	private static boolean useCache = false;

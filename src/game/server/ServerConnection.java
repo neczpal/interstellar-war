@@ -135,10 +135,10 @@ public class ServerConnection extends Thread {
 	}
 
 	private void exitServer (User user) {
-		log.i ("User (" + user.getId () + ") exits the server.");
 		leaveRoom (user);
 		mUsers.remove (user.getId ());
 		mClients.remove (user.getId ());
+		log.i ("User (" + user.getId () + ") exits the server.");
 	}
 
 	private void leaveRoom (User user) {
