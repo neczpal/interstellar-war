@@ -12,7 +12,7 @@ public class Server {
 	public static void main (String[] args) {
 		try {
 			ServerConnection srv = new ServerConnection ();
-			Socket s = new Socket ("localhost", 23232);
+			Socket s = new Socket ("152.66.180.66", 23232);
 			Client client = new Client(srv,s);
 			client.start ();
 		} catch (IOException e) {

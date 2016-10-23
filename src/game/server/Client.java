@@ -40,8 +40,11 @@ public class Client extends Thread {
 		try {
 			while (mIsRunning) {
 				try {
-					Command command = (Command) mIn.readObject ();
-					mServerConnection.receive (command, mPort);
+					Object object = mIn.readObject ();
+					if (object instanceof Command) {
+						Command command = (Command) object;
+						mServerConnection.receive (command, mPort);
+					}
 				} catch (ClassNotFoundException ex) {
 					System.err.println (ex.getMessage ());
 				}

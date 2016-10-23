@@ -60,8 +60,13 @@ public class GameConnection extends Thread implements Connection {
 		try {
 			while (mIsRunning) {
 				try {
-					Command msg = (Command) mIn.readObject ();
-					receive (msg);
+					Object object = mIn.readObject ();
+					if (object instanceof Command) {
+						Command msg = (Command) object;
+						receive (msg);
+					} else {
+						log.w (object + " was not a Command");
+					}
 				} catch (ClassNotFoundException | ClassCastException ex) {
 					log.e (ex.getMessage ());
 					ex.printStackTrace ();

@@ -12,6 +12,7 @@ import org.lwjgl.input.Mouse;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 /**
@@ -119,7 +120,8 @@ public class InterstellarWar extends GameMap {
 			Color.WHITE.setGLColor ();
 			line.draw ();
 		}
-		mSpaceShips.forEach (SpaceShip::draw);
+
+		mSpaceShips.forEach (SpaceShip::draw);//#TODO ConcurrentModificationException
 	}
 
 	@Override
@@ -220,16 +222,10 @@ public class InterstellarWar extends GameMap {
 	@Override
 	public boolean onGameThread () {
 		try {
-			Thread.sleep (50);
+			Thread.sleep (100);
 			tickNummber++;
-			ArrayList <SpaceShip> toDel = new ArrayList <> ();
-			for (SpaceShip spaceShip : mSpaceShips) {
-				if (spaceShip.tick ()) {
-					spaceShip.moveUnitsTo (mPlanets.get (spaceShip.getToPlanet ()));
-					toDel.add (spaceShip);
-				}
-			}
-			mSpaceShips.removeAll (toDel);
+
+			moveUnits ();
 			getConnection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS);
 
 			if (tickNummber % 32 == 0) {
@@ -257,14 +253,7 @@ public class InterstellarWar extends GameMap {
 				//				mPlanets.get ((int) command.data[1]).moveUnitsTo (mPlanets.get ((int) command.data[2]));
 				break;
 			case MOVE_UNITS:
-				ArrayList <SpaceShip> toDel = new ArrayList <> ();
-				for (SpaceShip spaceShip : mSpaceShips) {
-					if (spaceShip.tick ()) {
-						spaceShip.moveUnitsTo (mPlanets.get (spaceShip.getToPlanet ()));
-						toDel.add (spaceShip);
-					}
-				}
-				mSpaceShips.removeAll (toDel);
+				moveUnits ();
 				break;
 		}
 	}
@@ -298,6 +287,17 @@ public class InterstellarWar extends GameMap {
 
 		mSpaceShips.add (new SpaceShip (a, b, c, from.getOwnedBy (), from.getUnitNumber (), (int) (2 * length / SpaceShip.SPACE_SHIP_SIZE), hx / 2, hy / 2, mPlanets.indexOf (to)));
 		from.setUnitNumber (0);
+	}
+
+	private void moveUnits () {
+		Iterator <SpaceShip> iterator = mSpaceShips.iterator ();
+		while (iterator.hasNext ()) {
+			SpaceShip spaceShip = iterator.next ();
+			if (spaceShip.tick ()) {
+				spaceShip.moveUnitsTo (mPlanets.get (spaceShip.getToPlanet ()));
+				iterator.remove ();
+			}
+		}
 	}
 
 	enum GameCommand {
