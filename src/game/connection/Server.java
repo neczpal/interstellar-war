@@ -1,4 +1,4 @@
-package game.server;
+package game.connection;
 
 /**
  * Created by neczp on 2016. 09. 22..

@@ -1,12 +1,12 @@
 package game.map.rockpaperscissors;
 
 import game.Textures;
+import game.connection.ClientConnection;
+import game.connection.Command;
 import game.geom.Color;
 import game.geom.Point2D;
 import game.geom.Rect;
 import game.map.GameMap;
-import game.server.Command;
-import game.server.GameConnection;
 import org.lwjgl.input.Mouse;
 
 import java.io.Serializable;
@@ -55,7 +55,7 @@ public class RockPaperScissors extends GameMap {
 	public void mouseEvent () {
 		if (Mouse.isButtonDown (0) && mSelectedP1 == 0) {
 			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
-			int index = ((GameConnection) getConnection ()).getRoomIndex ();
+			int index = ((ClientConnection) getConnection ()).getRoomIndex ();
 
 			if (mRockButtonP1.isInside (point)) {
 				getConnection ().send (Command.Type.GAME_DATA, GameCommand.MY_CHOICE, index, 1);
@@ -112,7 +112,7 @@ public class RockPaperScissors extends GameMap {
 	public void receiveClient (Command command) {
 		switch ((GameCommand) command.data[0]) {
 			case OTHER_CHOICE:
-				int index = ((GameConnection) getConnection ()).getRoomIndex ();
+				int index = ((ClientConnection) getConnection ()).getRoomIndex ();
 				mSelectedP2 = index == 1 ? (int) command.data[2] : (int) command.data[1];
 				if (mSelectedP2 == 1) {
 					mRockButtonP2.setColor (Color.TEAL);

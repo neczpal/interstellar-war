@@ -1,4 +1,4 @@
-package game.server;
+package game.connection;
 
 public class User {
 

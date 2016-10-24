@@ -1,4 +1,4 @@
-package game.server;
+package game.connection;
 
 import game.Log;
 import game.map.GameMap;
@@ -95,7 +95,7 @@ public class ServerConnection extends Thread {
 		User user = mUsers.get (id);
 		leaveRoom (user);
 
-		log.i ("User (" + user + ") disconnected from the server");
+		log.i ("User (" + user + ") disconnected from the connection");
 		mClients.remove (id);
 	}
 
@@ -149,7 +149,7 @@ public class ServerConnection extends Thread {
 			e.printStackTrace ();
 		}
 		mClients.remove (user.getId ());
-		log.i ("User (" + user.getId () + ") exits the server.");
+		log.i ("User (" + user.getId () + ") exits the connection.");
 	}
 
 	private void leaveRoom (User user) {

@@ -2,12 +2,12 @@ package game.map.interstellarwar;
 
 import game.Textures;
 import game.Util;
+import game.connection.ClientConnection;
+import game.connection.Command;
 import game.geom.Color;
 import game.geom.Line;
 import game.geom.Point2D;
 import game.map.GameMap;
-import game.server.Command;
-import game.server.GameConnection;
 import org.lwjgl.input.Mouse;
 
 import java.io.*;
@@ -49,7 +49,7 @@ public class InterstellarWar extends GameMap {
 			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
 
 			for (Planet planet : mPlanets) {
-				if (planet.isInside (point) && ((GameConnection) getConnection ()).getRoomIndex () == planet.getOwnedBy ()) {
+				if (planet.isInside (point) && ((ClientConnection) getConnection ()).getRoomIndex () == planet.getOwnedBy ()) {
 					mSelectedPlanetFrom = planet;
 					break;
 				}
@@ -79,7 +79,7 @@ public class InterstellarWar extends GameMap {
 					for (Planet planet : mPlanets) {
 						if (planet.isInside (point) && planet.isNeighbor (mSelectedPlanetFrom)) {
 							mSelectedPlanetTo = planet;
-							int index = ((GameConnection) getConnection ()).getRoomIndex ();
+							int index = ((ClientConnection) getConnection ()).getRoomIndex ();
 							if (mSelectedPlanetFrom.getOwnedBy () == index) {
 								getConnection ().send (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
 							}

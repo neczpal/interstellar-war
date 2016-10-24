@@ -1,4 +1,4 @@
-package game.server;
+package game.connection;
 
 import game.map.GameMap;
 

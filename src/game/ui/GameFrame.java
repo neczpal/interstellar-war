@@ -2,8 +2,8 @@ package game.ui;
 
 import game.Textures;
 import game.Util;
+import game.connection.ClientConnection;
 import game.map.GameMap;
-import game.server.GameConnection;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -49,7 +49,7 @@ public class GameFrame extends Thread {
 			Display.update ();
 		}
 		clean ();
-		((GameConnection) mGameMap.getConnection ()).leaveRoom ();
+		((ClientConnection) mGameMap.getConnection ()).leaveRoom ();
 	}
 
 	private void initDisplay () {

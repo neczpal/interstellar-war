@@ -1,9 +1,10 @@
-package game.server;
+package game.connection;
 
 import game.Log;
 import game.map.GameMap;
 import game.ui.GameFrame;
-import game.ui.OpenRoomsFrame;
+import game.ui.LoginFrame;
+import game.ui.RoomsFrame;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,10 +15,11 @@ import java.net.Socket;
 /**
  * @author neczpal
  */
-public class GameConnection extends Thread implements Connection {
+public class ClientConnection extends Thread implements Connection {
 
-	private OpenRoomsFrame mOpenRoomsFrame;
-	private GameFrame gameFrame;
+	private LoginFrame mLoginFrame;
+	private RoomsFrame mRoomsFrame;
+	private GameFrame mGameFrame;
 	private GameMap mGameMap;
 
 	private int mConnectionId;
@@ -32,19 +34,19 @@ public class GameConnection extends Thread implements Connection {
 
 	private Log log = new Log (this);
 
-	public GameConnection (OpenRoomsFrame openRoomsFrame, String ip, String userName) {
-		super ("GameConnection " + userName);
-		mOpenRoomsFrame = openRoomsFrame;
+	public ClientConnection (String ip, String userName) {
+		super ("ClientConnection " + userName);
+		//		mRoomsFrame = openRoomsFrame;
 		mUserName = userName;
 		mIsRunning = false;
 		try {
-			mSocket = new Socket (ip, 23232);
+			mSocket = new Socket (ip, 23232);//#TODO set port
 
 			if (mSocket.isConnected ()) {
 				mIn = new ObjectInputStream (mSocket.getInputStream ());
 				mOut = new ObjectOutputStream (mSocket.getOutputStream ());
 			}
-			send (Command.Type.ENTER_SERVER, mUserName);
+			enterServer ();
 
 			this.start ();
 		} catch (IOException e) {
@@ -75,7 +77,7 @@ public class GameConnection extends Thread implements Connection {
 		}
 	}
 
-	public void stopGameConnection () {
+	public void stopClientConnection () {
 		mIsRunning = false;
 		send (Command.Type.EXIT_SERVER);
 		try {
@@ -91,11 +93,12 @@ public class GameConnection extends Thread implements Connection {
 	//RECEIVE
 	private void connectionReady (int newConnectionId) {
 		mConnectionId = newConnectionId;
+		mLoginFrame.openRoomsFrame ();
 		log.i ("Connection succesful id: " + mConnectionId);
 	}
 
 	private void listRooms (Serializable[] roomData) {
-		mOpenRoomsFrame.loadRoomInfos (roomData);
+		mRoomsFrame.loadRoomInfos (roomData);
 		log.i ("Room datas loaded");
 	}
 
@@ -104,14 +107,15 @@ public class GameConnection extends Thread implements Connection {
 		mGameMap = GameMap.createGameMap (gameName);
 		mGameMap.setConnection (this);
 		mGameMap.loadData (mapData);
+		mRoomsFrame.setIsInRoom (true);
 		log.i ("Map data received");
 	}
 
 	private void startGame (String gameName, String mapName) {
-		gameFrame = new GameFrame (gameName + " : " + mapName, 640, 480, mGameMap);
-		gameFrame.start ();
+		mGameFrame = new GameFrame (gameName + " : " + mapName, 640, 480, mGameMap);
+		mGameFrame.start ();
 		mGameMap.start ();
-		mOpenRoomsFrame.setVisible (false);
+		mRoomsFrame.setVisible (false);
 		log.i (gameName + " (" + mapName + ") is ready to play.");
 	}
 
@@ -121,7 +125,7 @@ public class GameConnection extends Thread implements Connection {
 	}
 
 	public void receive (Command command) {
-		log.i ("Got msg from server: " + command.type.toString ());
+		log.i ("Got msg from connection: " + command.type.toString ());
 
 		switch (command.type) {
 			case CONNECTION_READY:
@@ -146,9 +150,14 @@ public class GameConnection extends Thread implements Connection {
 	}
 
 	//SEND
+	public void enterServer () {
+		send (Command.Type.ENTER_SERVER, mUserName);
+	}
+
 	public void leaveRoom () {
 		send (Command.Type.LEAVE_ROOM);
-		mOpenRoomsFrame.setVisible (true);
+		mRoomsFrame.setIsInRoom (false);
+		mRoomsFrame.setVisible (true);//#TODO somehting room vs. game
 	}
 
 	public void enterRoom (int roomId) {
@@ -170,5 +179,17 @@ public class GameConnection extends Thread implements Connection {
 		} catch (IOException e) {
 			log.e ("Nem sikerült elküldeni:" + command);
 		}
+	}
+
+	public void setLoginFrame (LoginFrame loginFrame) {
+		mLoginFrame = loginFrame;
+	}
+
+	public void setRoomsFrame (RoomsFrame roomsFrame) {
+		mRoomsFrame = roomsFrame;
+	}
+
+	public void setGameFrame (GameFrame gameFrame) {
+		mGameFrame = gameFrame;
 	}
 }

@@ -1,9 +1,9 @@
 package game.map;
 
+import game.connection.Command;
+import game.connection.Connection;
 import game.map.interstellarwar.InterstellarWar;
 import game.map.rockpaperscissors.RockPaperScissors;
-import game.server.Command;
-import game.server.Connection;
 
 import java.io.Serializable;
 
