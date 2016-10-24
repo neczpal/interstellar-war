@@ -2,15 +2,13 @@ package game.ui;
 
 import game.Textures;
 import game.Util;
+import game.map.GameMap;
 import game.server.GameConnection;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -21,14 +19,14 @@ public class GameFrame extends Thread {
 
 	private final int width, height;
 	private String name;
-	private GameConnection mConnection;
+	private GameMap mGameMap;
 
-	public GameFrame (String name, int width, int height, GameConnection connection) {
+	public GameFrame (String name, int width, int height, GameMap gameMap) {
 		super (name);
 		this.name = name;
 		this.width = width;
 		this.height = height;
-		mConnection = connection;
+		this.mGameMap = gameMap;
 	}
 
 	@Override
@@ -37,7 +35,7 @@ public class GameFrame extends Thread {
 		initGL ();
 		Util.loadTextures ();
 		Textures.loadTextures ();
-		mConnection.getGameMap ().initTextures ();
+		mGameMap.initTextures ();
 
 		while (!Display.isCloseRequested ()) {
 			glClear (GL_COLOR_BUFFER_BIT);
@@ -51,6 +49,7 @@ public class GameFrame extends Thread {
 			Display.update ();
 		}
 		clean ();
+		((GameConnection) mGameMap.getConnection ()).leaveRoom ();
 	}
 
 	private void initDisplay () {
@@ -62,7 +61,7 @@ public class GameFrame extends Thread {
 			Mouse.create ();
 
 		} catch (LWJGLException ex) {
-			Logger.getLogger (GameFrame.class.getName ()).log (Level.SEVERE, null, ex);
+			//			Logger.getLogger (GameFrame.class.getName ()).log (Level.SEVERE, null, ex);
 		}
 	}
 
@@ -81,21 +80,20 @@ public class GameFrame extends Thread {
 	}
 
 	private void draw () {
-		mConnection.getGameMap ().draw ();
+		mGameMap.draw ();
 	}
 
 	private void mouseEvent () {
 		if (Mouse.isInsideWindow ()) {
-			mConnection.getGameMap ().mouseEvent ();
+			mGameMap.mouseEvent ();
 		}
 	}
 
 	private void keyboardEvent () {
-		mConnection.getGameMap ().keyboardEvent ();
+		mGameMap.keyboardEvent ();
 	}
 
 	private void clean () {
-		mConnection.leaveRoom ();
 		Display.destroy ();
 		Keyboard.destroy ();
 		Mouse.destroy ();

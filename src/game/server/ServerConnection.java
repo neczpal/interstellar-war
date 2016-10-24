@@ -17,6 +17,7 @@ public class ServerConnection extends Thread {
 
 	private static int mClientIdCounter = 1;
 	private static int mRoomIdCounter = 1;
+
 	private int mPort;
 
 	private ServerSocket mServerSocket;
@@ -33,9 +34,9 @@ public class ServerConnection extends Thread {
 	private Log log = new Log (this);
 
 
-	public ServerConnection () {
+	public ServerConnection (int port) {
 		super ("ServerConnection");
-		mPort = 23232;
+		mPort = port;
 		mRoomServer = new RoomServer (this);
 		try {
 			mServerSocket = new ServerSocket (mPort);
@@ -64,7 +65,7 @@ public class ServerConnection extends Thread {
 		}
 	}
 
-	public void stopServer () {
+	public void stopServerConnection () {
 		mRoomServer.stopRoomServer ();
 		mIsRunning = false;
 		try {
@@ -72,6 +73,7 @@ public class ServerConnection extends Thread {
 		} catch (IOException e) {
 		}
 	}
+
 
 	public void addRoom (String gameName, String mapName) {
 		try {
@@ -81,15 +83,6 @@ public class ServerConnection extends Thread {
 		} catch (GameMap.NotValidMapException e) {
 			log.e (gameName + " : " + mapName + " is not a valid map. :" + e.getMessage ());
 		}
-	}
-
-	public int findClientByPort (int port) {
-		for (int i = 0; i < mTemporaryClients.size (); i++) {
-			if (mTemporaryClients.get (i).getPort () == port) {
-				return i;
-			}
-		}
-		return -1;
 	}
 
 	public void addClient () throws IOException {
@@ -104,6 +97,15 @@ public class ServerConnection extends Thread {
 
 		log.i ("User (" + user + ") disconnected from the server");
 		mClients.remove (id);
+	}
+
+	public int findClientByPort (int port) {
+		for (int i = 0; i < mTemporaryClients.size (); i++) {
+			if (mTemporaryClients.get (i).getPort () == port) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	public Serializable[] getRoomData () {
@@ -121,6 +123,7 @@ public class ServerConnection extends Thread {
 		return roomData;
 	}
 
+	// RECEIVE
 	private void enterServer (String name, int port) {
 		int tempIndex = findClientByPort (port);
 		Client client = mTemporaryClients.get (tempIndex);
@@ -131,12 +134,20 @@ public class ServerConnection extends Thread {
 		User newUser = new User (name, id);
 		mUsers.put (id, newUser);
 
-		sendToId (id, new Command (Command.Type.ACCEPT_CONNECTION, id));
+		sendToId (id, new Command (Command.Type.CONNECTION_READY, id));
 	}
 
 	private void exitServer (User user) {
 		leaveRoom (user);
 		mUsers.remove (user.getId ());
+
+		Client client = mClients.get (user.getId ());
+		client.stopClient ();
+		try {
+			client.close ();
+		} catch (IOException e) {
+			e.printStackTrace ();
+		}
 		mClients.remove (user.getId ());
 		log.i ("User (" + user.getId () + ") exits the server.");
 	}
@@ -148,7 +159,7 @@ public class ServerConnection extends Thread {
 			Room room = mRooms.get (roomId);
 			log.i ("User (" + user + ") is leaving the Room (" + room + ")");
 			room.removeUser (user);
-			if (room.isEmpty () && room.isRunning ()) {
+			if (room.isEmpty () && room.isMapRunning ()) {
 				room.stopGame ();
 				mRooms.remove (roomId);
 			}
@@ -160,14 +171,14 @@ public class ServerConnection extends Thread {
 
 	private void enterRoom (User user, Room room) {
 		leaveRoom (user);
-		if (room != null && !room.isFull () && !room.isRunning ()) {
+		if (room != null && !room.isFull () && !room.isMapRunning ()) {
 			log.i ("User (" + user + ") is connecting to the Room (" + room + ")");
 			user.setRoomId (room.getRoomId ());
 			room.addUser (user);
 			sendToId (user.getId (), new Command (Command.Type.MAP_DATA, user.getRoomIndex (), room.getGameName (), room.getGameMap ().toData ()));
 			if (room.isFull ()) {
 				room.send (Command.Type.READY_TO_PLAY, room.getGameName (), room.getMapFantasyName ());
-				room.start ();
+				room.startGame ();
 				addRoom (room.getGameName (), room.getMapName ());
 			} else {
 				//				send (Command.Type.LIST_ROOMS, getRoomData ());
@@ -177,7 +188,7 @@ public class ServerConnection extends Thread {
 		}
 	}
 
-	public void gameCommand (User user, Command command) {
+	private void gameCommand (User user, Command command) {
 		Room room = mRooms.get (user.getRoomId ());
 		log.i ("User (" + user + ") in the Room (" + room + ") sent GAME_DATA " + command.data[1]);
 		room.receive (command);

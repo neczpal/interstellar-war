@@ -9,20 +9,18 @@ import java.util.Iterator;
 /**
  * Created by neczp on 2016. 10. 11..
  */
-public class Room extends Thread implements Connection {
+public class Room implements Connection {
 
 	private int mRoomId;
+
 	private String mGameName;
 	private String mMapName;
 	private int mMaxUserCount;
-
-	private ServerConnection mServerConnection;
-	private GameMap mMap;
-
 	private HashMap <Integer, Integer> mConnectionIds = new HashMap <> ();
 	private int mIndexes;
 
-	private boolean mGameIsRunning = false;
+	private ServerConnection mServerConnection;
+	private GameMap mMap;
 
 	public Room (ServerConnection serverConnection, String gameName, String mapName) throws GameMap.NotValidMapException {
 		mServerConnection = serverConnection;
@@ -44,56 +42,22 @@ public class Room extends Thread implements Connection {
 		mRoomId = id;
 	}
 
-	@Override
-	public void run () {
-		mGameIsRunning = true;
-		while (mGameIsRunning) {
-			if (!mMap.onGameThread ()) {
-				//				stopGame ();
-			}
-		}
-	}
 
 	@Override
 	public String toString () {
 		return mGameName + " (" + mMapName + ")" + getUserCount () + " / " + getMaxUserCount () + " [" + mRoomId + "] ";
 	}
 
+	public void startGame () {
+		mMap.start ();
+	}
+
 	public void stopGame () {
-		mGameIsRunning = false;
+		mMap.stopGame ();
 	}
 
 	public void receive (Command command) {
 		mMap.receiveServer (command);
-	}
-
-	@Override
-	public void send (Command.Type type) {
-		send (new Command (type));
-	}
-
-	@Override
-	public void send (Command.Type type, Serializable... data) {
-		send (new Command (type, data));
-	}
-
-	@Override
-	public void send (Command command) {
-		HashMap <Integer, Client> clients = mServerConnection.getClients ();
-		Iterator <HashMap.Entry <Integer, Client>> iterator = clients.entrySet ().iterator ();
-		while (iterator.hasNext ()) {
-			HashMap.Entry <Integer, Client> entry = iterator.next ();
-			if (mConnectionIds.containsKey (entry.getKey ())) {
-				if (!entry.getValue ().send (command)) {
-					iterator.remove ();
-					mServerConnection.removeClient (entry.getKey ());
-				}
-			}
-		}
-	}
-
-	public boolean isInside (int id) {
-		return mConnectionIds.containsKey (id);
 	}
 
 	public boolean isEmpty () {
@@ -104,8 +68,8 @@ public class Room extends Thread implements Connection {
 		return mConnectionIds.size () >= mMaxUserCount;
 	}
 
-	public boolean isRunning () {
-		return mGameIsRunning;
+	public boolean isMapRunning () {
+		return mMap.isAlive ();
 	}
 
 	public void addUser (User user) {
@@ -142,5 +106,30 @@ public class Room extends Thread implements Connection {
 
 	public int getUserCount () {
 		return mConnectionIds.size ();
+	}
+
+	@Override
+	public void send (Command.Type type) {
+		send (new Command (type));
+	}
+
+	@Override
+	public void send (Command.Type type, Serializable... data) {
+		send (new Command (type, data));
+	}
+
+	@Override
+	public void send (Command command) {
+		HashMap <Integer, Client> clients = mServerConnection.getClients ();
+		Iterator <HashMap.Entry <Integer, Client>> iterator = clients.entrySet ().iterator ();
+		while (iterator.hasNext ()) {
+			HashMap.Entry <Integer, Client> entry = iterator.next ();
+			if (mConnectionIds.containsKey (entry.getKey ())) {
+				if (!entry.getValue ().send (command)) {
+					iterator.remove ();
+					mServerConnection.removeClient (entry.getKey ());
+				}
+			}
+		}
 	}
 }

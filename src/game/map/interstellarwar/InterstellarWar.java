@@ -33,7 +33,7 @@ public class InterstellarWar extends GameMap {
 	private Planet mSelectedPlanetFrom = null;
 	private Planet mSelectedPlanetTo = null;
 	//ONLY SERVER
-	private int tickNummber = 0;
+	private int tickNumber = 0;
 
 	@Override
 	public void initTextures () {
@@ -105,11 +105,11 @@ public class InterstellarWar extends GameMap {
 	public void draw () {
 		if (mSelectedPlanetFrom != null) {
 			Point2D center1 = mSelectedPlanetFrom.getCenter ();
-			Util.drawCircle (center1.getX (), center1.getY (), mSelectedPlanetFrom.getRadius () + 5, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+			Util.drawCircle (center1.getX (), center1.getY (), mSelectedPlanetFrom.getRadius () + 3, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 		if (mSelectedPlanetTo != null) {
 			Point2D center2 = mSelectedPlanetTo.getCenter ();
-			Util.drawCircle (center2.getX (), center2.getY (), mSelectedPlanetTo.getRadius () + 5, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+			Util.drawCircle (center2.getX (), center2.getY (), mSelectedPlanetTo.getRadius () + 3, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 
 		mPlanets.forEach (Planet::draw);
@@ -120,8 +120,9 @@ public class InterstellarWar extends GameMap {
 			Color.WHITE.setGLColor ();
 			line.draw ();
 		}
-
-		mSpaceShips.forEach (SpaceShip::draw);//#TODO ConcurrentModificationException
+		for (SpaceShip spaceShip : mSpaceShips) {
+			spaceShip.draw ();
+		}//#TODO ConcurrentModificationException toDel list delete here??
 	}
 
 	@Override
@@ -220,41 +221,30 @@ public class InterstellarWar extends GameMap {
 	}
 
 	@Override
-	public boolean onGameThread () {
+	public void onGameThread () {
 		try {
-			Thread.sleep (100);
-			tickNummber++;
+			Thread.sleep (50);
+			tickNumber++;
 
 			moveUnits ();
-			getConnection ().send (Command.Type.GAME_DATA, GameCommand.MOVE_UNITS);
 
-			if (tickNummber % 32 == 0) {
-				for (Planet planet : mPlanets) {
-					planet.addUnit ();
-				}
-				getConnection ().send (Command.Type.GAME_DATA, GameCommand.SPAWN_UNITS);
+			if (tickNumber % 32 == 0) {
+				spawnUnits ();
 			}
+
 		} catch (InterruptedException e) {
 			e.printStackTrace ();
 		}
-		return true;
 	}
 
 	@Override
 	public void receiveClient (Command command) {
 		switch ((GameCommand) command.data[0]) {
-			case SPAWN_UNITS:
-				for (Planet planet : mPlanets) {
-					planet.addUnit ();
-				}
-				break;
 			case START_MOVE_UNITS:
 				addSpaceShip (mPlanets.get ((int) command.data[1]), mPlanets.get ((int) command.data[2]));
-				//				mPlanets.get ((int) command.data[1]).moveUnitsTo (mPlanets.get ((int) command.data[2]));
 				break;
-			case MOVE_UNITS:
-				moveUnits ();
-				break;
+			case END_MOVE_UNITS:
+				mSpaceShips.remove (command.data[1]);
 		}
 	}
 
@@ -263,9 +253,11 @@ public class InterstellarWar extends GameMap {
 		switch ((GameCommand) command.data[1]) {
 			case START_MOVE_UNITS:
 				addSpaceShip (mPlanets.get ((int) command.data[2]), mPlanets.get ((int) command.data[3]));
-				//				mPlanets.get ((int) command.data[3]).moveUnitsTo (mPlanets.get ((int) command.data[4]));
-				getConnection ().send (new Command (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, command.data[2], command.data[3]));
+				getConnection ().send (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, command.data[2], command.data[3]);
 				break;
+			case END_MOVE_UNITS:
+				mSpaceShips.remove (command.data[2]);
+				getConnection ().send (Command.Type.GAME_DATA, GameCommand.END_MOVE_UNITS, command.data[2]);
 		}
 	}
 
@@ -300,7 +292,13 @@ public class InterstellarWar extends GameMap {
 		}
 	}
 
+	private void spawnUnits () {
+		for (Planet planet : mPlanets) {
+			planet.addUnit ();
+		}
+	}
+
 	enum GameCommand {
-		SPAWN_UNITS, START_MOVE_UNITS, MOVE_UNITS
+		START_MOVE_UNITS, END_MOVE_UNITS// #TODO end move units
 	}
 }

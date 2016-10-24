@@ -104,8 +104,8 @@ public class RockPaperScissors extends GameMap {
 	}
 
 	@Override
-	public boolean onGameThread () {
-		return false;
+	public void onGameThread () {
+		return;
 	}
 
 	@Override

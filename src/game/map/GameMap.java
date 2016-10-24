@@ -10,10 +10,12 @@ import java.io.Serializable;
 /**
  * @author neczpal
  */
-public abstract class GameMap {
+public abstract class GameMap extends Thread {
 	private String mMapName;
 	private int mMaxUsers;
 	private Connection mConnection;
+
+	private boolean mGameIsRunning = false;
 
 	public static GameMap createGameMap (String gameName) {
 		GameMap gameMap = null;
@@ -23,6 +25,18 @@ public abstract class GameMap {
 			gameMap = new RockPaperScissors ();
 		}
 		return gameMap;
+	}
+
+	@Override
+	public void run () {
+		mGameIsRunning = true;
+		while (mGameIsRunning) {
+			onGameThread ();
+		}
+	}
+
+	public void stopGame () {
+		mGameIsRunning = false;
 	}
 
 	public String getMapName () {
@@ -63,7 +77,7 @@ public abstract class GameMap {
 		mConnection = connection;
 	}
 
-	public abstract boolean onGameThread ();
+	public abstract void onGameThread ();
 
 	public abstract void receiveClient (Command command);
 

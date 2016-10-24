@@ -20,9 +20,9 @@ public class Client extends Thread {
 	private Log log = new Log (this);
 
 
-	public Client (ServerConnection servet, Socket socket) {
+	public Client (ServerConnection server, Socket socket) {
 		this.mSocket = socket;
-		this.mServerConnection = servet;
+		this.mServerConnection = server;
 
 		mPort = socket.getPort ();
 
@@ -63,6 +63,14 @@ public class Client extends Thread {
 		mIsRunning = false;
 	}
 
+	public void close () throws IOException {
+		mSocket.close ();
+	}
+
+	public int getPort () {
+		return mPort;
+	}
+
 	public boolean send (Command command) {
 		try {
 			if (!mSocket.isClosed ()) {
@@ -75,14 +83,5 @@ public class Client extends Thread {
 			log.e ("Nem sikerült elküldeni ezt: " + command.type + "\n" + e.toString ());
 		}
 		return false;
-	}
-
-
-	public void close () throws IOException {
-		mSocket.close ();
-	}
-
-	public int getPort () {
-		return mPort;
 	}
 }
