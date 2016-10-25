@@ -5,10 +5,13 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by neczp on 2016. 10. 24..
@@ -24,12 +27,19 @@ public class LoginFrame extends JFrame implements ActionListener {
 
 	public LoginFrame () {
 		super ("Login");
-
-		setLayout (new GridLayout (7, 1));
-		setSize (250, 300);
+		try {
+			setIconImage (ImageIO.read (new File ("res/rockpaperscissors/rock.png")));// #TODO useful icon
+		} catch (IOException e) {
+			e.printStackTrace ();
+		}
+		setSize (290, 320);
 		setResizable (false);
 		setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
 		setLocationByPlatform (true);
+
+		JPanel panel = new JPanel ();
+		panel.setLayout (new GridLayout (8, 1));
+		panel.setBorder (BorderFactory.createEmptyBorder (10, 10, 10, 10));
 
 		JLabel userNameLabel = new JLabel ("USERNAME:");
 		userNameTextField = new JTextField ("neczpal", 20);// #TODO remember last one
@@ -37,10 +47,10 @@ public class LoginFrame extends JFrame implements ActionListener {
 		JLabel ipAddressLabel = new JLabel ("IP-ADDRESS:");
 		ipAddressTextField = new JTextField ("localhost", 20);
 
-		add (userNameLabel);
-		add (userNameTextField);
-		add (ipAddressLabel);
-		add (ipAddressTextField);
+		panel.add (userNameLabel);
+		panel.add (userNameTextField);
+		panel.add (ipAddressLabel);
+		panel.add (ipAddressTextField);
 
 		try {
 			JLabel resolutionLabel = new JLabel ("RESOLUTION:"); //#TODO in settings?
@@ -63,8 +73,12 @@ public class LoginFrame extends JFrame implements ActionListener {
 		loginButton.addActionListener (this);
 		getRootPane ().setDefaultButton (loginButton);
 
-		add (loginButton);
+		JLabel gap = new JLabel ("");
+		panel.add (gap);
 
+		panel.add (loginButton);
+
+		add (panel);
 		setVisible (true);
 	}
 

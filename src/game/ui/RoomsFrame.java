@@ -99,7 +99,7 @@ public class RoomsFrame extends JFrame {
 		rightPanel.setBorder (BorderFactory.createEmptyBorder (20, 10, 20, 20));
 		rightPanel.setLayout (new GridLayout (3, 1));
 
-		ImageIcon image = new ImageIcon ("res/rockpaperscissors/rock.png");
+		ImageIcon image = new ImageIcon ("res/rockpaperscissors/rock.png");// #TODO image for every map
 		mRoomPicture = new JLabel ("", image, JLabel.CENTER);
 
 		DefaultListModel <String> listModel = new DefaultListModel ();
@@ -169,8 +169,10 @@ public class RoomsFrame extends JFrame {
 	public void setIsInRoom (boolean isInRoom) {
 		this.mIsInRoom = isInRoom;
 		if (isInRoom) {
+			mRoomsTable.setEnabled (false);
 			mJoinOrLeaveButton.setText ("Leave");
 		} else {
+			mRoomsTable.setEnabled (true);
 			mJoinOrLeaveButton.setText ("Join");
 		}
 	}
