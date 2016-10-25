@@ -4,12 +4,8 @@ import game.connection.ClientConnection;
 import game.connection.RoomData;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -72,21 +68,18 @@ public class RoomsFrame extends JFrame {
 		};
 		mRoomsTable.getTableHeader ().setReorderingAllowed (false);
 		mRoomsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
-		mRoomsTable.getSelectionModel ().addListSelectionListener (new ListSelectionListener () {
-			@Override
-			public void valueChanged (ListSelectionEvent e) {//#TODO not always refreshes the last selection
-				TableModel model = mRoomsTable.getModel ();
-				int selectedRow = mRoomsTable.getSelectedRow ();
-				if (selectedRow != -1) {
-					mSelectedRoomId = (int) model.getValueAt (selectedRow, 0);//#TODO ArrayIndexOutOfBoundsException
+		mRoomsTable.getSelectionModel ().addListSelectionListener (e -> {//#TODO ArrayINdexOutofBoundsException
+			TableModel model = mRoomsTable.getModel ();
+			int selectedRow = mRoomsTable.getSelectedRow ();
+			if (selectedRow != -1) {
+				mSelectedRoomId = (int) model.getValueAt (selectedRow, 0);
 
-					DefaultListModel listModel = (DefaultListModel) mRoomUserList.getModel ();
-					listModel.clear ();
-					ArrayList <String> users = mAllRoomUsers.get (mSelectedRoomId);
-					if (users != null && !users.isEmpty ()) {
-						for (String userName : mAllRoomUsers.get (mSelectedRoomId)) {
-							listModel.addElement (userName);
-						}
+				DefaultListModel listModel = (DefaultListModel) mRoomUserList.getModel ();
+				listModel.clear ();
+				ArrayList <String> users = mAllRoomUsers.get (mSelectedRoomId);
+				if (users != null && !users.isEmpty ()) {
+					for (String userName : mAllRoomUsers.get (mSelectedRoomId)) {
+						listModel.addElement (userName);
 					}
 				}
 			}
@@ -112,26 +105,17 @@ public class RoomsFrame extends JFrame {
 		roomButtonsPanel.setLayout (new FlowLayout ());
 
 		mJoinOrLeaveButton = new JButton ("Join");
-		mJoinOrLeaveButton.addActionListener (new ActionListener () {
-			@Override
-			public void actionPerformed (ActionEvent e) {
-				if (mIsInRoom) {
-					mConnection.leaveRoom ();
-					setIsInRoom (false);
-					setVisible (true);//#TODO somehting room vs. game
-				} else {
-					mConnection.enterRoom (mSelectedRoomId);
-				}
+		mJoinOrLeaveButton.addActionListener (e -> {
+			if (mIsInRoom) {
+				mConnection.leaveRoom ();
+			} else {
+				mConnection.enterRoom (mSelectedRoomId);
 			}
 		});
 
 		mStartButton = new JButton ("Start");
-		mStartButton.addActionListener (new ActionListener () {
-			@Override
-			public void actionPerformed (ActionEvent e) {
-				//				mConnection.start () #TODO
-			}
-		});
+		mStartButton.addActionListener (e -> mConnection.startRoom ());
+		mStartButton.setEnabled (false);
 
 		roomButtonsPanel.add (mJoinOrLeaveButton);
 		roomButtonsPanel.add (mStartButton);
@@ -146,7 +130,7 @@ public class RoomsFrame extends JFrame {
 		setVisible (true);
 	}
 
-	public void loadRoomInfos (RoomData[] data) {
+	public void loadRoomData (RoomData[] data) {
 		mAllRoomUsers.clear ();
 		DefaultTableModel model = (DefaultTableModel) mRoomsTable.getModel ();
 		model.setColumnCount (4);
@@ -158,21 +142,27 @@ public class RoomsFrame extends JFrame {
 			mAllRoomUsers.put (data[i].getRoomId (), data[i].getUsers ());
 			if (data[i].getRoomId () == mSelectedRoomId) {
 				selectedRowIndex = i;
+				if (data[i].getUsers ().size () == data[i].getMaxUserCount ()) {
+					mStartButton.setEnabled (true);
+				} else {
+					mStartButton.setEnabled (false);
+				}
 			}
 		}
 		model.fireTableDataChanged ();
 
 		mRoomsTable.setRowSelectionInterval (selectedRowIndex, selectedRowIndex);
-		//		mSelectedRoomId = (int) mRoomsTable.getModel ().getValueAt (selectedRowIndex, 0);
 	}
 
 	public void setIsInRoom (boolean isInRoom) {
 		this.mIsInRoom = isInRoom;
 		if (isInRoom) {
 			mRoomsTable.setEnabled (false);
+			//			mStartButton.setEnabled (true);
 			mJoinOrLeaveButton.setText ("Leave");
 		} else {
 			mRoomsTable.setEnabled (true);
+			//			mStartButton.setEnabled (false);
 			mJoinOrLeaveButton.setText ("Join");
 		}
 	}

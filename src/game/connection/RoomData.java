@@ -14,13 +14,15 @@ public class RoomData implements Serializable {
 	private String mMapName;
 	private ArrayList <String> mUsers;
 	private int mMaxUserCount;
+	private boolean mIsRunning;
 
-	public RoomData (int mRoomId, String mGameName, String mMapName, ArrayList <String> mUsers, int mMaxUserCount) {
+	public RoomData (int mRoomId, String mGameName, String mMapName, ArrayList <String> mUsers, int mMaxUserCount, boolean mIsRunning) {
 		this.mRoomId = mRoomId;
 		this.mGameName = mGameName;
 		this.mMapName = mMapName;
 		this.mUsers = mUsers;
 		this.mMaxUserCount = mMaxUserCount;
+		this.mIsRunning = mIsRunning;
 	}
 
 	public int getRoomId () {

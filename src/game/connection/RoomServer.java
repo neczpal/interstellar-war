@@ -17,8 +17,8 @@ public class RoomServer extends Thread {
 		mIsRunning = true;
 		while (mIsRunning) {
 			try {
-				Thread.sleep (3000);
-				mServerConnection.send (Command.Type.LIST_ROOMS, mServerConnection.getRoomData ());
+				Thread.sleep (10000);
+				mServerConnection.listRoom ();
 			} catch (InterruptedException e) {
 				e.printStackTrace ();
 			}

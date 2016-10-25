@@ -58,15 +58,15 @@ public class RockPaperScissors extends GameMap {
 			int index = ((ClientConnection) getConnection ()).getRoomIndex ();
 
 			if (mRockButtonP1.isInside (point)) {
-				getConnection ().send (Command.Type.GAME_DATA, GameCommand.MY_CHOICE, index, 1);
+				getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.MY_CHOICE, index, 1);
 				mSelectedP1 = 1;
 				mRockButtonP1.setColor (Color.TEAL);
 			} else if (mPaperButtonP1.isInside (point)) {
-				getConnection ().send (Command.Type.GAME_DATA, GameCommand.MY_CHOICE, index, 2);
+				getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.MY_CHOICE, index, 2);
 				mSelectedP1 = 2;
 				mPaperButtonP1.setColor (Color.TEAL);
 			} else if (mScissorButtonP1.isInside (point)) {
-				getConnection ().send (Command.Type.GAME_DATA, GameCommand.MY_CHOICE, index, 3);
+				getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.MY_CHOICE, index, 3);
 				mSelectedP1 = 3;
 				mScissorButtonP1.setColor (Color.TEAL);
 			}
@@ -135,7 +135,7 @@ public class RockPaperScissors extends GameMap {
 					mSelectedP2 = (int) command.data[4];
 				}
 				if (mSelectedP1 != 0 && mSelectedP2 != 0)
-					getConnection ().send (Command.Type.GAME_DATA, GameCommand.OTHER_CHOICE, mSelectedP1, mSelectedP2);
+					getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.OTHER_CHOICE, mSelectedP1, mSelectedP2);
 				break;
 		}
 	}

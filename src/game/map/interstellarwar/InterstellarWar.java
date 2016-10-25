@@ -82,7 +82,7 @@ public class InterstellarWar extends GameMap {
 							mSelectedPlanetTo = planet;
 							int index = ((ClientConnection) getConnection ()).getRoomIndex ();
 							if (mSelectedPlanetFrom.getOwnedBy () == index) {
-								getConnection ().send (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
+								getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
 							}
 							break;
 						}
@@ -258,11 +258,11 @@ public class InterstellarWar extends GameMap {
 		switch ((GameCommand) command.data[1]) {
 			case START_MOVE_UNITS:
 				addSpaceShip (mPlanets.get ((int) command.data[2]), mPlanets.get ((int) command.data[3]));
-				getConnection ().send (Command.Type.GAME_DATA, GameCommand.START_MOVE_UNITS, command.data[2], command.data[3]);
+				getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.START_MOVE_UNITS, command.data[2], command.data[3]);
 				break;
 			case END_MOVE_UNITS:
 				mSpaceShips.remove (command.data[2]);
-				getConnection ().send (Command.Type.GAME_DATA, GameCommand.END_MOVE_UNITS, command.data[2]);
+				getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.END_MOVE_UNITS, command.data[2]);
 		}
 	}
 

@@ -17,6 +17,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class GameFrame extends Thread {
 
 	private int mDisplayModeIndex;
+	private int mWidth, mHeight;
 	private String mName;
 	private GameMap mGameMap;
 
@@ -53,7 +54,9 @@ public class GameFrame extends Thread {
 	private void initDisplay () {
 		try {
 			Display.setDisplayMode (Display.getAvailableDisplayModes ()[mDisplayModeIndex]);
-			//			Display.setFullscreen (true); #TODO
+			mWidth = Display.getDisplayMode ().getWidth ();
+			mHeight = Display.getDisplayMode ().getHeight ();
+			//			Display.setFullscreen (true); //#TODO
 			Display.setTitle (mName);
 			Display.create ();
 			Keyboard.create ();
@@ -67,7 +70,7 @@ public class GameFrame extends Thread {
 	private void initGL () {
 		glMatrixMode (GL_PROJECTION);
 		glLoadIdentity ();
-		glOrtho (0, Display.getWidth (), 0, Display.getHeight (), -1, 1);
+		glOrtho (0, mWidth, 0, mHeight, -1, 1);
 		glMatrixMode (GL_MODELVIEW);
 
 		glClearColor (0, 0, 0, 1);

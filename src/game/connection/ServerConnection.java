@@ -121,6 +121,10 @@ public class ServerConnection extends Thread {
 		return mUsers.get (key);
 	}
 
+	public Room getRoom (Object key) {
+		return mRooms.get (key);
+	}
+
 	// RECEIVE
 	private void enterServer (String name, int port) {
 		int tempIndex = findClientByPort (port);
@@ -154,7 +158,7 @@ public class ServerConnection extends Thread {
 		int userId = user.getId ();
 		int roomId = user.getRoomId ();
 		if (roomId != 0) {
-			Room room = mRooms.get (roomId);
+			Room room = getRoom (roomId);
 			log.i ("User (" + user + ") is leaving the Room (" + room + ")");
 			room.removeUser (user);
 			if (room.isEmpty () && room.isMapRunning ()) {
@@ -162,6 +166,8 @@ public class ServerConnection extends Thread {
 				mRooms.remove (roomId);
 			}
 			user.setRoomId (0);
+
+			listRoom ();
 		} else {
 			log.i ("User (" + userId + ") is not in a room");
 		}
@@ -174,21 +180,30 @@ public class ServerConnection extends Thread {
 			user.setRoomId (room.getRoomId ());
 			room.addUser (user);
 			sendToId (user.getId (), new Command (Command.Type.MAP_DATA, user.getRoomIndex (), room.getGameName (), room.getGameMap ().toData ()));
-			if (room.isFull ()) {
-				room.send (Command.Type.READY_TO_PLAY, room.getGameName (), room.getMapFantasyName ());
-				room.startGame ();
-				addRoom (room.getGameName (), room.getMapName ());
-			} else {
-				//				send (Command.Type.LIST_ROOMS, getRoomData ());
-			}
+
+			listRoom ();
 		} else {
 			log.i (user + " is connecting to the Room (" + room + "), but its full/running/not existing!");
 		}
 	}
 
+	private void startRoom (User user) {
+		Room room = getRoom (user.getRoomId ());
+		if (room != null && room.isFull () && !room.isMapRunning ()) {
+			room.send (Command.Type.READY_TO_PLAY, room.getGameName (), room.getMapFantasyName ());
+			room.startGame ();
+			addRoom (room.getGameName (), room.getMapName ());
+
+			listRoom ();
+			log.i (user + " is starting the game in the Room (" + room + ")");
+		} else {
+			log.i (user + " couldn't start the game in the Room (" + room + "), because it was not full/already started/not existing");
+		}
+	}
+
 	private void gameCommand (User user, Command command) {
-		Room room = mRooms.get (user.getRoomId ());
-		log.i ("User (" + user + ") in the Room (" + room + ") sent GAME_DATA " + command.data[1]);
+		Room room = getRoom (user.getRoomId ());
+		log.i ("User (" + user + ") in the Room (" + room + ") sent GAME_COMMAND " + command.data[1]);
 		room.receive (command);
 	}
 
@@ -205,12 +220,20 @@ public class ServerConnection extends Thread {
 				leaveRoom (getUser (command.data[0]));
 				break;
 			case ENTER_ROOM:
-				enterRoom (getUser (command.data[0]), mRooms.get (command.data[1]));
+				enterRoom (getUser (command.data[0]), getRoom (command.data[1]));
 				break;
-			case GAME_DATA:
+			case START_ROOM:
+				startRoom (getUser (command.data[0]));
+				break;
+			case GAME_COMMAND:
 				gameCommand (getUser (command.data[0]), command);
 				break;
 		}
+	}
+
+	//SEND
+	public void listRoom () {
+		send (Command.Type.LIST_ROOMS, getRoomData ());
 	}
 
 	public void sendToId (int id, Command.Type type) {

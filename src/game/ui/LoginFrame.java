@@ -62,8 +62,8 @@ public class LoginFrame extends JFrame implements ActionListener {
 			availableResolutionsComboBox = new JComboBox <> (availableResolutions);
 			availableResolutionsComboBox.setSelectedIndex (10);//# TODO ez igy nem lesz jo
 
-			add (resolutionLabel);
-			add (availableResolutionsComboBox);
+			panel.add (resolutionLabel);
+			panel.add (availableResolutionsComboBox);
 		} catch (LWJGLException e) {
 			e.printStackTrace ();
 		}

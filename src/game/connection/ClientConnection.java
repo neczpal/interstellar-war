@@ -97,7 +97,7 @@ public class ClientConnection extends Thread implements Connection {
 	}
 
 	private void listRooms (Serializable[] roomData) {
-		mRoomsFrame.loadRoomInfos ((RoomData[]) roomData);
+		mRoomsFrame.loadRoomData ((RoomData[]) roomData);
 		log.i ("Room datas loaded");
 	}
 
@@ -114,11 +114,10 @@ public class ClientConnection extends Thread implements Connection {
 		mGameFrame = new GameFrame (gameName + " : " + mapName, mLoginFrame.getSelectedDisplayModeIndex (), mGameMap);
 		mGameFrame.start ();
 		mGameMap.start ();
-		mRoomsFrame.setVisible (false);
 		log.i (gameName + " (" + mapName + ") is ready to play.");
 	}
 
-	private void gameData (Command command) {
+	private void gameCommand (Command command) {
 		mGameMap.receiveClient (command);
 		log.i (command.data[0] + " game command received.");
 	}
@@ -139,8 +138,8 @@ public class ClientConnection extends Thread implements Connection {
 			case READY_TO_PLAY:
 				startGame ((String) command.data[0], (String) command.data[1]);
 				break;
-			case GAME_DATA:
-				gameData (command);
+			case GAME_COMMAND:
+				gameCommand (command);
 		}
 	}
 
@@ -155,10 +154,15 @@ public class ClientConnection extends Thread implements Connection {
 
 	public void leaveRoom () {
 		send (Command.Type.LEAVE_ROOM);
+		mRoomsFrame.setIsInRoom (false);
 	}
 
 	public void enterRoom (int roomId) {
 		send (Command.Type.ENTER_ROOM, roomId);
+	}
+
+	public void startRoom () {
+		send (Command.Type.START_ROOM);
 	}
 
 	public void send (Command.Type type) {
