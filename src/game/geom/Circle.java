@@ -5,19 +5,12 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * Created by neczp on 2016. 10. 06..
  */
-public class Circle {
-	private static final int circle_points = 120;
-
-	private Point2D k;
+public class Circle extends Point2D {
 	private double r;
 	private int mTexture = -1;
 
 	public Circle (double x, double y, double r) {
-		this (new Point2D (x, y), r);
-	}
-
-	public Circle (Point2D k, double r) {
-		this.k = k;
+		super (x, y);
 		this.r = r;
 	}
 
@@ -31,8 +24,8 @@ public class Circle {
 
 			double xcos = Math.cos (radian);
 			double ysin = Math.sin (radian);
-			double x = xcos * r + k.x;
-			double y = ysin * r + k.y;
+			double x = xcos * r + this.x;
+			double y = ysin * r + this.y;
 			double tx = xcos * 0.5 + 0.5;
 			double ty = ysin * 0.5 + 0.5;
 			glTexCoord2d (tx, ty);
@@ -40,10 +33,6 @@ public class Circle {
 		}
 
 		glEnd ();
-	}
-
-	public double distance (Circle other) {
-		return getCenter ().distance (other.getCenter ());
 	}
 
 	public int getTexture () {
@@ -54,20 +43,8 @@ public class Circle {
 		mTexture = texture;
 	}
 
-	public void move (double dx, double dy) {
-		k.move (dx, dy);
-	}
-
-	public void rotate (Point2D p, double angle) {
-		p.rotate (p, angle);
-	}
-
 	public boolean isInside (Point2D p) {
-		return Math.pow ((p.x - k.x), 2) + Math.pow ((p.y - k.y), 2) <= r * r;
-	}
-
-	public Point2D getCenter () {
-		return k;
+		return Math.pow ((p.x - x), 2) + Math.pow ((p.y - y), 2) <= r * r;
 	}
 
 	public double getRadius () {
@@ -78,7 +55,4 @@ public class Circle {
 		this.r = radius;
 	}
 
-	public void setPosition (double x, double y) {
-		k.setPosition (x, y);
-	}
 }

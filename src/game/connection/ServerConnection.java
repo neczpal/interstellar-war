@@ -137,6 +137,7 @@ public class ServerConnection extends Thread {
 		mUsers.put (id, newUser);
 
 		sendToId (id, new Command (Command.Type.CONNECTION_READY, id));
+		sendToId (id, Command.Type.LIST_ROOMS, getRoomData ());
 	}
 
 	private void exitServer (User user) {

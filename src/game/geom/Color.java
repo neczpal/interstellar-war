@@ -19,18 +19,6 @@ public enum Color {
 		this.blue = blue / 255.0f;
 	}
 
-	public float getRed () {
-		return red;
-	}
-
-	public float getGreen () {
-		return green;
-	}
-
-	public float getBlue () {
-		return blue;
-	}
-
 	public void setGLColor () {
 		glColor3f (red, green, blue);
 	}

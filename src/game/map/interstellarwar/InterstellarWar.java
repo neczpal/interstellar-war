@@ -4,6 +4,7 @@ import game.Textures;
 import game.Util;
 import game.connection.ClientConnection;
 import game.connection.Command;
+import game.geom.Arrow;
 import game.geom.Color;
 import game.geom.Line;
 import game.geom.Point2D;
@@ -39,7 +40,7 @@ public class InterstellarWar extends GameMap {
 	@Override
 	public void initTextures () {
 		for (Planet planet : mPlanets) {
-			planet.setTexture (Textures.InterstellarWar.planet[(int) (planet.getCenter ().getX () + planet.getCenter ().getY ()) % 9]);
+			planet.setTexture (Textures.InterstellarWar.planet[(int) (planet.getX () + planet.getY ()) % 9]);
 		}
 	}
 
@@ -105,19 +106,18 @@ public class InterstellarWar extends GameMap {
 	@Override
 	public void draw () {
 		if (mSelectedPlanetFrom != null) {
-			Point2D center1 = mSelectedPlanetFrom.getCenter ();
+			Point2D center1 = mSelectedPlanetFrom;
 			Util.drawCircle (center1.getX (), center1.getY (), mSelectedPlanetFrom.getRadius () + 3, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 		if (mSelectedPlanetTo != null) {
-			Point2D center2 = mSelectedPlanetTo.getCenter ();
+			Point2D center2 = mSelectedPlanetTo;
 			Util.drawCircle (center2.getX (), center2.getY (), mSelectedPlanetTo.getRadius () + 3, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
-
 		mPlanets.forEach (Planet::draw);
 		for (Integer[] integers : mConnections) {
 			Planet planet1 = mPlanets.get (integers[0]);
 			Planet planet2 = mPlanets.get (integers[1]);
-			Line line = new Line (planet1.getCenter (), planet2.getCenter ());
+			Line line = new Line (planet1, planet2);
 			Color.WHITE.setGLColor ();
 			line.draw ();
 		}
@@ -128,6 +128,12 @@ public class InterstellarWar extends GameMap {
 		} catch (ConcurrentModificationException ex) {
 		}
 		//#TODO ConcurrentModificationException toDel list delete here??
+
+		if (mSelectedPlanetTo != null) {
+			Arrow arrow = new Arrow (mSelectedPlanetFrom, mSelectedPlanetTo, 40);
+			Color.values ()[mSelectedPlanetFrom.getOwnedBy ()].setGLColor ();
+			arrow.draw ();
+		}
 	}
 
 	@Override
@@ -208,7 +214,7 @@ public class InterstellarWar extends GameMap {
 
 		for (int j = 0; j < mPlanetNumber; j++) {
 			Planet planet = mPlanets.get (j);
-			Point2D center = planet.getCenter ();
+			Point2D center = planet;
 			list.add (center.getX ());
 			list.add (center.getY ());
 			list.add (planet.getRadius ());
@@ -271,16 +277,16 @@ public class InterstellarWar extends GameMap {
 			return;
 
 		double length = from.distance (to);
-		double lx = to.getCenter ().getX () - from.getCenter ().getX ();
-		double ly = to.getCenter ().getY () - from.getCenter ().getY ();
+		double lx = to.getX () - from.getX ();
+		double ly = to.getY () - from.getY ();
 		double hx = lx / length * SpaceShip.SPACE_SHIP_SIZE;
 		double hy = ly / length * SpaceShip.SPACE_SHIP_SIZE;
 
-		Point2D a = new Point2D (from.getCenter ().getX () + hx, from.getCenter ().getY () + hy);
-		Point2D b = new Point2D (from.getCenter ().getX () + hx / 2, from.getCenter ().getY () + hy / 2);
-		Point2D c = new Point2D (from.getCenter ().getX () + hx / 2, from.getCenter ().getY () + hy / 2);
-		b.rotate (from.getCenter (), -90);
-		c.rotate (from.getCenter (), 90);
+		Point2D a = new Point2D (from.getX () + hx, from.getY () + hy);
+		Point2D b = new Point2D (from.getX () + hx / 2, from.getY () + hy / 2);
+		Point2D c = new Point2D (from.getX () + hx / 2, from.getY () + hy / 2);
+		b.rotate (from, -90);
+		c.rotate (from, 90);
 
 		mSpaceShips.add (new SpaceShip (a, b, c, from.getOwnedBy (), from.getUnitNumber (), (int) (2 * length / SpaceShip.SPACE_SHIP_SIZE), hx / 2, hy / 2, mPlanets.indexOf (to)));
 		from.setUnitNumber (0);

@@ -3,7 +3,6 @@ package game.map.interstellarwar;
 import game.Util;
 import game.geom.Circle;
 import game.geom.Color;
-import game.geom.Point2D;
 
 import java.util.ArrayList;
 
@@ -59,12 +58,10 @@ public class Planet extends Circle {
 
 	@Override
 	public void draw () {
-		Point2D center = getCenter ();
-
 		Color.values ()[mOwnedBy].setGLColor ();
 		super.draw ();
 
-		Util.drawString (Integer.toString (mUnitNumber), center.getX (), center.getY (), Util.DEFAULT_FONTSIZE, Color.values ()[mOwnedBy]);
+		Util.drawString (Integer.toString (mUnitNumber), getX (), getY (), Util.DEFAULT_FONTSIZE, Color.values ()[mOwnedBy]);
 	}
 
 	public void addUnit (int mUnitsNum) {
