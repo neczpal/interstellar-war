@@ -92,7 +92,7 @@ public class ServerConnection extends Thread {
 	}
 
 	public void removeClient (int id) {
-		User user = mUsers.get (id);
+		User user = getUser (id);
 		leaveRoom (user);
 
 		log.i ("User (" + user + ") disconnected from the connection");
@@ -108,19 +108,17 @@ public class ServerConnection extends Thread {
 		return -1;
 	}
 
-	public Serializable[] getRoomData () {
+	public RoomData[] getRoomData () {
 		int i = 0;
-		Serializable[] roomData = new Serializable[mRooms.size () * 5];
-		Iterator <HashMap.Entry <Integer, Room>> iterator = mRooms.entrySet ().iterator ();
-		while (iterator.hasNext ()) {
-			Room connection = iterator.next ().getValue ();
-			roomData[i++] = connection.getRoomId ();
-			roomData[i++] = connection.getGameName ();
-			roomData[i++] = connection.getMapFantasyName ();
-			roomData[i++] = connection.getUserCount ();
-			roomData[i++] = connection.getMaxUserCount ();
+		RoomData[] roomData = new RoomData[mRooms.size ()];
+		for (Room room : mRooms.values ()) {
+			roomData[i++] = room.getData ();
 		}
 		return roomData;
+	}
+
+	public User getUser (Object key) {
+		return mUsers.get (key);
 	}
 
 	// RECEIVE
@@ -201,16 +199,16 @@ public class ServerConnection extends Thread {
 				enterServer ((String) command.data[1], currentPort);
 				break;
 			case EXIT_SERVER:
-				exitServer (mUsers.get (command.data[0]));
+				exitServer (getUser (command.data[0]));
 				break;
 			case LEAVE_ROOM:
-				leaveRoom (mUsers.get (command.data[0]));
+				leaveRoom (getUser (command.data[0]));
 				break;
 			case ENTER_ROOM:
-				enterRoom (mUsers.get (command.data[0]), mRooms.get (command.data[1]));
+				enterRoom (getUser (command.data[0]), mRooms.get (command.data[1]));
 				break;
 			case GAME_DATA:
-				gameCommand (mUsers.get (command.data[0]), command);
+				gameCommand (getUser (command.data[0]), command);
 				break;
 		}
 	}

@@ -3,8 +3,10 @@ package game.connection;
 import game.map.GameMap;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 /**
  * Created by neczp on 2016. 10. 11..
@@ -41,7 +43,6 @@ public class Room implements Connection {
 	public void setRoomId (int id) {
 		mRoomId = id;
 	}
-
 
 	@Override
 	public String toString () {
@@ -106,6 +107,11 @@ public class Room implements Connection {
 
 	public int getUserCount () {
 		return mConnectionIds.size ();
+	}
+
+	public RoomData getData () {
+		ArrayList <String> mUsers = mConnectionIds.keySet ().stream ().map (id -> mServerConnection.getUser (id).getName ()).collect (Collectors.toCollection (ArrayList::new));
+		return new RoomData (mRoomId, mGameName, mMapName, mUsers, mMaxUserCount);
 	}
 
 	@Override

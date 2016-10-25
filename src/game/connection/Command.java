@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @author neczpal
  */
 public class Command implements Serializable {
-	static final long serialVersionUID = 42L;
+	static final long serialVersionUID = 42321L;
 	public Type type;
 	public Serializable[] data;
 
@@ -31,6 +31,7 @@ public class Command implements Serializable {
 		System.arraycopy (data, 0, tempData, header_data.length, data.length);
 		this.data = tempData;
 	}
+
 	public enum Type {
 		ENTER_SERVER, EXIT_SERVER, LIST_ROOMS, MAP_DATA, CONNECTION_READY, READY_TO_PLAY, ENTER_ROOM, LEAVE_ROOM, GAME_DATA
 	}

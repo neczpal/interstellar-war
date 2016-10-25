@@ -8,7 +8,6 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -17,15 +16,14 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class GameFrame extends Thread {
 
-	private final int width, height;
-	private String name;
+	private int mDisplayModeIndex;
+	private String mName;
 	private GameMap mGameMap;
 
-	public GameFrame (String name, int width, int height, GameMap gameMap) {
-		super (name);
-		this.name = name;
-		this.width = width;
-		this.height = height;
+	public GameFrame (String mTitle, int displayModeIndex, GameMap gameMap) {
+		super (mTitle);
+		this.mName = mTitle;
+		this.mDisplayModeIndex = displayModeIndex;
 		this.mGameMap = gameMap;
 	}
 
@@ -54,14 +52,15 @@ public class GameFrame extends Thread {
 
 	private void initDisplay () {
 		try {
-			Display.setDisplayMode (new DisplayMode (width, height));
-			Display.setTitle (name);
+			Display.setDisplayMode (Display.getAvailableDisplayModes ()[mDisplayModeIndex]);
+			//			Display.setFullscreen (true); #TODO
+			Display.setTitle (mName);
 			Display.create ();
 			Keyboard.create ();
 			Mouse.create ();
 
 		} catch (LWJGLException ex) {
-			//			Logger.getLogger (GameFrame.class.getName ()).log (Level.SEVERE, null, ex);
+			ex.printStackTrace ();
 		}
 	}
 

@@ -8,10 +8,6 @@ public class User {
 
 	private String mName;
 
-	public User (String name) {
-		this (name, 0);
-	}
-
 	public User (String name, int id) {
 		mName = name;
 		mId = id;
@@ -25,6 +21,14 @@ public class User {
 
 	public void setId (int id) {
 		mId = id;
+	}
+
+	public String getName () {
+		return mName;
+	}
+
+	public void setName (String name) {
+		mName = name;
 	}
 
 	public int getRoomId () {

@@ -98,7 +98,7 @@ public class ClientConnection extends Thread implements Connection {
 	}
 
 	private void listRooms (Serializable[] roomData) {
-		mRoomsFrame.loadRoomInfos (roomData);
+		mRoomsFrame.loadRoomInfos ((RoomData[]) roomData);
 		log.i ("Room datas loaded");
 	}
 
@@ -112,7 +112,7 @@ public class ClientConnection extends Thread implements Connection {
 	}
 
 	private void startGame (String gameName, String mapName) {
-		mGameFrame = new GameFrame (gameName + " : " + mapName, 640, 480, mGameMap);
+		mGameFrame = new GameFrame (gameName + " : " + mapName, mLoginFrame.getSelectedDisplayModeIndex (), mGameMap);
 		mGameFrame.start ();
 		mGameMap.start ();
 		mRoomsFrame.setVisible (false);

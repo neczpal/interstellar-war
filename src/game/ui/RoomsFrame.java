@@ -1,6 +1,7 @@
 package game.ui;
 
 import game.connection.ClientConnection;
+import game.connection.RoomData;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -11,22 +12,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by neczp on 2016. 10. 11..
  */
 public class RoomsFrame extends JFrame {
-	private JTable roomsTable;
-	private JLabel roomPicture;
-	private JList roomUserList;
-	private JButton joinOrLeaveButton;
-	private JButton startButton;
+	private JTable mRoomsTable;
+	private JLabel mRoomPicture;
+	private JList mRoomUserList;
+	private JButton mJoinOrLeaveButton;
+	private JButton mStartButton;
 
 	private ClientConnection mConnection;
 
 	private int mSelectedRoomId = -1;
 	private boolean isInRoom = false;
+	private HashMap <Integer, ArrayList <String>> roomUsers = new HashMap <> ();
 
 	public RoomsFrame (ClientConnection clientConnection) {
 		super ("Rooms");
@@ -36,7 +39,7 @@ public class RoomsFrame extends JFrame {
 		setLayout (new FlowLayout ());
 		setLocationByPlatform (true);
 		setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
-		setSize (700, 500);
+		setSize (900, 500);
 		addWindowListener (new WindowAdapter () {
 			@Override
 			public void windowClosing (WindowEvent e) {
@@ -58,41 +61,52 @@ public class RoomsFrame extends JFrame {
 		third.setHeaderValue ("Users");
 		tableColumnModel.addColumn (third);
 
-		roomsTable = new JTable (tableModel, tableColumnModel) {
+		mRoomsTable = new JTable (tableModel, tableColumnModel) {
 			public boolean isCellEditable (int row, int column) {
 				return false;
 			}
 		};
-		roomsTable.getTableHeader ().setReorderingAllowed (false);
-		roomsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
-		roomsTable.getSelectionModel ().addListSelectionListener (new ListSelectionListener () {
+		mRoomsTable.getTableHeader ().setReorderingAllowed (false);
+		mRoomsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
+		mRoomsTable.getSelectionModel ().addListSelectionListener (new ListSelectionListener () {
 			@Override
 			public void valueChanged (ListSelectionEvent e) {//#TODO not always refreshes the last selection
-				TableModel model = roomsTable.getModel ();
-				int rowIndex = e.getFirstIndex ();
+				TableModel model = mRoomsTable.getModel ();
+				int selectedRow = mRoomsTable.getSelectedRow ();
+				if (selectedRow != -1) {
+					mSelectedRoomId = (int) model.getValueAt (selectedRow, 0);//#TODO ArrayIndexOutOfBoundsException
 
-				if (rowIndex < model.getRowCount ()) {
-					mSelectedRoomId = (int) model.getValueAt (rowIndex, 0);//#TODO ArrayIndexOutOfBoundsException
+					DefaultListModel listModel = (DefaultListModel) mRoomUserList.getModel ();
+					listModel.clear ();
+					ArrayList <String> users = roomUsers.get (mSelectedRoomId);
+					if (users != null && !users.isEmpty ()) {
+						for (String userName : roomUsers.get (mSelectedRoomId)) {
+							listModel.addElement (userName);
+						}
+					}
 				}
 			}
 		});
-		roomsTable.setDefaultRenderer (Object.class, new RoomTableCellRenderer ());
+		mRoomsTable.setDefaultRenderer (Object.class, new RoomTableCellRenderer ());
 
-		leftPanel.add (new JScrollPane (roomsTable));
+		leftPanel.add (new JScrollPane (mRoomsTable));
 
 		JPanel rightPanel = new JPanel ();
 		rightPanel.setLayout (new GridLayout (3, 1));
 
 		ImageIcon image = new ImageIcon ("res/rockpaperscissors/rock.png");
-		roomPicture = new JLabel ("", image, JLabel.CENTER);
-		roomUserList = new JList (new String[] {"era", "bsfsf", "casd", "asfaoiefjeaoi"});
-		roomUserList.setEnabled (false);
+		mRoomPicture = new JLabel ("", image, JLabel.CENTER);
+
+		DefaultListModel <String> listModel = new DefaultListModel ();
+
+		mRoomUserList = new JList <> (listModel);
+		mRoomUserList.setEnabled (false);
 
 		JPanel roomButtonsPanel = new JPanel ();
 		roomButtonsPanel.setLayout (new FlowLayout ());
 
-		joinOrLeaveButton = new JButton ("Join");
-		joinOrLeaveButton.addActionListener (new ActionListener () {
+		mJoinOrLeaveButton = new JButton ("Join");
+		mJoinOrLeaveButton.addActionListener (new ActionListener () {
 			@Override
 			public void actionPerformed (ActionEvent e) {
 				if (isInRoom) {
@@ -102,19 +116,19 @@ public class RoomsFrame extends JFrame {
 				}
 			}
 		});
-		startButton = new JButton ("Start");
-		startButton.addActionListener (new ActionListener () {
+		mStartButton = new JButton ("Start");
+		mStartButton.addActionListener (new ActionListener () {
 			@Override
 			public void actionPerformed (ActionEvent e) {
 				//				mConnection.start () #TODO
 			}
 		});
 
-		roomButtonsPanel.add (joinOrLeaveButton);
-		roomButtonsPanel.add (startButton);
+		roomButtonsPanel.add (mJoinOrLeaveButton);
+		roomButtonsPanel.add (mStartButton);
 
-		rightPanel.add (roomPicture);
-		rightPanel.add (new JScrollPane (roomUserList));
+		rightPanel.add (mRoomPicture);
+		rightPanel.add (new JScrollPane (mRoomUserList));
 		rightPanel.add (roomButtonsPanel);
 
 		add (leftPanel);
@@ -123,34 +137,32 @@ public class RoomsFrame extends JFrame {
 		setVisible (true);
 	}
 
-	public void loadRoomInfos (Serializable[] data) {
-		DefaultTableModel model = (DefaultTableModel) roomsTable.getModel ();
+	public void loadRoomInfos (RoomData[] data) {
+		roomUsers.clear ();
+		DefaultTableModel model = (DefaultTableModel) mRoomsTable.getModel ();
 		model.setColumnCount (4);
 		model.setRowCount (0);
-		int i = 0;
 		int selectedRowIndex = 0;
 
-		while (i < data.length) {
-			int id = (int) data[i++];
-			String game = (String) data[i++];
-			String map = (String) data[i++];
-			int user = (int) data[i++];
-			int maxuser = (int) data[i++];
-			model.addRow (new Object[] {id, game, map, String.valueOf (user) + "/" + String.valueOf (maxuser)});
-			if (id == mSelectedRoomId) {
-				selectedRowIndex = model.getRowCount () - 1;
+		for (int i = 0; i < data.length; i++) {
+			model.addRow (new Object[] {data[i].getRoomId (), data[i].getGameName (), data[i].getMapName (), String.valueOf (data[i].getUsers ().size ()) + "/" + String.valueOf (data[i].getMaxUserCount ())});
+			roomUsers.put (data[i].getRoomId (), data[i].getUsers ());
+			if (data[i].getRoomId () == mSelectedRoomId) {
+				selectedRowIndex = i;
 			}
 		}
 		model.fireTableDataChanged ();
-		roomsTable.setRowSelectionInterval (selectedRowIndex, selectedRowIndex);
+
+		mRoomsTable.setRowSelectionInterval (selectedRowIndex, selectedRowIndex);
+		//		mSelectedRoomId = (int) mRoomsTable.getModel ().getValueAt (selectedRowIndex, 0);
 	}
 
 	public void setIsInRoom (boolean isInRoom) {
 		this.isInRoom = isInRoom;
 		if (isInRoom) {
-			joinOrLeaveButton.setText ("Leave");
+			mJoinOrLeaveButton.setText ("Leave");
 		} else {
-			joinOrLeaveButton.setText ("Join");
+			mJoinOrLeaveButton.setText ("Join");
 		}
 	}
 
