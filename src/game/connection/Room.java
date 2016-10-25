@@ -111,7 +111,7 @@ public class Room implements Connection {
 
 	public RoomData getData () {
 		ArrayList <String> mUsers = mConnectionIds.keySet ().stream ().map (id -> mServerConnection.getUser (id).getName ()).collect (Collectors.toCollection (ArrayList::new));
-		return new RoomData (mRoomId, mGameName, mMapName, mUsers, mMaxUserCount);
+		return new RoomData (mRoomId, mGameName, mMap.getMapName (), mUsers, mMaxUserCount);
 	}
 
 	@Override

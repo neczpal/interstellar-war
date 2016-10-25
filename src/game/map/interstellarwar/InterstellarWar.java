@@ -12,6 +12,7 @@ import org.lwjgl.input.Mouse;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 
@@ -120,9 +121,13 @@ public class InterstellarWar extends GameMap {
 			Color.WHITE.setGLColor ();
 			line.draw ();
 		}
-		for (SpaceShip spaceShip : mSpaceShips) {
-			spaceShip.draw ();
-		}//#TODO ConcurrentModificationException toDel list delete here??
+		try {
+			for (SpaceShip spaceShip : mSpaceShips) {
+				spaceShip.draw ();
+			}
+		} catch (ConcurrentModificationException ex) {
+		}
+		//#TODO ConcurrentModificationException toDel list delete here??
 	}
 
 	@Override

@@ -36,7 +36,6 @@ public class ClientConnection extends Thread implements Connection {
 
 	public ClientConnection (String ip, String userName) {
 		super ("ClientConnection " + userName);
-		//		mRoomsFrame = openRoomsFrame;
 		mUserName = userName;
 		mIsRunning = false;
 		try {
@@ -156,8 +155,6 @@ public class ClientConnection extends Thread implements Connection {
 
 	public void leaveRoom () {
 		send (Command.Type.LEAVE_ROOM);
-		mRoomsFrame.setIsInRoom (false);
-		mRoomsFrame.setVisible (true);//#TODO somehting room vs. game
 	}
 
 	public void enterRoom (int roomId) {

@@ -28,25 +28,29 @@ public class RoomsFrame extends JFrame {
 	private ClientConnection mConnection;
 
 	private int mSelectedRoomId = -1;
-	private boolean isInRoom = false;
-	private HashMap <Integer, ArrayList <String>> roomUsers = new HashMap <> ();
+	private boolean mIsInRoom = false;
+
+	private HashMap <Integer, ArrayList <String>> mAllRoomUsers = new HashMap <> ();
 
 	public RoomsFrame (ClientConnection clientConnection) {
 		super ("Rooms");
 
 		mConnection = clientConnection;
 
-		setLayout (new FlowLayout ());
+		setLayout (new BorderLayout ());
 		setLocationByPlatform (true);
 		setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
-		setSize (900, 500);
+		setSize (720, 500);
+		setResizable (false);
 		addWindowListener (new WindowAdapter () {
 			@Override
 			public void windowClosing (WindowEvent e) {
 				mConnection.stopClientConnection ();
 			}
 		});
+
 		JPanel leftPanel = new JPanel ();
+		leftPanel.setBorder (BorderFactory.createEmptyBorder (20, 20, 20, 10));
 
 		TableModel tableModel = new DefaultTableModel (0, 4);
 
@@ -78,9 +82,9 @@ public class RoomsFrame extends JFrame {
 
 					DefaultListModel listModel = (DefaultListModel) mRoomUserList.getModel ();
 					listModel.clear ();
-					ArrayList <String> users = roomUsers.get (mSelectedRoomId);
+					ArrayList <String> users = mAllRoomUsers.get (mSelectedRoomId);
 					if (users != null && !users.isEmpty ()) {
-						for (String userName : roomUsers.get (mSelectedRoomId)) {
+						for (String userName : mAllRoomUsers.get (mSelectedRoomId)) {
 							listModel.addElement (userName);
 						}
 					}
@@ -92,6 +96,7 @@ public class RoomsFrame extends JFrame {
 		leftPanel.add (new JScrollPane (mRoomsTable));
 
 		JPanel rightPanel = new JPanel ();
+		rightPanel.setBorder (BorderFactory.createEmptyBorder (20, 10, 20, 20));
 		rightPanel.setLayout (new GridLayout (3, 1));
 
 		ImageIcon image = new ImageIcon ("res/rockpaperscissors/rock.png");
@@ -101,6 +106,7 @@ public class RoomsFrame extends JFrame {
 
 		mRoomUserList = new JList <> (listModel);
 		mRoomUserList.setEnabled (false);
+		mRoomUserList.setFixedCellWidth (190);
 
 		JPanel roomButtonsPanel = new JPanel ();
 		roomButtonsPanel.setLayout (new FlowLayout ());
@@ -109,13 +115,16 @@ public class RoomsFrame extends JFrame {
 		mJoinOrLeaveButton.addActionListener (new ActionListener () {
 			@Override
 			public void actionPerformed (ActionEvent e) {
-				if (isInRoom) {
+				if (mIsInRoom) {
 					mConnection.leaveRoom ();
+					setIsInRoom (false);
+					setVisible (true);//#TODO somehting room vs. game
 				} else {
 					mConnection.enterRoom (mSelectedRoomId);
 				}
 			}
 		});
+
 		mStartButton = new JButton ("Start");
 		mStartButton.addActionListener (new ActionListener () {
 			@Override
@@ -131,14 +140,14 @@ public class RoomsFrame extends JFrame {
 		rightPanel.add (new JScrollPane (mRoomUserList));
 		rightPanel.add (roomButtonsPanel);
 
-		add (leftPanel);
-		add (rightPanel);
+		add (leftPanel, BorderLayout.LINE_START);
+		add (rightPanel, BorderLayout.LINE_END);
 
 		setVisible (true);
 	}
 
 	public void loadRoomInfos (RoomData[] data) {
-		roomUsers.clear ();
+		mAllRoomUsers.clear ();
 		DefaultTableModel model = (DefaultTableModel) mRoomsTable.getModel ();
 		model.setColumnCount (4);
 		model.setRowCount (0);
@@ -146,7 +155,7 @@ public class RoomsFrame extends JFrame {
 
 		for (int i = 0; i < data.length; i++) {
 			model.addRow (new Object[] {data[i].getRoomId (), data[i].getGameName (), data[i].getMapName (), String.valueOf (data[i].getUsers ().size ()) + "/" + String.valueOf (data[i].getMaxUserCount ())});
-			roomUsers.put (data[i].getRoomId (), data[i].getUsers ());
+			mAllRoomUsers.put (data[i].getRoomId (), data[i].getUsers ());
 			if (data[i].getRoomId () == mSelectedRoomId) {
 				selectedRowIndex = i;
 			}
@@ -158,7 +167,7 @@ public class RoomsFrame extends JFrame {
 	}
 
 	public void setIsInRoom (boolean isInRoom) {
-		this.isInRoom = isInRoom;
+		this.mIsInRoom = isInRoom;
 		if (isInRoom) {
 			mJoinOrLeaveButton.setText ("Leave");
 		} else {
