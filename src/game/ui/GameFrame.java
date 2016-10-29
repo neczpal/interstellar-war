@@ -11,21 +11,20 @@ import org.lwjgl.opengl.Display;
 
 import static org.lwjgl.opengl.GL11.*;
 
-/**
- * @author neczpal
- */
 public class GameFrame extends Thread {
 
 	private int mDisplayModeIndex;
 	private int mWidth, mHeight;
 	private String mName;
 	private GameMap mGameMap;
+	private boolean mIsGameFrameRunning;
 
 	public GameFrame (String mTitle, int displayModeIndex, GameMap gameMap) {
 		super (mTitle);
 		this.mName = mTitle;
 		this.mDisplayModeIndex = displayModeIndex;
 		this.mGameMap = gameMap;
+		this.mIsGameFrameRunning = false;
 	}
 
 	@Override
@@ -35,8 +34,8 @@ public class GameFrame extends Thread {
 		Util.loadTextures ();
 		Textures.loadTextures ();
 		mGameMap.init ();
-
-		while (!Display.isCloseRequested ()) {
+		mIsGameFrameRunning = true;
+		while (!Display.isCloseRequested () && mIsGameFrameRunning) {
 			glClear (GL_COLOR_BUFFER_BIT);
 
 			mouseEvent ();
@@ -99,5 +98,9 @@ public class GameFrame extends Thread {
 		Display.destroy ();
 		Keyboard.destroy ();
 		Mouse.destroy ();
+	}
+
+	public void stopGameFrame () {
+		mIsGameFrameRunning = false;
 	}
 }

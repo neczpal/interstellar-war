@@ -2,9 +2,6 @@ package game.geom;
 
 import static org.lwjgl.opengl.GL11.*;
 
-/**
- * Created by neczp on 2016. 10. 21..
- */
 public class Triangle {
 	private Point2D a;
 	private Point2D b;

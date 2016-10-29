@@ -1,8 +1,5 @@
 package game;
 
-/**
- * Created by neczp on 2016. 10. 17..
- */
 public class Textures {
 
 	public static void loadTextures () {

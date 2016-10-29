@@ -6,15 +6,13 @@ import game.ui.GameFrame;
 import game.ui.LoginFrame;
 import game.ui.RoomsFrame;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 
-/**
- * @author neczpal
- */
 public class UserConnection extends Thread implements Connection {
 
 	private LoginFrame mLoginFrame;
@@ -69,10 +67,13 @@ public class UserConnection extends Thread implements Connection {
 			}
 		} catch (IOException e) {
 			log.e ("gameconnection bibi" + e.getMessage ());
+			stopUserConnection ();
+			backToLogin ();
+			JOptionPane.showMessageDialog (mLoginFrame, "Disconnected from the server (" + mSocket.getInetAddress ().getHostAddress () + ")", "Connection lost!", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
-	public void stopClientConnection () {
+	public void stopUserConnection () {
 		mIsRunning = false;
 		send (Command.Type.EXIT_SERVER);
 		try {
@@ -188,5 +189,15 @@ public class UserConnection extends Thread implements Connection {
 
 	public void setGameFrame (GameFrame gameFrame) {
 		mGameFrame = gameFrame;
+	}
+
+	private void backToLogin () {
+		if (mGameMap != null && mGameMap.isAlive ()) {
+			mGameMap.stopGame ();
+			mGameFrame.stopGameFrame ();
+		}
+		mRoomsFrame.dispose ();
+		mLoginFrame = new LoginFrame ();
+		mLoginFrame.setVisible (true);
 	}
 }

@@ -16,9 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * Created by neczp on 2016. 10. 24..
- */
 public class LoginFrame extends JFrame implements ActionListener {
 
 	private UserConnection mConnection;

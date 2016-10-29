@@ -5,9 +5,6 @@ import game.geom.Color;
 import game.geom.Point2D;
 import game.geom.Triangle;
 
-/**
- * Created by neczp on 2016. 10. 21..
- */
 public class SpaceShip extends Triangle {
 	public static final int SPACE_SHIP_SIZE = 12;
 

@@ -8,9 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 
-/**
- * Created by neczp on 2016. 10. 11..
- */
 public class Room implements Connection {
 
 	private int mRoomId;
@@ -128,7 +125,7 @@ public class Room implements Connection {
 	public void send (Command command) {
 		HashMap <Integer, Client> clients = mServerConnection.getClients ();
 		Iterator <HashMap.Entry <Integer, Client>> iterator = clients.entrySet ().iterator ();
-		while (iterator.hasNext ()) {
+		while (iterator.hasNext () && mServerConnection.isAlive ()) {
 			HashMap.Entry <Integer, Client> entry = iterator.next ();
 			if (mConnectionIds.containsKey (entry.getKey ())) {
 				if (!entry.getValue ().send (command)) {

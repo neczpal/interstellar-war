@@ -4,9 +4,6 @@ import game.Util;
 
 import java.io.Serializable;
 
-/**
- * Created by neczp on 2016. 10. 06..
- */
 public class Rect implements Serializable {
 
 	private double x, y;

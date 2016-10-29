@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class ServerConnection extends Thread {
+public class ServerConnection extends Thread implements Connection {
 
 	private static int mClientIdCounter = 1;
 	private static int mRoomIdCounter = 1;
@@ -66,6 +66,14 @@ public class ServerConnection extends Thread {
 	public void stopServerConnection () {
 		mRoomServer.stopRoomServer ();
 		mIsRunning = false;
+		for (Client client : mClients.values ()) {
+			client.stopClient ();
+			try {
+				client.close ();
+			} catch (IOException ex) {
+				log.w ("stopServerConnection Client close bibi");
+			}
+		}
 		try {
 			mServerSocket.close ();
 		} catch (IOException e) {
@@ -253,7 +261,7 @@ public class ServerConnection extends Thread {
 
 	public void send (Command command) {
 		Iterator <HashMap.Entry <Integer, Client>> iterator = mClients.entrySet ().iterator ();
-		while (iterator.hasNext ()) {
+		while (iterator.hasNext () && mIsRunning) {
 			HashMap.Entry <Integer, Client> entry = iterator.next ();
 			if (!entry.getValue ().send (command)) {
 				iterator.remove ();

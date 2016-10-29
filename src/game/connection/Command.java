@@ -8,9 +8,6 @@ package game.connection;
 
 import java.io.Serializable;
 
-/**
- * @author neczpal
- */
 public class Command implements Serializable {
 	static final long serialVersionUID = 42321L;
 	public Type type;

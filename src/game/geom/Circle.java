@@ -2,9 +2,6 @@ package game.geom;
 
 import static org.lwjgl.opengl.GL11.*;
 
-/**
- * Created by neczp on 2016. 10. 06..
- */
 public class Circle extends Point2D {
 	private double r;
 	private int mTexture = -1;

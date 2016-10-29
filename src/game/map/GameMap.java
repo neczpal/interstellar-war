@@ -6,9 +6,6 @@ import game.map.interstellarwar.InterstellarWar;
 
 import java.io.Serializable;
 
-/**
- * @author neczpal
- */
 public abstract class GameMap extends Thread {
 	private String mMapName;
 	private int mMaxUsers;

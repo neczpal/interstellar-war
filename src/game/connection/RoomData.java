@@ -3,9 +3,6 @@ package game.connection;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-/**
- * Created by neczp on 2016. 10. 12..
- */
 public class RoomData implements Serializable {
 	static final long serialVersionUID = 42123L;
 

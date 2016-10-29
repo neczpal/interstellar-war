@@ -11,9 +11,6 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by neczp on 2016. 10. 11..
- */
 public class RoomsFrame extends JFrame {
 	private JTable mRoomsTable;
 	private JLabel mRoomPicture;//#TODO
@@ -41,7 +38,7 @@ public class RoomsFrame extends JFrame {
 		addWindowListener (new WindowAdapter () {
 			@Override
 			public void windowClosing (WindowEvent e) {
-				mConnection.stopClientConnection ();
+				mConnection.stopUserConnection ();
 			}
 		});
 
@@ -68,12 +65,15 @@ public class RoomsFrame extends JFrame {
 		};
 		mRoomsTable.getTableHeader ().setReorderingAllowed (false);
 		mRoomsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
-		mRoomsTable.getSelectionModel ().addListSelectionListener (e -> {//#TODO ArrayINdexOutofBoundsException
+		mRoomsTable.getSelectionModel ().addListSelectionListener (e -> {
 			TableModel model = mRoomsTable.getModel ();
 			int selectedRow = mRoomsTable.getSelectedRow ();
 			if (selectedRow != -1 && selectedRow < model.getRowCount ()) {
-				mSelectedRoomId = (int) model.getValueAt (selectedRow, 0);
-
+				try {
+					mSelectedRoomId = (int) model.getValueAt (selectedRow, 0);
+				} catch (ArrayIndexOutOfBoundsException ex) {//#TODO ArrayINdexOutofBoundsException
+					System.out.println (ex.getMessage ());
+				}
 				DefaultListModel listModel = (DefaultListModel) mRoomUserList.getModel ();
 				listModel.clear ();
 				ArrayList <String> users = mAllRoomUsers.get (mSelectedRoomId);

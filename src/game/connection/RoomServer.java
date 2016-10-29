@@ -1,8 +1,5 @@
 package game.connection;
 
-/**
- * Created by neczp on 2016. 10. 14..
- */
 public class RoomServer extends Thread {
 
 	ServerConnection mServerConnection;
@@ -17,7 +14,7 @@ public class RoomServer extends Thread {
 		mIsRunning = true;
 		while (mIsRunning) {
 			try {
-				Thread.sleep (10000);
+				Thread.sleep (1000);
 				mServerConnection.listRoom ();
 			} catch (InterruptedException e) {
 				e.printStackTrace ();

@@ -2,9 +2,6 @@ package game.geom;
 
 import static org.lwjgl.opengl.GL11.*;
 
-/**
- * Created by neczp on 2016. 10. 08..
- */
 public class Line {
 	private Point2D a, b;
 

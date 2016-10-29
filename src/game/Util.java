@@ -4,9 +4,6 @@ import game.geom.Color;
 
 import static org.lwjgl.opengl.GL11.*;
 
-/**
- * Created by neczp on 2016. 10. 09..
- */
 public class Util {
 
 	public static final int DEFAULT_FONTSIZE = 16;

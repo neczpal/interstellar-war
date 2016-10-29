@@ -6,9 +6,6 @@ import game.geom.Color;
 
 import java.util.ArrayList;
 
-/**
- * Created by neczp on 2016. 10. 06..
- */
 public class Planet extends Circle {
 
 	private int mOwnedBy;

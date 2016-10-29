@@ -1,9 +1,6 @@
 package game.geom;
 
 
-/**
- * Created by neczp on 2016. 10. 25..
- */
 public class Arrow extends Line {
 	private Triangle triangle;
 

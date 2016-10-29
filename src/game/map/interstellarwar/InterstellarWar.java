@@ -16,9 +16,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 
-/**
- * Created by neczp on 2016. 10. 06..
- */
 public class InterstellarWar extends GameMap {
 	public static final String GAME_NAME = "Interstellar War";
 	private static final int EDGE_MOVE_DISTANCE = 20;
@@ -48,17 +45,7 @@ public class InterstellarWar extends GameMap {
 
 	@Override
 	public void mouseEvent () {
-		if (Mouse.getX () < EDGE_MOVE_DISTANCE) {
-			mViewPort.move (EDGE_MOVE_UNIT, 0);
-		} else if (Mouse.getX () > Display.getWidth () - EDGE_MOVE_DISTANCE) {
-			mViewPort.move (-EDGE_MOVE_UNIT, 0);
-		}
-		if (Mouse.getY () < EDGE_MOVE_DISTANCE) {
-			mViewPort.move (0, EDGE_MOVE_UNIT);
-		} else if (Mouse.getY () > Display.getHeight () - EDGE_MOVE_DISTANCE) {
-			mViewPort.move (0, -EDGE_MOVE_UNIT);
-		}
-
+		mouseOnEdge ();
 
 		if (Mouse.isButtonDown (0) && !mWasMouseDown) {
 			mWasMouseDown = true;
@@ -332,6 +319,19 @@ public class InterstellarWar extends GameMap {
 	private void spawnUnits () {
 		for (Planet planet : mPlanets) {
 			planet.addUnit ();
+		}
+	}
+
+	private void mouseOnEdge () {
+		if (Mouse.getX () < EDGE_MOVE_DISTANCE) {
+			mViewPort.move (EDGE_MOVE_UNIT, 0);
+		} else if (Mouse.getX () > Display.getWidth () - EDGE_MOVE_DISTANCE) {
+			mViewPort.move (-EDGE_MOVE_UNIT, 0);
+		}
+		if (Mouse.getY () < EDGE_MOVE_DISTANCE) {
+			mViewPort.move (0, EDGE_MOVE_UNIT);
+		} else if (Mouse.getY () > Display.getHeight () - EDGE_MOVE_DISTANCE) {
+			mViewPort.move (0, -EDGE_MOVE_UNIT);
 		}
 	}
 
