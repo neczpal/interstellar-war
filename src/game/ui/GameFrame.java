@@ -56,7 +56,7 @@ public class GameFrame extends Thread {
 			Display.setDisplayMode (Display.getAvailableDisplayModes ()[mDisplayModeIndex]);
 			mWidth = Display.getDisplayMode ().getWidth ();
 			mHeight = Display.getDisplayMode ().getHeight ();
-			//						Display.setFullscreen (true); //#TODO
+			//			Display.setFullscreen (true); //#TODO
 			Display.setTitle (mName);
 			Display.create ();
 			Keyboard.create ();

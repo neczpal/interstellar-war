@@ -1,5 +1,6 @@
 package game.ui;
 
+import game.Loader;
 import game.connection.UserConnection;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -11,7 +12,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Created by neczp on 2016. 10. 24..
@@ -25,8 +28,12 @@ public class LoginFrame extends JFrame implements ActionListener {
 	private JButton loginButton;
 	private JComboBox <String> availableResolutionsComboBox;
 
+	private Properties mProperties;
+
 	public LoginFrame () {
 		super ("Login");
+		mProperties = Loader.loadProperties ("res/config");
+
 		try {
 			setIconImage (ImageIO.read (new File ("res/interstellarwar/planet5.png")));// #TODO useful icon
 		} catch (IOException e) {
@@ -42,10 +49,10 @@ public class LoginFrame extends JFrame implements ActionListener {
 		panel.setBorder (BorderFactory.createEmptyBorder (10, 10, 10, 10));
 
 		JLabel userNameLabel = new JLabel ("USERNAME:");
-		userNameTextField = new JTextField ("neczpal", 20);// #TODO remember last one
+		userNameTextField = new JTextField (mProperties.getProperty ("username", "Player"), 20);
 
 		JLabel ipAddressLabel = new JLabel ("IP-ADDRESS:");
-		ipAddressTextField = new JTextField ("localhost", 20);
+		ipAddressTextField = new JTextField (mProperties.getProperty ("ip_address", "152.66.180.66"), 20);
 
 		panel.add (userNameLabel);
 		panel.add (userNameTextField);
@@ -53,14 +60,14 @@ public class LoginFrame extends JFrame implements ActionListener {
 		panel.add (ipAddressTextField);
 
 		try {
-			JLabel resolutionLabel = new JLabel ("RESOLUTION:"); //#TODO in settings?
+			JLabel resolutionLabel = new JLabel ("RESOLUTION:");
 			DisplayMode[] availableDisplayModes = Display.getAvailableDisplayModes ();
 			String[] availableResolutions = new String[availableDisplayModes.length];
 			for (int i = 0; i < availableDisplayModes.length; i++) {
 				availableResolutions[i] = availableDisplayModes[i].getWidth () + "x" + availableDisplayModes[i].getHeight ();
 			}
 			availableResolutionsComboBox = new JComboBox <> (availableResolutions);
-			availableResolutionsComboBox.setSelectedIndex (10);//# TODO ez igy nem lesz jo
+			availableResolutionsComboBox.setSelectedIndex (Integer.parseInt (mProperties.getProperty ("resolution", "0")));
 
 			panel.add (resolutionLabel);
 			panel.add (availableResolutionsComboBox);
@@ -79,6 +86,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 		panel.add (loginButton);
 
 		add (panel);
+
 	}
 
 	public static void main (String args[]) {
@@ -88,12 +96,27 @@ public class LoginFrame extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed (ActionEvent e) {
-		try {
-			mConnection = new UserConnection (ipAddressTextField.getText (), userNameTextField.getText ());
-			mConnection.setLoginFrame (this);
+		if (ipAddressTextField.getText ().isEmpty ()) {
+			JOptionPane.showMessageDialog (this, "Please enter an IP-Address", "IP-Address missing!", JOptionPane.WARNING_MESSAGE);
+		} else if (userNameTextField.getText ().isEmpty ()) {
+			JOptionPane.showMessageDialog (this, "Please enter a username", "Username missing!", JOptionPane.WARNING_MESSAGE);
+		} else {
+			try {
+				mConnection = new UserConnection (ipAddressTextField.getText (), userNameTextField.getText ());
+				mConnection.setLoginFrame (this);
 
-		} catch (IOException ex) {
-			JOptionPane.showMessageDialog (this, "Cannot connect to the server ( " + ipAddressTextField.getText () + ")", "Connection Error!", JOptionPane.ERROR_MESSAGE);
+				try {
+					mProperties.setProperty ("username", userNameTextField.getText ());
+					mProperties.setProperty ("ip_address", ipAddressTextField.getText ());
+					mProperties.setProperty ("resolution", Integer.toString (availableResolutionsComboBox.getSelectedIndex ()));
+					mProperties.store (new FileOutputStream ("res/config"), null);
+				} catch (IOException prop_ex) {
+					prop_ex.printStackTrace ();
+				}
+
+			} catch (IOException ex) {
+				JOptionPane.showMessageDialog (this, "Cannot connect to the server ( " + ipAddressTextField.getText () + ")", "Connection Error!", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 

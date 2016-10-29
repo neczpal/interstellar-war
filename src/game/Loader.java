@@ -2,7 +2,6 @@ package game;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.util.WaveData;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -11,7 +10,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Properties;
 
-import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -21,7 +19,6 @@ public final class Loader {
 
 	private static String mRootDirectory = new File ("").getAbsolutePath ();
 	private static HashMap <String, Integer> mTextureCache = new HashMap <> ();
-	private static HashMap <String, Integer> mSoundCache = new HashMap <> ();
 	private static boolean useCache = false;
 
 	private Loader () {
@@ -134,58 +131,23 @@ public final class Loader {
 	public static BufferedImage loadImage (String filepath) {
 		try {
 			return ImageIO.read (getInputStream (filepath));
-		} catch (Exception ex) {
-			return null;
-		}
-	}
-
-	public static int loadSoundSource (String name) {
-		Integer soundId;
-		if ((soundId = mSoundCache.get (name)) != null) {
-			return soundId;
-		}
-		return loadSoundSource (loadSound (name), name);
-	}
-
-	public static int loadSoundSource (WaveData sound) {
-		int buffer = alGenBuffers ();
-		alBufferData (buffer, sound.format, sound.data, sound.samplerate);
-		int source = alGenSources ();
-		alSourcei (source, AL_BUFFER, buffer);
-
-		return source;
-	}
-
-	private static int loadSoundSource (WaveData sound, String name) {
-
-		int soundId = loadSoundSource (sound);
-		if (useCache) {
-			mSoundCache.put (name, soundId);
-		}
-		return soundId;
-	}
-
-	public static WaveData loadSound (String sound) {
-		return WaveData.create (new BufferedInputStream (getInputStream (sound)));
-	}
-
-	public static Properties loadProperties (String propFile) {
-		try {
-			Properties p = new Properties ();
-			p.load (getInputStream (propFile));
-			return p;
 		} catch (IOException ex) {
 			return null;
 		}
 	}
 
-	public static InputStream getInputStream (String filename) {
+	public static Properties loadProperties (String propFile) {
+		Properties p = new Properties ();
 		try {
-			return new FileInputStream (mRootDirectory + "/" + filename);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace ();
-			return null;
+			p.load (getInputStream (propFile));
+			return p;
+		} catch (IOException ex) {
+			return p;
 		}
+	}
+
+	public static InputStream getInputStream (String filename) throws FileNotFoundException {
+		return new FileInputStream (mRootDirectory + "/" + filename);
 	}
 
 }
