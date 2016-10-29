@@ -34,7 +34,7 @@ public class GameFrame extends Thread {
 		initGL ();
 		Util.loadTextures ();
 		Textures.loadTextures ();
-		mGameMap.initTextures ();
+		mGameMap.init ();
 
 		while (!Display.isCloseRequested ()) {
 			glClear (GL_COLOR_BUFFER_BIT);
@@ -56,7 +56,7 @@ public class GameFrame extends Thread {
 			Display.setDisplayMode (Display.getAvailableDisplayModes ()[mDisplayModeIndex]);
 			mWidth = Display.getDisplayMode ().getWidth ();
 			mHeight = Display.getDisplayMode ().getHeight ();
-			//			Display.setFullscreen (true); //#TODO
+			//						Display.setFullscreen (true); //#TODO
 			Display.setTitle (mName);
 			Display.create ();
 			Keyboard.create ();

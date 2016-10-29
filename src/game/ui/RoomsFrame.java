@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public class RoomsFrame extends JFrame {
 	private JTable mRoomsTable;
-	private JLabel mRoomPicture;
+	private JLabel mRoomPicture;//#TODO
 	private JList mRoomUserList;
 	private JButton mJoinOrLeaveButton;
 	private JButton mStartButton;

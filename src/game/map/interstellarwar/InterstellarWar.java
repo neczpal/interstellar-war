@@ -8,6 +8,7 @@ import game.geom.*;
 import game.map.GameMap;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -20,37 +21,48 @@ import java.util.Iterator;
  */
 public class InterstellarWar extends GameMap {
 	public static final String GAME_NAME = "Interstellar War";
-
+	private static final int EDGE_MOVE_DISTANCE = 20;
+	private static final int EDGE_MOVE_UNIT = 2;
 	private Rect mBackground;
-
+	private Point2D mViewPort;
 	private int mPlanetNumber;
 	private int mConnectionNumber;
-
 	private ArrayList <Planet> mPlanets = new ArrayList <> ();
 	private ArrayList <SpaceShip> mSpaceShips = new ArrayList <> ();
 	private ArrayList <Integer[]> mConnections = new ArrayList <> ();
-
 	private boolean mWasMouseDown = false;
-
 	private Planet mSelectedPlanetFrom = null;
 	private Planet mSelectedPlanetTo = null;
-
 	private int tickNumber = 0;
 
 	@Override
-	public void initTextures () {
+	public void init () {
 		mBackground = new Rect (0, 0, Display.getWidth (), Display.getHeight ());
 		mBackground.setTexture (Textures.InterstellarWar.background);
 		for (Planet planet : mPlanets) {
 			planet.setTexture (Textures.InterstellarWar.planet[(int) (planet.getX () + planet.getY ()) % Textures.InterstellarWar.planet.length]);
 		}
+
+		mViewPort.setPosition (Display.getWidth () / 2 - mViewPort.getX (), Display.getHeight () / 2 - mViewPort.getY ());
 	}
 
 	@Override
 	public void mouseEvent () {
+		if (Mouse.getX () < EDGE_MOVE_DISTANCE) {
+			mViewPort.move (EDGE_MOVE_UNIT, 0);
+		} else if (Mouse.getX () > Display.getWidth () - EDGE_MOVE_DISTANCE) {
+			mViewPort.move (-EDGE_MOVE_UNIT, 0);
+		}
+		if (Mouse.getY () < EDGE_MOVE_DISTANCE) {
+			mViewPort.move (0, EDGE_MOVE_UNIT);
+		} else if (Mouse.getY () > Display.getHeight () - EDGE_MOVE_DISTANCE) {
+			mViewPort.move (0, -EDGE_MOVE_UNIT);
+		}
+
+
 		if (Mouse.isButtonDown (0) && !mWasMouseDown) {
 			mWasMouseDown = true;
-			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
+			Point2D point = new Point2D (Mouse.getX () - mViewPort.getX (), Mouse.getY () - mViewPort.getY ());
 
 			for (Planet planet : mPlanets) {
 				if (planet.isInside (point) && ((UserConnection) getConnection ()).getRoomIndex () == planet.getOwnedBy ()) {
@@ -59,7 +71,7 @@ public class InterstellarWar extends GameMap {
 				}
 			}
 		} else if (Mouse.isButtonDown (0) && mWasMouseDown) {
-			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
+			Point2D point = new Point2D (Mouse.getX () - mViewPort.getX (), Mouse.getY () - mViewPort.getY ());
 
 			boolean isThere = false;
 			for (Planet planet : mPlanets) {
@@ -78,7 +90,7 @@ public class InterstellarWar extends GameMap {
 				mWasMouseDown = false;
 
 				if (mSelectedPlanetFrom != null) {
-					Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
+					Point2D point = new Point2D (Mouse.getX () - mViewPort.getX (), Mouse.getY () - mViewPort.getY ());
 
 					for (Planet planet : mPlanets) {
 						if (planet.isInside (point) && planet.isNeighbor (mSelectedPlanetFrom)) {
@@ -109,13 +121,15 @@ public class InterstellarWar extends GameMap {
 	public void draw () {
 		mBackground.draw ();
 
+		GL11.glPushMatrix ();
+		GL11.glTranslated (mViewPort.getX (), mViewPort.getY (), 0);
 		if (mSelectedPlanetFrom != null) {
 			Point2D center1 = mSelectedPlanetFrom;
-			Util.drawCircle (center1.getX (), center1.getY (), mSelectedPlanetFrom.getRadius () + 3, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+			Util.drawCircle (center1.getX (), center1.getY (), mSelectedPlanetFrom.getRadius (), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 		if (mSelectedPlanetTo != null) {
 			Point2D center2 = mSelectedPlanetTo;
-			Util.drawCircle (center2.getX (), center2.getY (), mSelectedPlanetTo.getRadius () + 3, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+			Util.drawCircle (center2.getX (), center2.getY (), mSelectedPlanetTo.getRadius (), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 		for (Integer[] integers : mConnections) {
 			Planet planet1 = mPlanets.get (integers[0]);
@@ -140,6 +154,7 @@ public class InterstellarWar extends GameMap {
 			Color.values ()[mSelectedPlanetFrom.getOwnedBy ()].setGLColor ();
 			arrow.draw ();
 		}
+		GL11.glPopMatrix ();
 	}
 
 	@Override
@@ -185,6 +200,7 @@ public class InterstellarWar extends GameMap {
 
 	@Override
 	public void loadData (Serializable[] data) {
+		mViewPort = new Point2D (0, 0);
 		mPlanets = new ArrayList <> ();
 		mConnections = new ArrayList <> ();
 		int i = 0;
@@ -196,7 +212,11 @@ public class InterstellarWar extends GameMap {
 		mConnectionNumber = (int) data[i++];
 
 		for (int j = 0; j < mPlanetNumber; j++) {
-			mPlanets.add (new Planet ((double) data[i++], (double) data[i++], (double) data[i++], (int) data[i++], (int) data[i++]));
+			Planet newPlanet = new Planet ((double) data[i++], (double) data[i++], (double) data[i++], (int) data[i++], (int) data[i++]);
+			mPlanets.add (newPlanet);
+			if (newPlanet.getOwnedBy () == ((UserConnection) getConnection ()).getRoomIndex ()) {
+				mViewPort.setPosition (newPlanet.getX (), newPlanet.getY ());
+			}
 		}
 
 		for (int j = 0; j < mConnectionNumber; j++) {

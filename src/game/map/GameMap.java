@@ -52,7 +52,7 @@ public abstract class GameMap extends Thread {
 		this.mMaxUsers = mMaxUsers;
 	}
 
-	public abstract void initTextures ();
+	public abstract void init ();
 
 	public abstract void mouseEvent ();
 
