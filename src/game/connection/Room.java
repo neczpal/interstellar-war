@@ -46,7 +46,7 @@ public class Room implements Connection {
 
 	@Override
 	public String toString () {
-		return mGameName + " (" + mMapName + ")" + getUserCount () + " / " + getMaxUserCount () + " [" + mRoomId + "] ";
+		return mGameName + " (" + mMapName + ") " + getUserCount () + "/" + getMaxUserCount () + " [" + mRoomId + "] ";
 	}
 
 	public void startGame () {

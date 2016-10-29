@@ -71,7 +71,7 @@ public class RoomsFrame extends JFrame {
 		mRoomsTable.getSelectionModel ().addListSelectionListener (e -> {//#TODO ArrayINdexOutofBoundsException
 			TableModel model = mRoomsTable.getModel ();
 			int selectedRow = mRoomsTable.getSelectedRow ();
-			if (selectedRow != -1) {
+			if (selectedRow != -1 && selectedRow < model.getRowCount ()) {
 				mSelectedRoomId = (int) model.getValueAt (selectedRow, 0);
 
 				DefaultListModel listModel = (DefaultListModel) mRoomUserList.getModel ();

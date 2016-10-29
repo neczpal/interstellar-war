@@ -34,23 +34,19 @@ public class ClientConnection extends Thread implements Connection {
 
 	private Log log = new Log (this);
 
-	public ClientConnection (String ip, String userName) {
+	public ClientConnection (String ip, String userName) throws IOException {
 		super ("ClientConnection " + userName);
 		mUserName = userName;
 		mIsRunning = false;
-		try {
-			mSocket = new Socket (ip, 23232);//#TODO set port
+		mSocket = new Socket (ip, 23232);//#TODO set port
 
-			if (mSocket.isConnected ()) {
-				mIn = new ObjectInputStream (mSocket.getInputStream ());
-				mOut = new ObjectOutputStream (mSocket.getOutputStream ());
-			}
-			enterServer ();
-
-			this.start ();
-		} catch (IOException e) {
-			log.e ("Hibás ip cím: " + ip);
+		if (mSocket.isConnected ()) {
+			mIn = new ObjectInputStream (mSocket.getInputStream ());
+			mOut = new ObjectOutputStream (mSocket.getOutputStream ());
 		}
+		enterServer ();
+
+		this.start ();
 	}
 
 	public void run () {

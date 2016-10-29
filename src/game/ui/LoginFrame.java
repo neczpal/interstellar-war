@@ -88,8 +88,13 @@ public class LoginFrame extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed (ActionEvent e) {
-		mConnection = new ClientConnection (ipAddressTextField.getText (), userNameTextField.getText ());
-		mConnection.setLoginFrame (this);
+		try {
+			mConnection = new ClientConnection (ipAddressTextField.getText (), userNameTextField.getText ());
+			mConnection.setLoginFrame (this);
+
+		} catch (IOException ex) {
+			JOptionPane.showMessageDialog (this, "Cannot connect to the server ( " + ipAddressTextField.getText () + ")", "Connection Error!", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public void openRoomsFrame () {

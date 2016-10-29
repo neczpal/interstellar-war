@@ -92,11 +92,12 @@ public class ServerConnection extends Thread {
 	}
 
 	public void removeClient (int id) {
+		mClients.remove (id);
+
 		User user = getUser (id);
 		leaveRoom (user);
-
-		log.i ("User (" + user + ") disconnected from the connection");
-		mClients.remove (id);
+		mUsers.remove (user.getId ());
+		log.i ("Client (" + id + ") removed from client-list");
 	}
 
 	public int findClientByPort (int port) {
@@ -141,18 +142,9 @@ public class ServerConnection extends Thread {
 	}
 
 	private void exitServer (User user) {
-		leaveRoom (user);
-		mUsers.remove (user.getId ());
+		removeClient (user.getId ());
 
-		Client client = mClients.get (user.getId ());
-		client.stopClient ();
-		try {
-			client.close ();
-		} catch (IOException e) {
-			e.printStackTrace ();
-		}
-		mClients.remove (user.getId ());
-		log.i ("User (" + user.getId () + ") exits the connection.");
+		log.i ("User (" + user + ") exits the connection.");
 	}
 
 	private void leaveRoom (User user) {
@@ -170,7 +162,7 @@ public class ServerConnection extends Thread {
 
 			listRoom ();
 		} else {
-			log.i ("User (" + userId + ") is not in a room");
+			log.i ("User (" + user + ") is not in a room");
 		}
 	}
 
