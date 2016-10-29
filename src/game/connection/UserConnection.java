@@ -15,7 +15,7 @@ import java.net.Socket;
 /**
  * @author neczpal
  */
-public class ClientConnection extends Thread implements Connection {
+public class UserConnection extends Thread implements Connection {
 
 	private LoginFrame mLoginFrame;
 	private RoomsFrame mRoomsFrame;
@@ -34,7 +34,7 @@ public class ClientConnection extends Thread implements Connection {
 
 	private Log log = new Log (this);
 
-	public ClientConnection (String ip, String userName) throws IOException {
+	public UserConnection (String ip, String userName) throws IOException {
 		super ("ClientConnection " + userName);
 		mUserName = userName;
 		mIsRunning = false;

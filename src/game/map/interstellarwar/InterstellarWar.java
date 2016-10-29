@@ -2,14 +2,12 @@ package game.map.interstellarwar;
 
 import game.Textures;
 import game.Util;
-import game.connection.ClientConnection;
 import game.connection.Command;
-import game.geom.Arrow;
-import game.geom.Color;
-import game.geom.Line;
-import game.geom.Point2D;
+import game.connection.UserConnection;
+import game.geom.*;
 import game.map.GameMap;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -23,6 +21,8 @@ import java.util.Iterator;
 public class InterstellarWar extends GameMap {
 	public static final String GAME_NAME = "Interstellar War";
 
+	private Rect mBackground;
+
 	private int mPlanetNumber;
 	private int mConnectionNumber;
 
@@ -34,13 +34,15 @@ public class InterstellarWar extends GameMap {
 
 	private Planet mSelectedPlanetFrom = null;
 	private Planet mSelectedPlanetTo = null;
-	//ONLY SERVER
+
 	private int tickNumber = 0;
 
 	@Override
 	public void initTextures () {
+		mBackground = new Rect (0, 0, Display.getWidth (), Display.getHeight ());
+		mBackground.setTexture (Textures.InterstellarWar.background);
 		for (Planet planet : mPlanets) {
-			planet.setTexture (Textures.InterstellarWar.planet[(int) (planet.getX () + planet.getY ()) % 9]);
+			planet.setTexture (Textures.InterstellarWar.planet[(int) (planet.getX () + planet.getY ()) % Textures.InterstellarWar.planet.length]);
 		}
 	}
 
@@ -51,7 +53,7 @@ public class InterstellarWar extends GameMap {
 			Point2D point = new Point2D (Mouse.getX (), Mouse.getY ());
 
 			for (Planet planet : mPlanets) {
-				if (planet.isInside (point) && ((ClientConnection) getConnection ()).getRoomIndex () == planet.getOwnedBy ()) {
+				if (planet.isInside (point) && ((UserConnection) getConnection ()).getRoomIndex () == planet.getOwnedBy ()) {
 					mSelectedPlanetFrom = planet;
 					break;
 				}
@@ -81,7 +83,7 @@ public class InterstellarWar extends GameMap {
 					for (Planet planet : mPlanets) {
 						if (planet.isInside (point) && planet.isNeighbor (mSelectedPlanetFrom)) {
 							mSelectedPlanetTo = planet;
-							int index = ((ClientConnection) getConnection ()).getRoomIndex ();
+							int index = ((UserConnection) getConnection ()).getRoomIndex ();
 							if (mSelectedPlanetFrom.getOwnedBy () == index) {
 								getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo));
 							}
@@ -105,6 +107,8 @@ public class InterstellarWar extends GameMap {
 
 	@Override
 	public void draw () {
+		mBackground.draw ();
+
 		if (mSelectedPlanetFrom != null) {
 			Point2D center1 = mSelectedPlanetFrom;
 			Util.drawCircle (center1.getX (), center1.getY (), mSelectedPlanetFrom.getRadius () + 3, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
@@ -113,7 +117,6 @@ public class InterstellarWar extends GameMap {
 			Point2D center2 = mSelectedPlanetTo;
 			Util.drawCircle (center2.getX (), center2.getY (), mSelectedPlanetTo.getRadius () + 3, Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
-		mPlanets.forEach (Planet::draw);
 		for (Integer[] integers : mConnections) {
 			Planet planet1 = mPlanets.get (integers[0]);
 			Planet planet2 = mPlanets.get (integers[1]);
@@ -121,6 +124,9 @@ public class InterstellarWar extends GameMap {
 			Color.WHITE.setGLColor ();
 			line.draw ();
 		}
+
+		mPlanets.forEach (Planet::draw);
+
 		try {
 			for (SpaceShip spaceShip : mSpaceShips) {
 				spaceShip.draw ();

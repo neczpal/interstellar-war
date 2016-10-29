@@ -3,7 +3,6 @@ package game.map;
 import game.connection.Command;
 import game.connection.Connection;
 import game.map.interstellarwar.InterstellarWar;
-import game.map.rockpaperscissors.RockPaperScissors;
 
 import java.io.Serializable;
 
@@ -21,8 +20,6 @@ public abstract class GameMap extends Thread {
 		GameMap gameMap = null;
 		if (gameName.equals (InterstellarWar.GAME_NAME)) {
 			gameMap = new InterstellarWar ();
-		} else if (gameName.equals (RockPaperScissors.GAME_NAME)) {
-			gameMap = new RockPaperScissors ();
 		}
 		return gameMap;
 	}

@@ -1,6 +1,6 @@
 package game.ui;
 
-import game.connection.ClientConnection;
+import game.connection.UserConnection;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class LoginFrame extends JFrame implements ActionListener {
 
-	private ClientConnection mConnection;
+	private UserConnection mConnection;
 
 	private JTextField userNameTextField;
 	private JTextField ipAddressTextField;
@@ -28,7 +28,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 	public LoginFrame () {
 		super ("Login");
 		try {
-			setIconImage (ImageIO.read (new File ("res/rockpaperscissors/rock.png")));// #TODO useful icon
+			setIconImage (ImageIO.read (new File ("res/interstellarwar/planet5.png")));// #TODO useful icon
 		} catch (IOException e) {
 			e.printStackTrace ();
 		}
@@ -79,17 +79,17 @@ public class LoginFrame extends JFrame implements ActionListener {
 		panel.add (loginButton);
 
 		add (panel);
-		setVisible (true);
 	}
 
 	public static void main (String args[]) {
 		LoginFrame loginFrame = new LoginFrame ();
+		loginFrame.setVisible (true);
 	}
 
 	@Override
 	public void actionPerformed (ActionEvent e) {
 		try {
-			mConnection = new ClientConnection (ipAddressTextField.getText (), userNameTextField.getText ());
+			mConnection = new UserConnection (ipAddressTextField.getText (), userNameTextField.getText ());
 			mConnection.setLoginFrame (this);
 
 		} catch (IOException ex) {
@@ -100,6 +100,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 	public void openRoomsFrame () {
 		dispose ();
 		RoomsFrame roomsFrame = new RoomsFrame (mConnection);
+		roomsFrame.setVisible (true);
 		mConnection.setRoomsFrame (roomsFrame);
 	}
 

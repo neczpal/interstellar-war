@@ -2,7 +2,7 @@ package game.ui;
 
 import game.Textures;
 import game.Util;
-import game.connection.ClientConnection;
+import game.connection.UserConnection;
 import game.map.GameMap;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -48,7 +48,7 @@ public class GameFrame extends Thread {
 			Display.update ();
 		}
 		clean ();
-		((ClientConnection) mGameMap.getConnection ()).leaveRoom ();
+		((UserConnection) mGameMap.getConnection ()).leaveRoom ();
 	}
 
 	private void initDisplay () {
@@ -100,5 +100,4 @@ public class GameFrame extends Thread {
 		Keyboard.destroy ();
 		Mouse.destroy ();
 	}
-
 }

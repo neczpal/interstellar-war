@@ -3,7 +3,6 @@ package game.connection;
 import game.Log;
 import game.map.GameMap;
 import game.map.interstellarwar.InterstellarWar;
-import game.map.rockpaperscissors.RockPaperScissors;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -53,7 +52,6 @@ public class ServerConnection extends Thread {
 		addRoom (InterstellarWar.GAME_NAME, "map03");
 		addRoom (InterstellarWar.GAME_NAME, "map04");
 		addRoom (InterstellarWar.GAME_NAME, "map05");
-		addRoom (RockPaperScissors.GAME_NAME, "");
 		mRoomServer.start ();
 		mIsRunning = true;
 		while (mIsRunning) {

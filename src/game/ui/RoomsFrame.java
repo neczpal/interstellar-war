@@ -1,7 +1,7 @@
 package game.ui;
 
-import game.connection.ClientConnection;
 import game.connection.RoomData;
+import game.connection.UserConnection;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -21,17 +21,17 @@ public class RoomsFrame extends JFrame {
 	private JButton mJoinOrLeaveButton;
 	private JButton mStartButton;
 
-	private ClientConnection mConnection;
+	private UserConnection mConnection;
 
 	private int mSelectedRoomId = -1;
 	private boolean mIsInRoom = false;
 
 	private HashMap <Integer, ArrayList <String>> mAllRoomUsers = new HashMap <> ();
 
-	public RoomsFrame (ClientConnection clientConnection) {
+	public RoomsFrame (UserConnection userConnection) {
 		super ("Rooms");
 
-		mConnection = clientConnection;
+		mConnection = userConnection;
 
 		setLayout (new BorderLayout ());
 		setLocationByPlatform (true);
@@ -92,8 +92,8 @@ public class RoomsFrame extends JFrame {
 		rightPanel.setBorder (BorderFactory.createEmptyBorder (20, 10, 20, 20));
 		rightPanel.setLayout (new GridLayout (3, 1));
 
-		ImageIcon image = new ImageIcon ("res/rockpaperscissors/rock.png");// #TODO image for every map
-		mRoomPicture = new JLabel ("", image, JLabel.CENTER);
+		//		ImageIcon image = new ImageIcon ("res/interstellarwar/planet5.png");// #TODO image for every map
+		//		mRoomPicture = new JLabel ("", image, JLabel.CENTER);
 
 		DefaultListModel <String> listModel = new DefaultListModel ();
 
@@ -120,14 +120,12 @@ public class RoomsFrame extends JFrame {
 		roomButtonsPanel.add (mJoinOrLeaveButton);
 		roomButtonsPanel.add (mStartButton);
 
-		rightPanel.add (mRoomPicture);
+		//		rightPanel.add (mRoomPicture);
 		rightPanel.add (new JScrollPane (mRoomUserList));
 		rightPanel.add (roomButtonsPanel);
 
 		add (leftPanel, BorderLayout.LINE_START);
 		add (rightPanel, BorderLayout.LINE_END);
-
-		setVisible (true);
 	}
 
 	public void loadRoomData (RoomData[] data) {
