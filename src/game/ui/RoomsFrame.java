@@ -57,6 +57,9 @@ public class RoomsFrame extends JFrame {
 		TableColumn third = new TableColumn (3);
 		third.setHeaderValue ("Users");
 		tableColumnModel.addColumn (third);
+		TableColumn fourth = new TableColumn (4);
+		fourth.setHeaderValue ("Running");
+		tableColumnModel.addColumn (fourth);
 
 		mRoomsTable = new JTable (tableModel, tableColumnModel) {
 			public boolean isCellEditable (int row, int column) {
@@ -114,7 +117,10 @@ public class RoomsFrame extends JFrame {
 		});
 
 		mStartButton = new JButton ("Start");
-		mStartButton.addActionListener (e -> mConnection.startRoom ());
+		mStartButton.addActionListener (e -> {
+			mStartButton.setEnabled (false);
+			mConnection.startRoom ();
+		});
 		mStartButton.setEnabled (false);
 
 		roomButtonsPanel.add (mJoinOrLeaveButton);
@@ -131,12 +137,20 @@ public class RoomsFrame extends JFrame {
 	public void loadRoomData (RoomData[] data) {
 		mAllRoomUsers.clear ();
 		DefaultTableModel model = (DefaultTableModel) mRoomsTable.getModel ();
-		model.setColumnCount (4);
+		model.setColumnCount (5);
 		model.setRowCount (0);
 		int selectedRowIndex = 0;
 
 		for (int i = 0; i < data.length; i++) {
-			model.addRow (new Object[] {data[i].getRoomId (), data[i].getGameName (), data[i].getMapName (), String.valueOf (data[i].getUsers ().size ()) + "/" + String.valueOf (data[i].getMaxUserCount ())});
+			model.addRow (
+					new Object[] {
+							data[i].getRoomId (),
+							data[i].getGameName (),
+							data[i].getMapName (),
+							String.valueOf (data[i].getUsers ().size ()) + "/" + String.valueOf (data[i].getMaxUserCount ()),
+							data[i].isRunning () ? "x" : ""
+					});
+
 			mAllRoomUsers.put (data[i].getRoomId (), data[i].getUsers ());
 			if (data[i].getRoomId () == mSelectedRoomId) {
 				selectedRowIndex = i;
@@ -156,11 +170,9 @@ public class RoomsFrame extends JFrame {
 		this.mIsInRoom = isInRoom;
 		if (isInRoom) {
 			mRoomsTable.setEnabled (false);
-			//			mStartButton.setEnabled (true);
 			mJoinOrLeaveButton.setText ("Leave");
 		} else {
 			mRoomsTable.setEnabled (true);
-			//			mStartButton.setEnabled (false);
 			mJoinOrLeaveButton.setText ("Join");
 		}
 	}
@@ -171,6 +183,7 @@ public class RoomsFrame extends JFrame {
 		public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			super.getTableCellRendererComponent (table, value, isSelected, hasFocus, row, column);
 			setBorder (noFocusBorder);
+			setHorizontalAlignment (CENTER);
 			return this;
 		}
 	}

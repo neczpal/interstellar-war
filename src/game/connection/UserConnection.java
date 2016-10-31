@@ -150,6 +150,9 @@ public class UserConnection extends Thread implements Connection {
 	}
 
 	public void leaveRoom () {
+		if (mGameFrame != null) {
+			mGameFrame.stopGameFrame ();
+		}
 		send (Command.Type.LEAVE_ROOM);
 		mRoomsFrame.setIsInRoom (false);
 	}

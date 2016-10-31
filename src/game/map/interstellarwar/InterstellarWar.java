@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
-
 public class InterstellarWar extends GameMap {
 	public static final String GAME_NAME = "Interstellar War";
 	private static final int EDGE_MOVE_DISTANCE = 20;

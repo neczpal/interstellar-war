@@ -41,4 +41,8 @@ public class RoomData implements Serializable {
 	public int getMaxUserCount () {
 		return mMaxUserCount;
 	}
+
+	public boolean isRunning () {
+		return mIsRunning;
+	}
 }

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ServerConnection extends Thread implements Connection {
 
@@ -99,11 +100,11 @@ public class ServerConnection extends Thread implements Connection {
 
 	public void removeClient (int id) {
 		mClients.remove (id);
-
+		log.i ("Client (" + id + ") removed");
 		User user = getUser (id);
 		leaveRoom (user);
 		mUsers.remove (user.getId ());
-		log.i ("Client (" + id + ") removed from client-list");
+		log.i ("User (" + user + ") exits the connection.");
 	}
 
 	public int findClientByPort (int port) {
@@ -116,12 +117,10 @@ public class ServerConnection extends Thread implements Connection {
 	}
 
 	public RoomData[] getRoomData () {
-		int i = 0;
-		RoomData[] roomData = new RoomData[mRooms.size ()];
-		for (Room room : mRooms.values ()) {
-			roomData[i++] = room.getData ();
-		}
-		return roomData;
+		ArrayList <RoomData> roomData = mRooms.values ().stream ().map (Room::getData).collect (Collectors.toCollection (ArrayList::new));
+		RoomData[] ret = new RoomData[roomData.size ()];
+		roomData.toArray (ret);
+		return ret;
 	}
 
 	public User getUser (Object key) {
@@ -154,7 +153,6 @@ public class ServerConnection extends Thread implements Connection {
 	}
 
 	private void leaveRoom (User user) {
-		int userId = user.getId ();
 		int roomId = user.getRoomId ();
 		if (roomId != 0) {
 			Room room = getRoom (roomId);
