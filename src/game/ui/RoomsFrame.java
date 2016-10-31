@@ -85,6 +85,12 @@ public class RoomsFrame extends JFrame {
 						listModel.addElement (userName);
 					}
 				}
+				String[] userCount = model.getValueAt (selectedRow, 3).toString ().split ("/");
+				if ((userCount[0].equals (userCount[1]) || model.getValueAt (selectedRow, 4).equals ("x")) && !mIsInRoom) {
+					mJoinOrLeaveButton.setEnabled (false);
+				} else {
+					mJoinOrLeaveButton.setEnabled (true);
+				}
 			}
 		});
 		mRoomsTable.setDefaultRenderer (Object.class, new RoomTableCellRenderer ());
@@ -118,7 +124,6 @@ public class RoomsFrame extends JFrame {
 
 		mStartButton = new JButton ("Start");
 		mStartButton.addActionListener (e -> {
-			mStartButton.setEnabled (false);
 			mConnection.startRoom ();
 		});
 		mStartButton.setEnabled (false);
@@ -154,7 +159,7 @@ public class RoomsFrame extends JFrame {
 			mAllRoomUsers.put (data[i].getRoomId (), data[i].getUsers ());
 			if (data[i].getRoomId () == mSelectedRoomId) {
 				selectedRowIndex = i;
-				if (data[i].getUsers ().size () == data[i].getMaxUserCount ()) {
+				if (data[i].getUsers ().size () == data[i].getMaxUserCount () && mIsInRoom) {
 					mStartButton.setEnabled (true);
 				} else {
 					mStartButton.setEnabled (false);

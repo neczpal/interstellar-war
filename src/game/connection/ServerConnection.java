@@ -148,8 +148,6 @@ public class ServerConnection extends Thread implements Connection {
 
 	private void exitServer (User user) {
 		removeClient (user.getId ());
-
-		log.i ("User (" + user + ") exits the connection.");
 	}
 
 	private void leaveRoom (User user) {
