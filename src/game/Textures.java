@@ -26,13 +26,16 @@ public class Textures {
 			InterstellarWar.spaceshipDimens[i][0] = image.getWidth () / 4.0;
 			InterstellarWar.spaceshipDimens[i][1] = image.getHeight () / 4.0;
 		}
-		InterstellarWar.background = Loader.loadTexture ("res/interstellarwar/background.png");
+		InterstellarWar.background = new int[5];
+		for (int i = 0; i < InterstellarWar.background.length; i++) {
+			InterstellarWar.background[i] = Loader.loadTexture ("res/interstellarwar/background" + (i + 1) + ".png");
+		}
 	}
 
 	public static class InterstellarWar {
 		public static int[] planet;
 		public static int[] spaceship;
 		public static double[][] spaceshipDimens;
-		public static int background;
+		public static int[] background;
 	}
 }

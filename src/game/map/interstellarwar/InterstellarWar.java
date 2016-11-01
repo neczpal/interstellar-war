@@ -38,9 +38,9 @@ public class InterstellarWar extends GameMap {
 	@Override
 	public void init () {
 		mBackground = new Rect (0, 0, Display.getWidth (), Display.getHeight ());
-		mBackground.setTexture (Textures.InterstellarWar.background);
+		mBackground.setTexture (Textures.InterstellarWar.background[(int) (Math.random () * Textures.InterstellarWar.background.length)]);
 		for (Planet planet : mPlanets) {
-			planet.setTexture (Textures.InterstellarWar.planet[(int) (planet.getX () + planet.getY ()) % Textures.InterstellarWar.planet.length]);
+			planet.setTexture (Textures.InterstellarWar.planet[(int) (Math.random () * Textures.InterstellarWar.planet.length)]);
 		}
 
 		mViewPort.setPosition (Display.getWidth () / 2 - mViewPort.getX (), Display.getHeight () / 2 - mViewPort.getY ());
