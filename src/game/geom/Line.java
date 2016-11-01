@@ -3,15 +3,18 @@ package game.geom;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Line {
-	private Point2D a, b;
+	private Point a, b;
 
-	public Line (Point2D a, Point2D b) {
+	private Color mColor = Color.WHITE;
+
+	public Line (Point a, Point b) {
 		this.a = a;
 		this.b = b;
 	}
 
 	public void draw () {
 		glDisable (GL_TEXTURE_2D);
+		mColor.setGLColor ();
 		glBegin (GL_LINES);
 		{
 			glVertex2d (a.x, a.y);
@@ -21,12 +24,16 @@ public class Line {
 		glEnable (GL_TEXTURE_2D);
 	}
 
+	public void setColor (Color color) {
+		mColor = color;
+	}
+
 	public void move (int dx, int dy) {
 		a.move (dx, dy);
 		b.move (dx, dy);
 	}
 
-	public void rotate (Point2D p, double angle) {
+	public void rotate (Point p, double angle) {
 		a.rotate (p, angle);
 		b.rotate (p, angle);
 	}
@@ -35,19 +42,19 @@ public class Line {
 		return a.distance (b);
 	}
 
-	public Point2D getA () {
+	public Point getA () {
 		return a;
 	}
 
-	public void setA (Point2D p) {
+	public void setA (Point p) {
 		a.setPosition (p.x, p.y);
 	}
 
-	public Point2D getB () {
+	public Point getB () {
 		return b;
 	}
 
-	public void setB (Point2D p) {
+	public void setB (Point p) {
 		b.setPosition (p.x, p.y);
 	}
 

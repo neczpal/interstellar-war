@@ -55,7 +55,7 @@ public class Planet extends Circle {
 
 	@Override
 	public void draw () {
-		Color.values ()[mOwnedBy].setGLColor ();
+		setColor (Color.values ()[mOwnedBy]);
 		super.draw ();
 
 		Util.drawString (Integer.toString (mUnitNumber), getX (), getY (), Util.DEFAULT_FONTSIZE, Color.values ()[mOwnedBy]);

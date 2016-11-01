@@ -2,8 +2,10 @@ package game.geom;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class Circle extends Point2D {
+public class Circle extends Point {
 	private double r;
+
+	private Color mColor = Color.WHITE;
 	private int mTexture = -1;
 
 	public Circle (double x, double y, double r) {
@@ -13,6 +15,7 @@ public class Circle extends Point2D {
 
 	public void draw () {
 		glBindTexture (GL_TEXTURE_2D, mTexture);
+		mColor.setGLColor ();
 
 		glBegin (GL_POLYGON);
 
@@ -32,15 +35,15 @@ public class Circle extends Point2D {
 		glEnd ();
 	}
 
-	public int getTexture () {
-		return mTexture;
+	public void setColor (Color color) {
+		this.mColor = color;
 	}
 
 	public void setTexture (int texture) {
-		mTexture = texture;
+		this.mTexture = texture;
 	}
 
-	public boolean isInside (Point2D p) {
+	public boolean isInside (Point p) {
 		return Math.pow ((p.x - x), 2) + Math.pow ((p.y - y), 2) <= r * r;
 	}
 

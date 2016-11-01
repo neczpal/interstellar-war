@@ -29,7 +29,11 @@ public class LoginFrame extends JFrame implements ActionListener {
 
 	public LoginFrame () {
 		super ("Login");
-		mProperties = Loader.loadProperties ("res/config");
+		try {
+			mProperties = Loader.loadProperties ("res/config");
+		} catch (IOException e) {
+			mProperties = new Properties ();
+		}
 
 		try {
 			setIconImage (ImageIO.read (new File ("res/interstellarwar/planet5.png")));// #TODO useful icon

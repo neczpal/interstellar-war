@@ -1,67 +1,95 @@
 package game.map.interstellarwar;
 
+import game.Textures;
 import game.Util;
 import game.geom.Color;
-import game.geom.Point2D;
-import game.geom.Triangle;
+import game.geom.Point;
+import game.geom.Quad;
+import org.lwjgl.opengl.GL11;
 
-public class SpaceShip extends Triangle {
-	public static final int SPACE_SHIP_SIZE = 12;
+public class SpaceShip extends Quad {
+	private static final int SPACE_SHIP_SPEED = 6;
 
 	private int mUnitsNum;
 	private int mOwnedBy;
 	private int mMaxTick;
 	private int mCurrentTick;
+	private Planet mToPlanet;
 	private double vx, vy;
-	private int mToPlanet;
 
-	public SpaceShip (Point2D a, Point2D b, Point2D c, int ownedBy, int unitNum, int maxtick, double vx, double vy, int to) {
-		super (a, b, c);
-		mUnitsNum = unitNum;
-		mOwnedBy = ownedBy;
-		mMaxTick = maxtick;
-		mCurrentTick = 0;
+	public SpaceShip (Planet from, Planet to, int currentTick) {
+		super (new Point[4]);
+
+		int spaceshipType = (int) (Math.random () * Textures.InterstellarWar.spaceship.length);
+
+		double w = Textures.InterstellarWar.spaceshipDimens[spaceshipType][0];
+		double h = Textures.InterstellarWar.spaceshipDimens[spaceshipType][1];
+		double lx = to.getX () - from.getX ();
+		double ly = to.getY () - from.getY ();
+		double angle = Math.atan (ly / lx);
+
+		//SET POINTS
+		Point[] arr = new Point[] {
+				new Point (from.getX () - w / 2, from.getY () + h / 2),
+				new Point (from.getX () + w / 2, from.getY () + h / 2),
+				new Point (from.getX () + w / 2, from.getY () - h / 2),
+				new Point (from.getX () - w / 2, from.getY () - h / 2)
+		};
+		for (Point point : arr) {
+			point.rotate (from, angle);
+		}
+
+		setA (arr[0]);
+		setB (arr[1]);
+		setC (arr[2]);
+		setD (arr[3]);
+
+		//SET SPEED
+		double length = from.distance (to);
+		vx = lx / length * SpaceShip.SPACE_SHIP_SPEED;
+		vy = ly / length * SpaceShip.SPACE_SHIP_SPEED;
+
+		//SET TICK
+		mMaxTick = (int) (length / SpaceShip.SPACE_SHIP_SPEED);
+		mCurrentTick = currentTick;
+
+		mOwnedBy = from.getOwnedBy ();
+
+		mUnitsNum = from.getUnitNumber ();
 		mToPlanet = to;
-		this.vx = vx;
-		this.vy = vy;
+
+		//SET GRAPHICHS
+		setColor (Color.values ()[mOwnedBy]);
+		setTexture (Textures.InterstellarWar.spaceship[spaceshipType]);
+
 	}
 
 	public boolean tick () {
-		move (vx, vy);
 		mCurrentTick++;
 		return mCurrentTick >= mMaxTick;
 	}
 
 	@Override
 	public void draw () {
-		Color.values ()[mOwnedBy].setGLColor ();
+		GL11.glPushMatrix ();
+		GL11.glTranslated (mCurrentTick * vx, mCurrentTick * vy, 0);
+
 		super.draw ();
-		Point2D top = getA ();
-		Util.drawString (Integer.toString (mUnitsNum), top.getX () + vx, top.getY () + vy, 10, Color.values ()[mOwnedBy]);
+		Point center = getCenter ();
+		Util.drawString (Integer.toString (mUnitsNum), center.getX (), center.getY () + 20, 12, Color.values ()[mOwnedBy]);
+
+		GL11.glPopMatrix ();
 	}
 
-	public int getUnitsNum () {
-		return mUnitsNum;
-	}
-
-	public int getOwnedBy () {
-		return mOwnedBy;
-	}
-
-	public int getToPlanet () {
-		return mToPlanet;
-	}
-
-	public void moveUnitsTo (Planet planet) {
-		if (planet.getOwnedBy () == mOwnedBy) {
-			planet.addUnit (mUnitsNum);
+	public void unitsArrived () {
+		if (mToPlanet.getOwnedBy () == mOwnedBy) {
+			mToPlanet.addUnit (mUnitsNum);
 		} else {
-			planet.addUnit (-mUnitsNum);
-			if (planet.getUnitNumber () < 0) {
-				planet.setOwnedBy (mOwnedBy);
-				planet.setUnitNumber (Math.abs (planet.getUnitNumber ()));
+			mToPlanet.addUnit (-mUnitsNum);
+			if (mToPlanet.getUnitNumber () < 0) {
+				mToPlanet.setOwnedBy (mOwnedBy);
+				mToPlanet.setUnitNumber (Math.abs (mToPlanet.getUnitNumber ()));
 			}
 		}
 	}
-
 }

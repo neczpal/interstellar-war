@@ -2,6 +2,7 @@ package game;
 
 import game.geom.Color;
 
+import static game.Textures.characters;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Util {
@@ -9,11 +10,6 @@ public class Util {
 	public static final int DEFAULT_FONTSIZE = 16;
 	public static final Color DEFAULT_COLOR = Color.WHITE;
 	public static final Color DEFAULT_FONT_COLOR = Color.WHITE;
-	private static int[] mCharacters;
-
-	public static void loadTextures () {
-		mCharacters = Loader.loadTextures ("res/pictures/font64.png", 64, 64);
-	}
 
 	public static void drawString (String string, double x, double y) {
 		drawString (string, x, y, DEFAULT_FONTSIZE);
@@ -28,7 +24,7 @@ public class Util {
 		x -= string.length () * fontSize / 2;//TO THE CENTER
 		y -= fontSize / 2;//TO THE CENTER
 		for (int i = 0; i < string.length (); i++) {
-			drawRect (x + i * fontSize, y, fontSize, fontSize, mCharacters[string.charAt (i)]);
+			drawRect (x + i * fontSize, y, fontSize, fontSize, characters[string.charAt (i)]);
 		}
 	}
 

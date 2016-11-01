@@ -2,13 +2,12 @@ package game.geom;
 
 import game.Util;
 
-import java.io.Serializable;
-
-public class Rect implements Serializable {
+public class Rect {
 
 	private double x, y;
 	private double width, height;
-	private Color color;
+
+	private Color mColor = Color.WHITE;
 	private int mTexture = -1;
 
 	public Rect (double x, double y, double w, double h) {
@@ -16,20 +15,19 @@ public class Rect implements Serializable {
 		this.y = y;
 		this.width = w;
 		this.height = h;
-		this.color = Color.WHITE;
 	}
 
 	public void draw () {
-		color.setGLColor ();
+		mColor.setGLColor ();
 		Util.drawRect (x, y, width, height, mTexture);
 	}
 
-	public boolean isInside (Point2D point) {
+	public boolean isInside (Point point) {
 		return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
 	}
 
 	public void setColor (Color color) {
-		this.color = color;
+		this.mColor = color;
 	}
 
 	public void setTexture (int texture) {

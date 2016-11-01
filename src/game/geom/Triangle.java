@@ -3,11 +3,13 @@ package game.geom;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Triangle {
-	private Point2D a;
-	private Point2D b;
-	private Point2D c;
+	private Point a;
+	private Point b;
+	private Point c;
 
-	public Triangle (Point2D a, Point2D b, Point2D c) {
+	private Color mColor = Color.WHITE;
+
+	public Triangle (Point a, Point b, Point c) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
@@ -15,6 +17,9 @@ public class Triangle {
 
 	public void draw () {
 		glDisable (GL_TEXTURE_2D);
+
+		mColor.setGLColor ();
+
 		glBegin (GL_TRIANGLES);
 		{
 			glVertex2d (a.getX (), a.getY ());
@@ -31,21 +36,25 @@ public class Triangle {
 		c.move (dx, dy);
 	}
 
-	public void rotate (Point2D p, double angle) {
+	public void rotate (Point p, double angle) {
 		a.rotate (p, angle);
 		b.rotate (p, angle);
 		c.rotate (p, angle);
 	}
 
-	public Point2D getA () {
+	public void setColor (Color color) {
+		this.mColor = color;
+	}
+
+	public Point getA () {
 		return a;
 	}
 
-	public Point2D getB () {
+	public Point getB () {
 		return b;
 	}
 
-	public Point2D getC () {
+	public Point getC () {
 		return c;
 	}
 

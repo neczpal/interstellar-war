@@ -1,13 +1,14 @@
 package game.ui;
 
 import game.Textures;
-import game.Util;
 import game.connection.UserConnection;
 import game.map.GameMap;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+
+import java.io.IOException;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -31,8 +32,11 @@ public class GameFrame extends Thread {
 	public void run () {
 		initDisplay ();
 		initGL ();
-		Util.loadTextures ();
-		Textures.loadTextures ();
+		try {
+			Textures.loadTextures ();
+		} catch (IOException ex) {
+			ex.printStackTrace ();//#TODO LOG
+		}
 		mGameMap.init ();
 		mIsGameFrameRunning = true;
 		while (!Display.isCloseRequested () && mIsGameFrameRunning) {

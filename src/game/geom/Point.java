@@ -2,14 +2,10 @@ package game.geom;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class Point2D {
+public class Point {
 	double x, y;
 
-	public Point2D () {
-		this (0, 0);
-	}
-
-	public Point2D (double x, double y) {
+	public Point (double x, double y) {
 		setPosition (x, y);
 	}
 
@@ -26,7 +22,7 @@ public class Point2D {
 		y += dy;
 	}
 
-	public void rotate (Point2D p, double angle) {
+	public void rotate (Point p, double angle) {
 		double lx = p.x - x;
 		double ly = p.y - y;
 		double cos = Math.cos (angle);
@@ -36,7 +32,7 @@ public class Point2D {
 		y = p.y - (int) (lx * sin + ly * cos);
 	}
 
-	public double distance (Point2D p) {
+	public double distance (Point p) {
 		return Math.sqrt (Math.pow (p.x - x, 2) + Math.pow (p.y - y, 2));
 	}
 

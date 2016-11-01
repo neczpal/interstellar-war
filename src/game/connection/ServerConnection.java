@@ -48,11 +48,15 @@ public class ServerConnection extends Thread implements Connection {
 
 	public void run () {
 		log.i ("Sever started.");
+
 		addRoom (InterstellarWar.GAME_NAME, "map01");
 		addRoom (InterstellarWar.GAME_NAME, "map02");
 		addRoom (InterstellarWar.GAME_NAME, "map03");
 		addRoom (InterstellarWar.GAME_NAME, "map04");
 		addRoom (InterstellarWar.GAME_NAME, "map05");
+		addRoom (InterstellarWar.GAME_NAME, "map06");
+		addRoom (InterstellarWar.GAME_NAME, "map07");
+
 		mRoomServer.start ();
 		mIsRunning = true;
 		while (mIsRunning) {

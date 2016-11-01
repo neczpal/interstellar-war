@@ -7,7 +7,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.Properties;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -15,8 +14,6 @@ import static org.lwjgl.opengl.GL11.*;
 public final class Loader {
 
 	private static String mRootDirectory = new File ("").getAbsolutePath ();
-	private static HashMap <String, Integer> mTextureCache = new HashMap <> ();
-	private static boolean useCache = false;
 
 	private Loader () {
 	}
@@ -25,33 +22,13 @@ public final class Loader {
 		mRootDirectory = rootDirectory;
 	}
 
-	public static void setUseCache (boolean useCache) {
-		Loader.useCache = useCache;
-	}
-
-	public static int[] loadTextures (String[] names) {
-		int[] textures = new int[names.length];
-		for (int i = 0; i < names.length; i++) {
-			textures[i] = loadTexture (names[i]);
-		}
-		return textures;
-	}
-
-	public static int[] loadTextures (BufferedImage[] imgs) {
-		int[] textures = new int[imgs.length];
-		for (int i = 0; i < imgs.length; i++) {
-			textures[i] = loadTexture (imgs[i]);
-		}
-		return textures;
-	}
-
-	public static int[] loadTextures (String name, int width, int height) {
+	public static int[] loadTextures (String name, int width, int height) throws IOException {
 		return loadTextures (loadImage (name), width, height);
 	}
 
 	public static int[] loadTextures (BufferedImage img, int width, int height) {
 		if (img.getWidth () % width > 0 || img.getHeight () % height > 0) {
-			System.out.println ("Nem sikerült feldarabolni a képet!");
+			System.err.println ("Nem sikerült feldarabolni a képet!");
 			return null;
 		}
 		int texw = img.getWidth () / width;
@@ -65,18 +42,11 @@ public final class Loader {
 		return r;
 	}
 
-	public static int loadTexture (String name) {
-		Integer textureId;
-		if ((textureId = mTextureCache.get (name)) != null) {
-			return textureId;
-		}
-		return loadTexture (loadImage (name), name);
+	public static int loadTexture (String name) throws IOException {
+		return loadTexture (loadImage (name));
 	}
 
 	public static int loadTexture (BufferedImage image) {
-		if (image == null) {
-			return -1;
-		}
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
@@ -111,30 +81,14 @@ public final class Loader {
 
 	}
 
-	private static int loadTexture (BufferedImage image, String name) {
-		int textureID = loadTexture (image);
-		if (useCache) {
-			mTextureCache.put (name, textureID);
-		}
-		return textureID;
+	public static BufferedImage loadImage (String filepath) throws IOException {
+		return ImageIO.read (getInputStream (filepath));
 	}
 
-	public static BufferedImage loadImage (String filepath) {
-		try {
-			return ImageIO.read (getInputStream (filepath));
-		} catch (IOException ex) {
-			return null;
-		}
-	}
-
-	public static Properties loadProperties (String propFile) {
+	public static Properties loadProperties (String propFile) throws IOException {
 		Properties p = new Properties ();
-		try {
-			p.load (getInputStream (propFile));
-			return p;
-		} catch (IOException ex) {
-			return p;
-		}
+		p.load (getInputStream (propFile));
+		return p;
 	}
 
 	public static InputStream getInputStream (String filename) throws FileNotFoundException {

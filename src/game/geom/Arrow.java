@@ -4,7 +4,7 @@ package game.geom;
 public class Arrow extends Line {
 	private Triangle triangle;
 
-	public Arrow (Point2D from, Point2D to, double arrowSize) {
+	public Arrow (Point from, Point to, double arrowSize) {
 		super (from, to);
 
 		double length = from.distance (to);
@@ -13,9 +13,9 @@ public class Arrow extends Line {
 		double hx = lx / length * arrowSize;
 		double hy = ly / length * arrowSize;
 
-		Point2D a = new Point2D (to.getX (), to.getY ());
-		Point2D b = new Point2D (to.getX () - hx / 2, to.getY () - hy / 2);
-		Point2D c = new Point2D (to.getX () - hx / 2, to.getY () - hy / 2);
+		Point a = new Point (to.getX (), to.getY ());
+		Point b = new Point (to.getX () - hx / 2, to.getY () - hy / 2);
+		Point c = new Point (to.getX () - hx / 2, to.getY () - hy / 2);
 		b.rotate (to, -45);
 		c.rotate (to, 45);
 
@@ -26,5 +26,11 @@ public class Arrow extends Line {
 	public void draw () {
 		super.draw ();
 		triangle.draw ();
+	}
+
+	@Override
+	public void setColor (Color color) {
+		super.setColor (color);
+		triangle.setColor (color);
 	}
 }
