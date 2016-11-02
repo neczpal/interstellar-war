@@ -17,7 +17,7 @@ public class SpaceShip extends Quad {
 	private Planet mToPlanet;
 	private double vx, vy;
 
-	public SpaceShip (Planet from, Planet to, int currentTick) {
+	public SpaceShip (Planet from, Planet to, int currentTick, int unitsNum) {
 		super (new Point[4]);
 
 		int spaceshipType = (int) (Math.random () * Textures.InterstellarWar.spaceship.length);
@@ -55,7 +55,7 @@ public class SpaceShip extends Quad {
 
 		mOwnedBy = from.getOwnedBy ();
 
-		mUnitsNum = from.getUnitNumber ();
+		mUnitsNum = unitsNum;
 		mToPlanet = to;
 
 		//SET GRAPHICHS

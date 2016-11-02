@@ -87,7 +87,7 @@ public class InterstellarWar extends GameMap {
 							mSelectedPlanetTo = planet;
 							int index = ((UserConnection) getConnection ()).getRoomIndex ();
 							if (mSelectedPlanetFrom.getOwnedBy () == index) {
-								getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo), mTickNumber);
+								getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.START_MOVE_UNITS, mPlanets.indexOf (mSelectedPlanetFrom), mPlanets.indexOf (mSelectedPlanetTo), mTickNumber, mSelectedPlanetFrom.getUnitNumber ());
 							}
 							break;
 						}
@@ -270,10 +270,8 @@ public class InterstellarWar extends GameMap {
 	public void receiveClient (Command command) {
 		switch ((GameCommand) command.data[0]) {
 			case START_MOVE_UNITS:
-				addSpaceShip (mPlanets.get ((int) command.data[1]), mPlanets.get ((int) command.data[2]), (int) command.data[3]);
+				addSpaceShip (mPlanets.get ((int) command.data[1]), mPlanets.get ((int) command.data[2]), (int) command.data[3], (int) command.data[4]);
 				break;
-			case END_MOVE_UNITS:
-				mSpaceShips.remove (command.data[1]);
 		}
 	}
 
@@ -281,34 +279,15 @@ public class InterstellarWar extends GameMap {
 	public void receiveServer (Command command) {
 		switch ((GameCommand) command.data[1]) {
 			case START_MOVE_UNITS:
-				//				addSpaceShip (mPlanets.get ((int) command.data[2]), mPlanets.get ((int) command.data[3]));
-				getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.START_MOVE_UNITS, command.data[2], command.data[3], command.data[4]);
+				if ((int) command.data[5] > 0)
+					getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.START_MOVE_UNITS, command.data[2], command.data[3], command.data[4], command.data[5]);
 				break;
-			case END_MOVE_UNITS:
-				mSpaceShips.remove (command.data[2]);
-				getConnection ().send (Command.Type.GAME_COMMAND, GameCommand.END_MOVE_UNITS, command.data[2]);
 		}
 	}
 
-	private void addSpaceShip (Planet from, Planet to, int tickNumber) {
-		if (from.getUnitNumber () == 0)
-			return;
-
-		mSpaceShips.add (new SpaceShip (from, to, mTickNumber - tickNumber));
-		//		double length = from.distance (to);
-		//		double lx = to.getX () - from.getX ();
-		//		double ly = to.getY () - from.getY ();
-		//		double hx = lx / length * SpaceShip.SPACE_SHIP_SIZE;
-		//		double hy = ly / length * SpaceShip.SPACE_SHIP_SIZE;
-		//
-		//		Point a = new Point (from.getX () + hx, from.getY () + hy);
-		//		Point b = new Point (from.getX () + hx / 2, from.getY () + hy / 2);
-		//		Point c = new Point (from.getX () + hx / 2, from.getY () + hy / 2);
-		//		b.rotate (from, -90);
-		//		c.rotate (from, 90);
-		//
-		//		mSpaceShips.add (new SpaceShip (a, b, c, from.getOwnedBy (), from.getUnitNumber (), (int) (2 * length / SpaceShip.SPACE_SHIP_SIZE), hx / 2, hy / 2, mPlanets.indexOf (to)));
-		from.setUnitNumber (0);
+	private void addSpaceShip (Planet from, Planet to, int tickNumber, int unitNumber) {
+		mSpaceShips.add (new SpaceShip (from, to, mTickNumber - tickNumber, unitNumber));
+		from.setUnitNumber (from.getUnitNumber () - unitNumber);
 	}
 
 	private void moveUnits () {
@@ -342,6 +321,6 @@ public class InterstellarWar extends GameMap {
 	}
 
 	enum GameCommand {
-		START_MOVE_UNITS, END_MOVE_UNITS// #TODO end move units
+		START_MOVE_UNITS
 	}
 }
