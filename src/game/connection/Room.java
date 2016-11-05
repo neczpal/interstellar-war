@@ -1,7 +1,9 @@
 package game.connection;
 
-import game.map.GameMap;
+import game.interstellarwar.InterstellarWarCore;
+import game.interstellarwar.InterstellarWarServer;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,23 +14,19 @@ public class Room implements Connection {
 
 	private int mRoomId;
 
-	private String mGameName;
-	private String mMapName;
-	private int mMaxUserCount;
+	private String mMapFileName;
+
 	private HashMap <Integer, Integer> mConnectionIds = new HashMap <> ();
 	private int mIndexes;
 
 	private ServerConnection mServerConnection;
-	private GameMap mMap;
+	private InterstellarWarServer mGameServer;
 
-	public Room (ServerConnection serverConnection, String gameName, String mapName) throws GameMap.NotValidMapException {
+	public Room (ServerConnection serverConnection, String mapFileName) throws IOException {
 		mServerConnection = serverConnection;
-		mGameName = gameName;
-		mMap = GameMap.createGameMap (gameName);
-		mMap.loadMap (mapName);
-		mMapName = mapName;
-		mMaxUserCount = mMap.getMaxUsers ();
-		mMap.setConnection (this);
+		mMapFileName = mapFileName;
+		InterstellarWarCore core = new InterstellarWarCore (mapFileName);
+		mGameServer = new InterstellarWarServer (core, this);
 		mRoomId = 0;
 		mIndexes = 1;
 	}
@@ -43,19 +41,19 @@ public class Room implements Connection {
 
 	@Override
 	public String toString () {
-		return mGameName + " (" + mMapName + ") " + getUserCount () + "/" + getMaxUserCount () + " [" + mRoomId + "] ";
+		return " (" + getMapFantasyName () + ") " + getUserCount () + "/" + getMaxUserCount () + " [" + mRoomId + "] ";
 	}
 
 	public void startGame () {
-		mMap.start ();
+		mGameServer.getCore ().start ();
 	}
 
 	public void stopGame () {
-		mMap.stopGame ();
+		mGameServer.getCore ().stopGame ();
 	}
 
 	public void receive (Command command) {
-		mMap.receiveServer (command);
+		mGameServer.receive (command);
 	}
 
 	public boolean isEmpty () {
@@ -63,11 +61,11 @@ public class Room implements Connection {
 	}
 
 	public boolean isFull () {
-		return mConnectionIds.size () >= mMaxUserCount;
+		return mConnectionIds.size () >= getMaxUserCount ();
 	}
 
 	public boolean isMapRunning () {
-		return mMap.isAlive ();
+		return mGameServer.getCore ().isRunning ();
 	}
 
 	public void addUser (User user) {
@@ -82,24 +80,20 @@ public class Room implements Connection {
 		mIndexes--;
 	}
 
-	public GameMap getGameMap () {
-		return mMap;
-	}
-
-	public String getGameName () {
-		return mGameName;
+	public InterstellarWarServer getGameServer () {
+		return mGameServer;
 	}
 
 	public String getMapName () {
-		return mMapName;
+		return mMapFileName;
 	}
 
 	public String getMapFantasyName () {
-		return mMap.getMapName ();
+		return mGameServer.getCore ().getMapName ();
 	}
 
 	public int getMaxUserCount () {
-		return mMaxUserCount;
+		return mGameServer.getCore ().getMaxUsers ();
 	}
 
 	public int getUserCount () {
@@ -108,7 +102,7 @@ public class Room implements Connection {
 
 	public RoomData getData () {
 		ArrayList <String> mUsers = mConnectionIds.keySet ().stream ().map (id -> mServerConnection.getUser (id).getName ()).collect (Collectors.toCollection (ArrayList::new));
-		return new RoomData (mRoomId, mGameName, mMap.getMapName (), mUsers, mMaxUserCount, isMapRunning ());
+		return new RoomData (mRoomId, getMapFantasyName (), mUsers, getMaxUserCount (), isMapRunning ());
 	}
 
 	@Override

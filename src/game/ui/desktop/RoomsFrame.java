@@ -1,7 +1,7 @@
-package game.ui;
+package game.ui.desktop;
 
+import game.connection.ClientConnection;
 import game.connection.RoomData;
-import game.connection.UserConnection;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -18,17 +18,17 @@ public class RoomsFrame extends JFrame {
 	private JButton mJoinOrLeaveButton;
 	private JButton mStartButton;
 
-	private UserConnection mConnection;
+	private ClientConnection mConnection;
 
 	private int mSelectedRoomId = -1;
 	private boolean mIsInRoom = false;
 
 	private HashMap <Integer, ArrayList <String>> mAllRoomUsers = new HashMap <> ();
 
-	public RoomsFrame (UserConnection userConnection) {
+	public RoomsFrame (ClientConnection clientConnection) {
 		super ("Rooms");
 
-		mConnection = userConnection;
+		mConnection = clientConnection;
 
 		setLayout (new BorderLayout ());
 		setLocationByPlatform (true);
@@ -38,28 +38,26 @@ public class RoomsFrame extends JFrame {
 		addWindowListener (new WindowAdapter () {
 			@Override
 			public void windowClosing (WindowEvent e) {
-				mConnection.stopUserConnection ();
+				mConnection.stopClientConnection ();
 			}
 		});
 
 		JPanel leftPanel = new JPanel ();
 		leftPanel.setBorder (BorderFactory.createEmptyBorder (20, 20, 20, 10));
 
-		TableModel tableModel = new DefaultTableModel (0, 4);
+		TableModel tableModel = new DefaultTableModel (0, 3);
 
 		TableColumnModel tableColumnModel = new DefaultTableColumnModel ();
-		TableColumn first = new TableColumn (1);
-		first.setHeaderValue ("Game");
-		tableColumnModel.addColumn (first);
-		TableColumn second = new TableColumn (2);
-		second.setHeaderValue ("Map");
-		tableColumnModel.addColumn (second);
-		TableColumn third = new TableColumn (3);
-		third.setHeaderValue ("Users");
-		tableColumnModel.addColumn (third);
-		TableColumn fourth = new TableColumn (4);
-		fourth.setHeaderValue ("Running");
-		tableColumnModel.addColumn (fourth);
+
+		TableColumn mapColumn = new TableColumn (1);
+		mapColumn.setHeaderValue ("Map");
+		tableColumnModel.addColumn (mapColumn);
+		TableColumn usersColumn = new TableColumn (2);
+		usersColumn.setHeaderValue ("Users");
+		tableColumnModel.addColumn (usersColumn);
+		TableColumn runningColumn = new TableColumn (3);
+		runningColumn.setHeaderValue ("Running");
+		tableColumnModel.addColumn (runningColumn);
 
 		mRoomsTable = new JTable (tableModel, tableColumnModel) {
 			public boolean isCellEditable (int row, int column) {
@@ -85,8 +83,8 @@ public class RoomsFrame extends JFrame {
 						listModel.addElement (userName);
 					}
 				}
-				String[] userCount = model.getValueAt (selectedRow, 3).toString ().split ("/");
-				if ((userCount[0].equals (userCount[1]) || model.getValueAt (selectedRow, 4).equals ("x")) && !mIsInRoom) {
+				String[] userCount = model.getValueAt (selectedRow, 2).toString ().split ("/");
+				if ((userCount[0].equals (userCount[1]) || model.getValueAt (selectedRow, 3).equals ("x")) && !mIsInRoom) {
 					mJoinOrLeaveButton.setEnabled (false);
 				} else {
 					mJoinOrLeaveButton.setEnabled (true);
@@ -101,7 +99,7 @@ public class RoomsFrame extends JFrame {
 		rightPanel.setBorder (BorderFactory.createEmptyBorder (20, 10, 20, 20));
 		rightPanel.setLayout (new GridLayout (3, 1));
 
-		//		ImageIcon image = new ImageIcon ("res/interstellarwar/planet5.png");// #TODO image for every map
+		//		ImageIcon image = new ImageIcon ("res/interstellarwar/planet5.png");// #TODO image for every interstellarwar
 		//		mRoomPicture = new JLabel ("", image, JLabel.CENTER);
 
 		DefaultListModel <String> listModel = new DefaultListModel ();
@@ -150,7 +148,6 @@ public class RoomsFrame extends JFrame {
 			model.addRow (
 					new Object[] {
 							data[i].getRoomId (),
-							data[i].getGameName (),
 							data[i].getMapName (),
 							String.valueOf (data[i].getUsers ().size ()) + "/" + String.valueOf (data[i].getMaxUserCount ()),
 							data[i].isRunning () ? "x" : ""
@@ -159,7 +156,8 @@ public class RoomsFrame extends JFrame {
 			mAllRoomUsers.put (data[i].getRoomId (), data[i].getUsers ());
 			if (data[i].getRoomId () == mSelectedRoomId) {
 				selectedRowIndex = i;
-				if (data[i].getUsers ().size () == data[i].getMaxUserCount () && mIsInRoom) {
+				if (data[i].getUsers ().size () == data[i].getMaxUserCount () && mIsInRoom &&
+						!model.getValueAt (i, 3).equals ("x")) {
 					mStartButton.setEnabled (true);
 				} else {
 					mStartButton.setEnabled (false);

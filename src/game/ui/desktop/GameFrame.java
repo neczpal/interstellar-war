@@ -1,8 +1,7 @@
-package game.ui;
+package game.ui.desktop;
 
 import game.Textures;
-import game.connection.UserConnection;
-import game.map.GameMap;
+import game.interstellarwar.InterstellarWarClient;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -17,14 +16,15 @@ public class GameFrame extends Thread {
 	private int mDisplayModeIndex;
 	private int mWidth, mHeight;
 	private String mName;
-	private GameMap mGameMap;
 	private boolean mIsGameFrameRunning;
 
-	public GameFrame (String mTitle, int displayModeIndex, GameMap gameMap) {
+	private InterstellarWarPanel mGamePanel;
+
+	public GameFrame (String mTitle, int displayModeIndex, InterstellarWarClient client) {
 		super (mTitle);
 		this.mName = mTitle;
 		this.mDisplayModeIndex = displayModeIndex;
-		this.mGameMap = gameMap;
+		this.mGamePanel = new InterstellarWarPanel (client);
 		this.mIsGameFrameRunning = false;
 	}
 
@@ -37,21 +37,23 @@ public class GameFrame extends Thread {
 		} catch (IOException ex) {
 			ex.printStackTrace ();//#TODO LOG
 		}
-		mGameMap.init ();
+		mGamePanel.init ();
 		mIsGameFrameRunning = true;
 		while (!Display.isCloseRequested () && mIsGameFrameRunning) {
 			glClear (GL_COLOR_BUFFER_BIT);
 
-			mouseEvent ();
-			keyboardEvent ();
+			if (Mouse.isInsideWindow ()) {
+				mGamePanel.inputEvents ();
+			}
 
-			draw ();
+			mGamePanel.draw ();
 
 			Display.sync (80);
 			Display.update ();
 		}
 		clean ();
-		((UserConnection) mGameMap.getConnection ()).leaveRoom ();
+		mGamePanel.getInterstellarWarClient ().getCore ().stopGame ();
+		mGamePanel.getInterstellarWarClient ().leaveRoom ();
 	}
 
 	private void initDisplay () {
@@ -84,20 +86,6 @@ public class GameFrame extends Thread {
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	private void draw () {
-		mGameMap.draw ();
-	}
-
-	private void mouseEvent () {
-		if (Mouse.isInsideWindow ()) {
-			mGameMap.mouseEvent ();
-		}
-	}
-
-	private void keyboardEvent () {
-		mGameMap.keyboardEvent ();
-	}
-
 	private void clean () {
 		Display.destroy ();
 		Keyboard.destroy ();
@@ -106,5 +94,6 @@ public class GameFrame extends Thread {
 
 	public void stopGameFrame () {
 		mIsGameFrameRunning = false;
+		mGamePanel.getInterstellarWarClient ().getCore ().stopGame ();
 	}
 }

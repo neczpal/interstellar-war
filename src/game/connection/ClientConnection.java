@@ -1,24 +1,21 @@
 package game.connection;
 
 import game.Log;
-import game.map.GameMap;
-import game.ui.GameFrame;
-import game.ui.LoginFrame;
-import game.ui.RoomsFrame;
+import game.interstellarwar.InterstellarWarClient;
+import game.interstellarwar.InterstellarWarCore;
+import game.ui.UserInterface;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.ArrayList;
 
-public class UserConnection extends Thread implements Connection {
+public class ClientConnection extends Thread implements Connection {
 
-	private LoginFrame mLoginFrame;
-	private RoomsFrame mRoomsFrame;
-	private GameFrame mGameFrame;
-	private GameMap mGameMap;
+	private UserInterface mUserInterface;
+	private InterstellarWarClient mGameClient;
 
 	private int mConnectionId;
 	private int mRoomIndex;
@@ -32,11 +29,11 @@ public class UserConnection extends Thread implements Connection {
 
 	private Log log = new Log (this);
 
-	public UserConnection (String ip, String userName) throws IOException {
+	public ClientConnection (String ip, String userName) throws IOException {
 		super ("ClientConnection " + userName);
 		mUserName = userName;
 		mIsRunning = false;
-		mSocket = new Socket (ip, 23232);//#TODO set port
+		mSocket = new Socket (ip, 23233);//#TODO set port
 
 		if (mSocket.isConnected ()) {
 			mIn = new ObjectInputStream (mSocket.getInputStream ());
@@ -67,13 +64,13 @@ public class UserConnection extends Thread implements Connection {
 			}
 		} catch (IOException e) {
 			log.e ("gameconnection bibi" + e.getMessage ());
-			stopUserConnection ();
-			backToLogin ();
-			JOptionPane.showMessageDialog (mLoginFrame, "Disconnected from the server (" + mSocket.getInetAddress ().getHostAddress () + ")", "Connection lost!", JOptionPane.ERROR_MESSAGE);
+			stopClientConnection ();
+			stopGame ();
+			mUserInterface.connectionDropped ();
 		}
 	}
 
-	public void stopUserConnection () {
+	public void stopClientConnection () {
 		mIsRunning = false;
 		send (Command.Type.EXIT_SERVER);
 		try {
@@ -89,33 +86,32 @@ public class UserConnection extends Thread implements Connection {
 	//RECEIVE
 	private void connectionReady (int newConnectionId) {
 		mConnectionId = newConnectionId;
-		mLoginFrame.openRoomsFrame ();
+		mUserInterface.connectionReady ();
 		log.i ("Connection succesful id: " + mConnectionId);
 	}
 
 	private void listRooms (Serializable[] roomData) {
-		mRoomsFrame.loadRoomData ((RoomData[]) roomData);
+		mUserInterface.listRooms ((RoomData[]) roomData);
 		log.i ("Room datas loaded");
 	}
 
-	private void loadMap (int roomIndex, String gameName, Serializable[] mapData) {
+	private void loadMap (int roomIndex, ArrayList <Serializable> mapData) {
 		mRoomIndex = roomIndex;
-		mGameMap = GameMap.createGameMap (gameName);
-		mGameMap.setConnection (this);
-		mGameMap.loadData (mapData);
-		mRoomsFrame.setIsInRoom (true);
+		InterstellarWarCore core = new InterstellarWarCore (mapData);
+
+		mGameClient = new InterstellarWarClient (core, this);
+		mUserInterface.setIsInRoom (true);
 		log.i ("Map data received");
 	}
 
-	private void startGame (String gameName, String mapName) {
-		mGameFrame = new GameFrame (gameName + " : " + mapName, mLoginFrame.getSelectedDisplayModeIndex (), mGameMap);
-		mGameFrame.start ();
-		mGameMap.start ();
-		log.i (gameName + " (" + mapName + ") is ready to play.");
+	private void startGame (String mapName) {
+		mUserInterface.startGame (mapName);
+		mGameClient.getCore ().start ();
+		log.i (" (" + mapName + ") is ready to play.");
 	}
 
 	private void gameCommand (Command command) {
-		mGameMap.receiveClient (command);
+		mGameClient.receive (command);
 		log.i (command.data[0] + " game command received.");
 	}
 
@@ -130,13 +126,14 @@ public class UserConnection extends Thread implements Connection {
 				listRooms (command.data);
 				break;
 			case MAP_DATA:
-				loadMap ((int) command.data[0], (String) command.data[1], (Serializable[]) command.data[2]);
+				loadMap ((int) command.data[0], (ArrayList <Serializable>) command.data[1]);
 				break;
 			case READY_TO_PLAY:
-				startGame ((String) command.data[0], (String) command.data[1]);
+				startGame ((String) command.data[0]);
 				break;
 			case GAME_COMMAND:
 				gameCommand (command);
+				break;
 		}
 	}
 
@@ -150,11 +147,9 @@ public class UserConnection extends Thread implements Connection {
 	}
 
 	public void leaveRoom () {
-		if (mGameFrame != null) {
-			mGameFrame.stopGameFrame ();
-		}
+		mUserInterface.stopGame ();
 		send (Command.Type.LEAVE_ROOM);
-		mRoomsFrame.setIsInRoom (false);
+		mUserInterface.setIsInRoom (false);
 	}
 
 	public void enterRoom (int roomId) {
@@ -182,25 +177,17 @@ public class UserConnection extends Thread implements Connection {
 		}
 	}
 
-	public void setLoginFrame (LoginFrame loginFrame) {
-		mLoginFrame = loginFrame;
-	}
-
-	public void setRoomsFrame (RoomsFrame roomsFrame) {
-		mRoomsFrame = roomsFrame;
-	}
-
-	public void setGameFrame (GameFrame gameFrame) {
-		mGameFrame = gameFrame;
-	}
-
-	private void backToLogin () {
-		if (mGameMap != null && mGameMap.isAlive ()) {
-			mGameMap.stopGame ();
-			mGameFrame.stopGameFrame ();
+	private void stopGame () {
+		if (mGameClient != null && mGameClient.getCore ().isRunning ()) {
+			mGameClient.getCore ().stopGame ();
 		}
-		mRoomsFrame.dispose ();
-		mLoginFrame = new LoginFrame ();
-		mLoginFrame.setVisible (true);
+	}
+
+	public InterstellarWarClient getGameClient () {
+		return mGameClient;
+	}
+
+	public void setUserInterface (UserInterface userInterface) {
+		mUserInterface = userInterface;
 	}
 }

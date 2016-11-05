@@ -1,7 +1,7 @@
-package game.ui;
+package game.ui.desktop;
 
 import game.Loader;
-import game.connection.UserConnection;
+import game.connection.ClientConnection;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -18,7 +18,9 @@ import java.util.Properties;
 
 public class LoginFrame extends JFrame implements ActionListener {
 
-	private UserConnection mConnection;
+	private ClientConnection mConnection;
+
+	private DesktopUI mUserInterface;
 
 	private JTextField userNameTextField;
 	private JTextField ipAddressTextField;
@@ -27,8 +29,10 @@ public class LoginFrame extends JFrame implements ActionListener {
 
 	private Properties mProperties;
 
-	public LoginFrame () {
+	public LoginFrame (DesktopUI userInterface) {
 		super ("Login");
+		mUserInterface = userInterface;
+
 		try {
 			mProperties = Loader.loadProperties ("res/config");
 		} catch (IOException e) {
@@ -90,11 +94,6 @@ public class LoginFrame extends JFrame implements ActionListener {
 
 	}
 
-	public static void main (String args[]) {
-		LoginFrame loginFrame = new LoginFrame ();
-		loginFrame.setVisible (true);
-	}
-
 	@Override
 	public void actionPerformed (ActionEvent e) {
 		if (ipAddressTextField.getText ().isEmpty ()) {
@@ -103,9 +102,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog (this, "Please enter a username", "Username missing!", JOptionPane.WARNING_MESSAGE);
 		} else {
 			try {
-				mConnection = new UserConnection (ipAddressTextField.getText (), userNameTextField.getText ());
-				mConnection.setLoginFrame (this);
-
+				mUserInterface.setConnection (new ClientConnection (ipAddressTextField.getText (), userNameTextField.getText ()));
 				try {
 					mProperties.setProperty ("username", userNameTextField.getText ());
 					mProperties.setProperty ("ip_address", ipAddressTextField.getText ());
@@ -119,13 +116,6 @@ public class LoginFrame extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog (this, "Cannot connect to the server ( " + ipAddressTextField.getText () + ")", "Connection Error!", JOptionPane.ERROR_MESSAGE);
 			}
 		}
-	}
-
-	public void openRoomsFrame () {
-		dispose ();
-		RoomsFrame roomsFrame = new RoomsFrame (mConnection);
-		roomsFrame.setVisible (true);
-		mConnection.setRoomsFrame (roomsFrame);
 	}
 
 	public int getSelectedDisplayModeIndex () {

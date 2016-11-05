@@ -1,8 +1,6 @@
 package game.connection;
 
 import game.Log;
-import game.map.GameMap;
-import game.map.interstellarwar.InterstellarWar;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -49,13 +47,13 @@ public class ServerConnection extends Thread implements Connection {
 	public void run () {
 		log.i ("Sever started.");
 
-		addRoom (InterstellarWar.GAME_NAME, "map01");
-		addRoom (InterstellarWar.GAME_NAME, "map02");
-		addRoom (InterstellarWar.GAME_NAME, "map03");
-		addRoom (InterstellarWar.GAME_NAME, "map04");
-		addRoom (InterstellarWar.GAME_NAME, "map05");
-		addRoom (InterstellarWar.GAME_NAME, "map06");
-		addRoom (InterstellarWar.GAME_NAME, "map07");
+		addRoom ("map01");
+		addRoom ("map02");
+		addRoom ("map03");
+		addRoom ("map04");
+		addRoom ("map05");
+		addRoom ("map06");
+		addRoom ("map07");
 
 		mRoomServer.start ();
 		mIsRunning = true;
@@ -86,13 +84,13 @@ public class ServerConnection extends Thread implements Connection {
 	}
 
 
-	public void addRoom (String gameName, String mapName) {
+	public void addRoom (String mapName) {
 		try {
-			Room room = new Room (this, gameName, mapName);
+			Room room = new Room (this, mapName);
 			room.setRoomId (mRoomIdCounter);
 			mRooms.put (mRoomIdCounter++, room);
-		} catch (GameMap.NotValidMapException e) {
-			log.e (gameName + " : " + mapName + " is not a valid map. :" + e.getMessage ());
+		} catch (IOException e) {
+			log.e (mapName + " is not a valid interstellarwar map :" + e.getMessage ());
 		}
 	}
 
@@ -168,7 +166,7 @@ public class ServerConnection extends Thread implements Connection {
 
 			listRoom ();
 		} else {
-			log.i ("User (" + user + ") is not in a room");
+			//			log.i ("User (" + user + ") is not in a room");
 		}
 	}
 
@@ -178,7 +176,7 @@ public class ServerConnection extends Thread implements Connection {
 			log.i ("User (" + user + ") is connecting to the Room (" + room + ")");
 			user.setRoomId (room.getRoomId ());
 			room.addUser (user);
-			sendToId (user.getId (), new Command (Command.Type.MAP_DATA, user.getRoomIndex (), room.getGameName (), room.getGameMap ().toData ()));
+			sendToId (user.getId (), new Command (Command.Type.MAP_DATA, user.getRoomIndex (), room.getGameServer ().getCore ().getData ()));
 
 			listRoom ();
 		} else {
@@ -189,9 +187,9 @@ public class ServerConnection extends Thread implements Connection {
 	private void startRoom (User user) {
 		Room room = getRoom (user.getRoomId ());
 		if (room != null && room.isFull () && !room.isMapRunning ()) {
-			room.send (Command.Type.READY_TO_PLAY, room.getGameName (), room.getMapFantasyName ());
+			room.send (Command.Type.READY_TO_PLAY, room.getMapFantasyName ());
 			room.startGame ();
-			addRoom (room.getGameName (), room.getMapName ());
+			addRoom (room.getMapName ());
 
 			listRoom ();
 			log.i (user + " is starting the game in the Room (" + room + ")");
