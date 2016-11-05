@@ -6,9 +6,6 @@ import net.neczpal.interstellarwar.common.RoomData;
 
 import javax.swing.*;
 
-/**
- * Created by neczp on 2016. 11. 05..
- */
 public class DesktopUI implements UserInterface {
 	private LoginFrame mLoginFrame;
 	private RoomsFrame mRoomsFrame;
