@@ -129,7 +129,9 @@ public class InterstellarWarCore extends Thread {
 	}
 
 	private void moveSpaceShips () {
-		mSpaceShips.forEach (SpaceShip::tick);
+		for (SpaceShip spaceShip : mSpaceShips) {
+			spaceShip.tick ();
+		}
 
 		Iterator <SpaceShip> iterator = mSpaceShips.iterator ();
 		while (iterator.hasNext ()) {
@@ -142,7 +144,9 @@ public class InterstellarWarCore extends Thread {
 	}
 
 	private void spawnUnits () {
-		mPlanets.forEach (Planet::spawnUnit);
+		for (Planet planet : mPlanets) {
+			planet.spawnUnit ();
+		}
 	}
 
 	//GAME LOOP

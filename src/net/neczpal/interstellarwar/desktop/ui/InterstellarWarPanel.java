@@ -151,7 +151,9 @@ public class InterstellarWarPanel {
 			Util.drawCircle (mSelectedPlanetTo.getX (), mSelectedPlanetTo.getY (), mSelectedPlanetTo.getRadius (), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 
-		roads.forEach (this::drawRoad);
+		for (Road road : roads) {
+			drawRoad (road);
+		}
 
 		for (int i = 0; i < planets.size (); i++) {
 			Planet planet = planets.get (i);
@@ -159,7 +161,9 @@ public class InterstellarWarPanel {
 		}
 
 		try {
-			spaceShips.forEach (this::drawSpaceShip);
+			for (SpaceShip spaceShip : spaceShips) {
+				drawSpaceShip (spaceShip);
+			}
 		} catch (ConcurrentModificationException ex) {
 		}
 		//#TODO ConcurrentModificationException toDel list delete here??

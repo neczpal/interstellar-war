@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ServerConnection extends Thread {
 
@@ -121,10 +120,14 @@ public class ServerConnection extends Thread {
 	}
 
 	public RoomData[] getRoomData () {
-		ArrayList <RoomData> roomData = mRooms.values ().stream ().map (Room::getData).collect (Collectors.toCollection (ArrayList::new));
+		ArrayList <RoomData> roomData = new ArrayList <> ();
+		for (Room room : mRooms.values ()) {
+			roomData.add (room.getData ());
+		}
+
 		RoomData[] ret = new RoomData[roomData.size ()];
 		roomData.toArray (ret);
-		return ret;
+		return ret;//#TODO ArrayList why not
 	}
 
 	public User getUser (Object key) {

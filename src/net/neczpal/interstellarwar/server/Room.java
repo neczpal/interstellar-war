@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.stream.Collectors;
 
 public class Room {
 
@@ -102,7 +101,10 @@ public class Room {
 	}
 
 	public RoomData getData () {
-		ArrayList <String> mUsers = mConnectionIds.keySet ().stream ().map (id -> mServerConnection.getUser (id).getName ()).collect (Collectors.toCollection (ArrayList::new));
+		ArrayList <String> mUsers = new ArrayList <> ();
+		for (Integer key : mConnectionIds.keySet ()) {
+			mUsers.add (mServerConnection.getUser (key).getName ());
+		}
 		return new RoomData (mRoomId, getMapFantasyName (), mUsers, getMaxUserCount (), isMapRunning ());
 	}
 

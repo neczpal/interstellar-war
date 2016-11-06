@@ -4,8 +4,12 @@ import net.neczpal.interstellarwar.client.ClientConnection;
 import net.neczpal.interstellarwar.common.RoomData;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -66,28 +70,31 @@ public class RoomsFrame extends JFrame {
 		};
 		mRoomsTable.getTableHeader ().setReorderingAllowed (false);
 		mRoomsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
-		mRoomsTable.getSelectionModel ().addListSelectionListener (e -> {
-			TableModel model = mRoomsTable.getModel ();
-			int selectedRow = mRoomsTable.getSelectedRow ();
-			if (selectedRow != -1 && selectedRow < model.getRowCount ()) {
-				try {
-					mSelectedRoomId = (int) model.getValueAt (selectedRow, 0);
-				} catch (ArrayIndexOutOfBoundsException ex) {//#TODO ArrayINdexOutofBoundsException
-					System.out.println (ex.getMessage ());
-				}
-				DefaultListModel listModel = (DefaultListModel) mRoomUserList.getModel ();
-				listModel.clear ();
-				ArrayList <String> users = mAllRoomUsers.get (mSelectedRoomId);
-				if (users != null && !users.isEmpty ()) {
-					for (String userName : mAllRoomUsers.get (mSelectedRoomId)) {
-						listModel.addElement (userName);
+		mRoomsTable.getSelectionModel ().addListSelectionListener (new ListSelectionListener () {
+			@Override
+			public void valueChanged (ListSelectionEvent e) {
+				TableModel model = mRoomsTable.getModel ();
+				int selectedRow = mRoomsTable.getSelectedRow ();
+				if (selectedRow != -1 && selectedRow < model.getRowCount ()) {
+					try {
+						mSelectedRoomId = (int) model.getValueAt (selectedRow, 0);
+					} catch (ArrayIndexOutOfBoundsException ex) {//#TODO ArrayINdexOutofBoundsException
+						System.out.println (ex.getMessage ());
 					}
-				}
-				String[] userCount = model.getValueAt (selectedRow, 2).toString ().split ("/");
-				if ((userCount[0].equals (userCount[1]) || model.getValueAt (selectedRow, 3).equals ("x")) && !mIsInRoom) {
-					mJoinOrLeaveButton.setEnabled (false);
-				} else {
-					mJoinOrLeaveButton.setEnabled (true);
+					DefaultListModel listModel = (DefaultListModel) mRoomUserList.getModel ();
+					listModel.clear ();
+					ArrayList <String> users = mAllRoomUsers.get (mSelectedRoomId);
+					if (users != null && !users.isEmpty ()) {
+						for (String userName : mAllRoomUsers.get (mSelectedRoomId)) {
+							listModel.addElement (userName);
+						}
+					}
+					String[] userCount = model.getValueAt (selectedRow, 2).toString ().split ("/");
+					if ((userCount[0].equals (userCount[1]) || model.getValueAt (selectedRow, 3).equals ("x")) && !mIsInRoom) {
+						mJoinOrLeaveButton.setEnabled (false);
+					} else {
+						mJoinOrLeaveButton.setEnabled (true);
+					}
 				}
 			}
 		});
@@ -112,17 +119,23 @@ public class RoomsFrame extends JFrame {
 		roomButtonsPanel.setLayout (new FlowLayout ());
 
 		mJoinOrLeaveButton = new JButton ("Join");
-		mJoinOrLeaveButton.addActionListener (e -> {
-			if (mIsInRoom) {
-				mConnection.leaveRoom ();
-			} else {
-				mConnection.enterRoom (mSelectedRoomId);
+		mJoinOrLeaveButton.addActionListener (new ActionListener () {
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				if (mIsInRoom) {
+					mConnection.leaveRoom ();
+				} else {
+					mConnection.enterRoom (mSelectedRoomId);
+				}
 			}
 		});
 
 		mStartButton = new JButton ("Start");
-		mStartButton.addActionListener (e -> {
-			mConnection.startRoom ();
+		mStartButton.addActionListener (new ActionListener () {
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				mConnection.startRoom ();
+			}
 		});
 		mStartButton.setEnabled (false);
 
@@ -130,10 +143,13 @@ public class RoomsFrame extends JFrame {
 		roomButtonsPanel.add (mStartButton);
 
 		//		rightPanel.add (mRoomPicture);
-		rightPanel.add (new JScrollPane (mRoomUserList));
+		rightPanel.add (new
+
+				JScrollPane (mRoomUserList));
 		rightPanel.add (roomButtonsPanel);
 
 		add (leftPanel, BorderLayout.LINE_START);
+
 		add (rightPanel, BorderLayout.LINE_END);
 	}
 
