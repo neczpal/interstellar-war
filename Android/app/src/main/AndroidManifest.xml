@@ -27,6 +27,14 @@
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="net.neczpal.interstellarwar.android.LoginActivity"/>
         </activity>
+        <activity
+                android:name=".InterstellarWarActivity"
+                android:label="@string/title_activity_lounge"
+                android:parentActivityName=".LoginActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="net.neczpal.interstellarwar.android.InterstellarWarActivity"/>
+        </activity>
     </application>
 
 </manifest>

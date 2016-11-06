@@ -1,6 +1,7 @@
 package net.neczpal.interstellarwar.android;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -34,6 +35,13 @@ public class LoungeActivity extends Activity implements UserInterface {
 	}
 
 	@Override
+	public void onBackPressed () {
+		super.onBackPressed ();
+		LoginActivity.mConnection = null;
+	}
+
+	// UI interface
+	@Override
 	public void connectionReady () {
 	}
 
@@ -59,8 +67,10 @@ public class LoungeActivity extends Activity implements UserInterface {
 	}
 
 	@Override
-	public void startGame (String s) {
-
+	public void startGame (String mapName) {
+		Intent intent = new Intent (this, InterstellarWarActivity.class);
+		intent.putExtra ("MAP_NAME", mapName);
+		startActivity (intent);
 	}
 
 	@Override
