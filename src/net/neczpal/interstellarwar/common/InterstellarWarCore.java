@@ -29,7 +29,7 @@ public class InterstellarWarCore extends Thread {
 		mRoads = new ArrayList <> ();
 		mSpaceShips = new ArrayList <> ();
 
-		File mapFile = new File (System.getProperty ("user.dir") + "/res/interstellarwar/" + fileName);
+		File mapFile = new File (System.getProperty ("user.dir") + "/res/maps/" + fileName);
 
 		FileReader fileReader = new FileReader (mapFile);
 		BufferedReader bufferedReader = new BufferedReader (fileReader);

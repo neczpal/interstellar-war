@@ -1,6 +1,6 @@
-package net.neczpal.interstellarwar.desktop.ui;
+package net.neczpal.interstellarwar.desktop.ui.frames;
 
-import net.neczpal.interstellarwar.client.InterstellarWarClient;
+import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
 import net.neczpal.interstellarwar.desktop.Textures;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;

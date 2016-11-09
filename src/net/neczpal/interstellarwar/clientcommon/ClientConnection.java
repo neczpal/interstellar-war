@@ -1,4 +1,4 @@
-package net.neczpal.interstellarwar.client;
+package net.neczpal.interstellarwar.clientcommon;
 
 import net.neczpal.interstellarwar.common.Command;
 import net.neczpal.interstellarwar.common.InterstellarWarCore;
@@ -90,8 +90,8 @@ public class ClientConnection extends Thread {
 		log.i ("Connection succesful id: " + mConnectionId);
 	}
 
-	private void listRooms (Serializable[] roomData) {
-		mUserInterface.listRooms ((RoomData[]) roomData);
+	private void listRooms (ArrayList <RoomData> roomData) {
+		mUserInterface.listRooms (roomData);
 		log.i ("Room datas loaded");
 	}
 
@@ -123,7 +123,7 @@ public class ClientConnection extends Thread {
 				connectionReady ((int) command.data[0]);
 				break;
 			case LIST_ROOMS:
-				listRooms (command.data);
+				listRooms ((ArrayList <RoomData>) command.data[0]);
 				break;
 			case MAP_DATA:
 				loadMap ((int) command.data[0], (ArrayList <Serializable>) command.data[1]);

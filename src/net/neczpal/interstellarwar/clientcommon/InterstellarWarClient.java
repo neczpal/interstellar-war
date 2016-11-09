@@ -1,4 +1,4 @@
-package net.neczpal.interstellarwar.client;
+package net.neczpal.interstellarwar.clientcommon;
 
 import net.neczpal.interstellarwar.common.Command;
 import net.neczpal.interstellarwar.common.InterstellarWarCommand;

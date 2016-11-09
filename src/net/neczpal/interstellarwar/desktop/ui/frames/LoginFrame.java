@@ -1,7 +1,8 @@
-package net.neczpal.interstellarwar.desktop.ui;
+package net.neczpal.interstellarwar.desktop.ui.frames;
 
-import net.neczpal.interstellarwar.client.ClientConnection;
+import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.desktop.Loader;
+import net.neczpal.interstellarwar.desktop.ui.DesktopUI;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -31,13 +32,13 @@ public class LoginFrame extends JFrame implements ActionListener {
 		mUserInterface = userInterface;
 
 		try {
-			mProperties = Loader.loadProperties ("res/config");
+			mProperties = Loader.loadProperties ("config.dat");
 		} catch (IOException e) {
 			mProperties = new Properties ();
 		}
 
 		try {
-			setIconImage (ImageIO.read (new File ("res/interstellarwar/planet5.png")));// #TODO useful icon
+			setIconImage (ImageIO.read (new File ("res/textures/planet5.png")));// #TODO useful icon
 		} catch (IOException e) {
 			e.printStackTrace ();
 		}
@@ -104,7 +105,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 					mProperties.setProperty ("username", userNameTextField.getText ());
 					mProperties.setProperty ("ip_address", ipAddressTextField.getText ());
 					mProperties.setProperty ("resolution", Integer.toString (availableResolutionsComboBox.getSelectedIndex ()));
-					mProperties.store (new FileOutputStream ("res/config"), null);
+					mProperties.store (new FileOutputStream ("config.dat"), null);
 				} catch (IOException prop_ex) {
 					prop_ex.printStackTrace ();
 				}

@@ -105,6 +105,8 @@ public class ServerConnection extends Thread {
 		mClients.remove (id);
 		log.i ("Client (" + id + ") removed");
 		User user = getUser (id);
+		if (user == null)
+			return;
 		leaveRoom (user);
 		mUsers.remove (user.getId ());
 		log.i ("User (" + user + ") exits the connection.");
@@ -119,15 +121,13 @@ public class ServerConnection extends Thread {
 		return -1;
 	}
 
-	public RoomData[] getRoomData () {
-		ArrayList <RoomData> roomData = new ArrayList <> ();
+	public ArrayList <RoomData> getRoomData () {
+		ArrayList <RoomData> roomDatas = new ArrayList <> ();
 		for (Room room : mRooms.values ()) {
-			roomData.add (room.getData ());
+			roomDatas.add (room.getData ());
 		}
 
-		RoomData[] ret = new RoomData[roomData.size ()];
-		roomData.toArray (ret);
-		return ret;//#TODO ArrayList why not
+		return roomDatas;
 	}
 
 	public User getUser (Object key) {
@@ -210,7 +210,7 @@ public class ServerConnection extends Thread {
 	}
 
 	public void receive (Command command, int currentPort) {
-		log.i ("Got msg from client: " + command.type.toString () + " : " + currentPort);
+		log.i ("Got msg from clientcommon: " + command.type.toString () + " : " + currentPort);
 		switch (command.type) {
 			case ENTER_SERVER:
 				enterServer ((String) command.data[1], currentPort);

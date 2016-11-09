@@ -1,10 +1,14 @@
 package net.neczpal.interstellarwar.desktop.ui;
 
-import net.neczpal.interstellarwar.client.ClientConnection;
-import net.neczpal.interstellarwar.client.UserInterface;
+import net.neczpal.interstellarwar.clientcommon.ClientConnection;
+import net.neczpal.interstellarwar.clientcommon.UserInterface;
 import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.desktop.ui.frames.GameFrame;
+import net.neczpal.interstellarwar.desktop.ui.frames.LoginFrame;
+import net.neczpal.interstellarwar.desktop.ui.frames.RoomsFrame;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class DesktopUI implements UserInterface {
 	private LoginFrame mLoginFrame;
@@ -43,7 +47,7 @@ public class DesktopUI implements UserInterface {
 	}
 
 	@Override
-	public void listRooms (RoomData[] roomData) {
+	public void listRooms (ArrayList <RoomData> roomData) {
 		mRoomsFrame.loadRoomData (roomData);
 	}
 

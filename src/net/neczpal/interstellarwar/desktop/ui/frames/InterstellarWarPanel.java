@@ -1,6 +1,6 @@
-package net.neczpal.interstellarwar.desktop.ui;
+package net.neczpal.interstellarwar.desktop.ui.frames;
 
-import net.neczpal.interstellarwar.client.InterstellarWarClient;
+import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
 import net.neczpal.interstellarwar.common.InterstellarWarCore;
 import net.neczpal.interstellarwar.common.Planet;
 import net.neczpal.interstellarwar.common.Road;
