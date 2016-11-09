@@ -1,8 +1,8 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.Command;
-import net.neczpal.interstellarwar.common.InterstellarWarCore;
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.common.connection.Command;
+import net.neczpal.interstellarwar.common.connection.RoomData;
+import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
 
 import java.io.IOException;
 import java.io.Serializable;

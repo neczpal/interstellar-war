@@ -1,8 +1,8 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.Command;
-import net.neczpal.interstellarwar.common.InterstellarWarCommand;
-import net.neczpal.interstellarwar.common.InterstellarWarCore;
+import net.neczpal.interstellarwar.common.connection.Command;
+import net.neczpal.interstellarwar.common.game.InterstellarWarCommand;
+import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
 
 public class InterstellarWarServer {
 	private InterstellarWarCore mInterstellarWarCore;

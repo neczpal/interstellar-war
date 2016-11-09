@@ -1,10 +1,10 @@
 package net.neczpal.interstellarwar.desktop.ui.frames;
 
 import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
-import net.neczpal.interstellarwar.common.InterstellarWarCore;
-import net.neczpal.interstellarwar.common.Planet;
-import net.neczpal.interstellarwar.common.Road;
-import net.neczpal.interstellarwar.common.SpaceShip;
+import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
+import net.neczpal.interstellarwar.common.game.Planet;
+import net.neczpal.interstellarwar.common.game.Road;
+import net.neczpal.interstellarwar.common.game.SpaceShip;
 import net.neczpal.interstellarwar.desktop.Textures;
 import net.neczpal.interstellarwar.desktop.Util;
 import net.neczpal.interstellarwar.desktop.geom.Color;

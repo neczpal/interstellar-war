@@ -2,7 +2,7 @@ package net.neczpal.interstellarwar.desktop.ui;
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.clientcommon.UserInterface;
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.common.connection.RoomData;
 import net.neczpal.interstellarwar.desktop.ui.frames.GameFrame;
 import net.neczpal.interstellarwar.desktop.ui.frames.LoginFrame;
 import net.neczpal.interstellarwar.desktop.ui.frames.RoomsFrame;

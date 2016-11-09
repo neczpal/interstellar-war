@@ -1,4 +1,4 @@
-package net.neczpal.interstellarwar.common;
+package net.neczpal.interstellarwar.common.connection;
 
 import java.io.Serializable;
 import java.util.ArrayList;

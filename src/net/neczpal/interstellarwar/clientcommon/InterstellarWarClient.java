@@ -1,8 +1,8 @@
 package net.neczpal.interstellarwar.clientcommon;
 
-import net.neczpal.interstellarwar.common.Command;
-import net.neczpal.interstellarwar.common.InterstellarWarCommand;
-import net.neczpal.interstellarwar.common.InterstellarWarCore;
+import net.neczpal.interstellarwar.common.connection.Command;
+import net.neczpal.interstellarwar.common.game.InterstellarWarCommand;
+import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
 
 import java.io.Serializable;
 import java.util.ArrayList;

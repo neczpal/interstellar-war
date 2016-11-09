@@ -1,6 +1,6 @@
 package net.neczpal.interstellarwar.clientcommon;
 
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.common.connection.RoomData;
 
 import java.util.ArrayList;
 

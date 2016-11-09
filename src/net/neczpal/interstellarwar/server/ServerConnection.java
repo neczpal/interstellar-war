@@ -1,8 +1,7 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.Command;
-import net.neczpal.interstellarwar.common.Log;
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.common.connection.Command;
+import net.neczpal.interstellarwar.common.connection.RoomData;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -11,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServerConnection extends Thread {
 
@@ -30,7 +31,7 @@ public class ServerConnection extends Thread {
 	private HashMap <Integer, User> mUsers = new HashMap <> ();
 
 	private boolean mIsRunning = false;
-	private Log log = new Log (this);
+	private Logger mLogger = Logger.getLogger (ServerConnection.class.getCanonicalName ());
 
 
 	public ServerConnection (int port) {
@@ -40,13 +41,13 @@ public class ServerConnection extends Thread {
 		try {
 			mServerSocket = new ServerSocket (mPort);
 		} catch (IOException e) {
-			log.e ("ServerConnection inicializási bibi: " + e.getMessage ());
+			mLogger.log (Level.SEVERE, "Server couldn't been created", e);
 		}
 		this.start ();
 	}
 
 	public void run () {
-		log.i ("Sever started.");
+		mLogger.log (Level.INFO, "Server started");
 
 		addRoom ("map01");
 		addRoom ("map02");
@@ -61,8 +62,8 @@ public class ServerConnection extends Thread {
 		while (mIsRunning) {
 			try {
 				addClient ();
-			} catch (IOException e) {
-				log.e ("ServerConnection futási bibi: " + e.getMessage ());
+			} catch (IOException ex) {
+				mLogger.log (Level.WARNING, "Server couldn't accept Client: " + ex.getMessage ());
 			}
 		}
 	}
@@ -72,15 +73,11 @@ public class ServerConnection extends Thread {
 		mIsRunning = false;
 		for (Client client : mClients.values ()) {
 			client.stopClient ();
-			try {
-				client.close ();
-			} catch (IOException ex) {
-				log.w ("stopServerConnection Client close bibi");
-			}
 		}
 		try {
 			mServerSocket.close ();
-		} catch (IOException e) {
+		} catch (IOException ex) {
+			mLogger.log (Level.WARNING, "ServerSocket couldn't close: " + ex.getMessage ());
 		}
 	}
 
@@ -90,8 +87,8 @@ public class ServerConnection extends Thread {
 			Room room = new Room (this, mapName);
 			room.setRoomId (mRoomIdCounter);
 			mRooms.put (mRoomIdCounter++, room);
-		} catch (IOException e) {
-			log.e (mapName + " is not a valid interstellarwar map :" + e.getMessage ());
+		} catch (IOException ex) {
+			mLogger.log (Level.WARNING, "Server couldn't add Room, because Map (" + mapName + ") couldn't load: " + ex.getMessage ());
 		}
 	}
 
@@ -103,13 +100,13 @@ public class ServerConnection extends Thread {
 
 	public void removeClient (int id) {
 		mClients.remove (id);
-		log.i ("Client (" + id + ") removed");
+		mLogger.log (Level.INFO, "Client removed with the ID (" + id + ")");
+
 		User user = getUser (id);
 		if (user == null)
 			return;
 		leaveRoom (user);
 		mUsers.remove (user.getId ());
-		log.i ("User (" + user + ") exits the connection.");
 	}
 
 	public int findClientByPort (int port) {
@@ -151,17 +148,19 @@ public class ServerConnection extends Thread {
 
 		sendToId (id, new Command (Command.Type.CONNECTION_READY, id));
 		sendToId (id, Command.Type.LIST_ROOMS, getRoomData ());
+
+		mLogger.log (Level.INFO, "-> User (" + newUser + ") entered the server");
 	}
 
 	private void exitServer (User user) {
 		removeClient (user.getId ());
+		mLogger.log (Level.INFO, "-> User (" + user + ") exits from the server");
 	}
 
 	private void leaveRoom (User user) {
 		int roomId = user.getRoomId ();
 		if (roomId != 0) {
 			Room room = getRoom (roomId);
-			log.i ("User (" + user + ") is leaving the Room (" + room + ")");
 			room.removeUser (user);
 			if (room.isEmpty () && room.isMapRunning ()) {
 				room.stopGame ();
@@ -170,22 +169,21 @@ public class ServerConnection extends Thread {
 			user.setRoomId (0);
 
 			listRoom ();
-		} else {
-			//			log.i ("User (" + user + ") is not in a room");
+			mLogger.log (Level.INFO, "-> User (" + user + ") left the Room (" + room + ")");
 		}
 	}
 
 	private void enterRoom (User user, Room room) {
 		leaveRoom (user);
 		if (room != null && !room.isFull () && !room.isMapRunning ()) {
-			log.i ("User (" + user + ") is connecting to the Room (" + room + ")");
 			user.setRoomId (room.getRoomId ());
 			room.addUser (user);
 			sendToId (user.getId (), new Command (Command.Type.MAP_DATA, user.getRoomIndex (), room.getGameServer ().getCore ().getData ()));
 
 			listRoom ();
+			mLogger.log (Level.INFO, "-> User (" + user + ") connected to the Room (" + room + ")");
 		} else {
-			log.i (user + " is connecting to the Room (" + room + "), but its full/running/not existing!");
+			mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't connect to the Room (" + room + "), because it was full/running/not existing");
 		}
 	}
 
@@ -197,20 +195,19 @@ public class ServerConnection extends Thread {
 			addRoom (room.getMapName ());
 
 			listRoom ();
-			log.i (user + " is starting the game in the Room (" + room + ")");
+			mLogger.log (Level.INFO, "-> User (" + user + ") started the game in the Room (" + room + ")");
 		} else {
-			log.i (user + " couldn't start the game in the Room (" + room + "), because it was not full/already started/not existing");
+			mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not yet full/running/not existing");
 		}
 	}
 
 	private void gameCommand (User user, Command command) {
 		Room room = getRoom (user.getRoomId ());
-		log.i ("User (" + user + ") in the Room (" + room + ") sent GAME_COMMAND " + command.data[1]);
+		mLogger.log (Level.INFO, "-> Received GameCommand (" + command + ")from User (" + user + ") in the Room (" + room + ")");
 		room.receive (command);
 	}
 
 	public void receive (Command command, int currentPort) {
-		log.i ("Got msg from clientcommon: " + command.type.toString () + " : " + currentPort);
 		switch (command.type) {
 			case ENTER_SERVER:
 				enterServer ((String) command.data[1], currentPort);
@@ -235,7 +232,9 @@ public class ServerConnection extends Thread {
 
 	//SEND
 	public void listRoom () {
+		ArrayList <RoomData> roomDatas = getRoomData ();
 		send (Command.Type.LIST_ROOMS, getRoomData ());
+		mLogger.log (Level.INFO, "<- Sending RoomDatas Size(" + roomDatas.size () + ")");
 	}
 
 	public void sendToId (int id, Command.Type type) {

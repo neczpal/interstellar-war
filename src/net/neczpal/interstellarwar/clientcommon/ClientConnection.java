@@ -1,9 +1,8 @@
 package net.neczpal.interstellarwar.clientcommon;
 
-import net.neczpal.interstellarwar.common.Command;
-import net.neczpal.interstellarwar.common.InterstellarWarCore;
-import net.neczpal.interstellarwar.common.Log;
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.common.connection.Command;
+import net.neczpal.interstellarwar.common.connection.RoomData;
+import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClientConnection extends Thread {
 
@@ -27,7 +28,7 @@ public class ClientConnection extends Thread {
 	private ObjectInputStream mIn;
 	private ObjectOutputStream mOut;
 
-	private Log log = new Log (this);
+	private Logger mLogger = Logger.getLogger (ClientConnection.class.getCanonicalName ());
 
 	public ClientConnection (String ip, String userName) throws IOException {
 		super ("ClientConnection " + userName);
@@ -55,15 +56,15 @@ public class ClientConnection extends Thread {
 						Command msg = (Command) object;
 						receive (msg);
 					} else {
-						log.w (object + " was not a Command");
+						mLogger.log (Level.WARNING, "-> Couldn't read " + object + ", because it wasn't a " + Command.class.getSimpleName ());
 					}
-				} catch (ClassNotFoundException | ClassCastException ex) {
-					log.e (ex.getMessage ());
-					ex.printStackTrace ();
+				} catch (ClassNotFoundException ex) {
+					mLogger.log (Level.SEVERE, "-> Couldn't read an object: " + ex.getMessage ());
 				}
 			}
-		} catch (IOException e) {
-			log.e ("gameconnection bibi" + e.getMessage ());
+		} catch (IOException ex2) {
+			mLogger.log (Level.WARNING, "Client stopped: " + ex2.getMessage ());
+
 			stopClientConnection ();
 			stopGame ();
 			mUserInterface.connectionDropped ();
@@ -74,25 +75,22 @@ public class ClientConnection extends Thread {
 		mIsRunning = false;
 		send (Command.Type.EXIT_SERVER);
 		try {
-			mOut.close ();
-			mIn.close ();
 			mSocket.close ();
-		} catch (IOException e) {
-			log.e (e.getMessage ());
+		} catch (IOException ex) {
+			mLogger.log (Level.WARNING, "Coulnd't close socket: " + ex.getMessage ());
 		}
 	}
-
 
 	//RECEIVE
 	private void connectionReady (int newConnectionId) {
 		mConnectionId = newConnectionId;
 		mUserInterface.connectionReady ();
-		log.i ("Connection succesful id: " + mConnectionId);
+		mLogger.log (Level.INFO, "-> Connected to the server. ID (" + mConnectionId + ")");
 	}
 
-	private void listRooms (ArrayList <RoomData> roomData) {
-		mUserInterface.listRooms (roomData);
-		log.i ("Room datas loaded");
+	private void listRooms (ArrayList <RoomData> roomDatas) {
+		mUserInterface.listRooms (roomDatas);
+		mLogger.log (Level.INFO, "-> RoomDatas loaded. Size (" + roomDatas.size () + ")");
 	}
 
 	private void loadMap (int roomIndex, ArrayList <Serializable> mapData) {
@@ -101,23 +99,21 @@ public class ClientConnection extends Thread {
 
 		mGameClient = new InterstellarWarClient (core, this);
 		mUserInterface.setIsInRoom (true);
-		log.i ("Map data received");
+		mLogger.log (Level.INFO, "-> MapData loaded. RoomIndex (" + mRoomIndex + ")");
 	}
 
 	private void startGame (String mapName) {
 		mUserInterface.startGame (mapName);
 		mGameClient.getCore ().start ();
-		log.i (" (" + mapName + ") is ready to play.");
+		mLogger.log (Level.INFO, "-> Started the game with Map (" + mapName + ")");
 	}
 
 	private void gameCommand (Command command) {
 		mGameClient.receive (command);
-		log.i (command.data[0] + " game command received.");
+		mLogger.log (Level.INFO, "-> Received GameCommand (" + command + ")");
 	}
 
 	public void receive (Command command) {
-		log.i ("Got msg from connection: " + command.type.toString ());
-
 		switch (command.type) {
 			case CONNECTION_READY:
 				connectionReady ((int) command.data[0]);
@@ -144,20 +140,24 @@ public class ClientConnection extends Thread {
 	//SEND
 	public void enterServer () {
 		send (Command.Type.ENTER_SERVER, mUserName);
+		mLogger.log (Level.INFO, "<- Connecting to the server Username (" + mUserName + ")");
 	}
 
 	public void leaveRoom () {
 		mUserInterface.stopGame ();
 		send (Command.Type.LEAVE_ROOM);
 		mUserInterface.setIsInRoom (false);
+		mLogger.log (Level.INFO, "<- Leaving the Room");
 	}
 
 	public void enterRoom (int roomId) {
 		send (Command.Type.ENTER_ROOM, roomId);
+		mLogger.log (Level.INFO, "<- Entering the Room Id (" + roomId + ")");
 	}
 
 	public void startRoom () {
 		send (Command.Type.START_ROOM);
+		mLogger.log (Level.INFO, "<- Starting the Room");
 	}
 
 	public void send (Command.Type type) {
@@ -171,9 +171,13 @@ public class ClientConnection extends Thread {
 	public void send (Command command) {
 		command.addHeader (mConnectionId);
 		try {
-			mOut.writeObject (command);
-		} catch (IOException e) {
-			log.e ("Nem sikerült elküldeni:" + command);
+			if (!mSocket.isClosed ()) {
+				mOut.writeObject (command);
+			} else {
+				mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + "), because socket was closed.");
+			}
+		} catch (IOException ex) {
+			mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + ")" + ex.getMessage ());
 		}
 	}
 

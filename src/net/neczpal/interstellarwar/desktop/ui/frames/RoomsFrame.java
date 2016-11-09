@@ -1,7 +1,7 @@
 package net.neczpal.interstellarwar.desktop.ui.frames;
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.common.connection.RoomData;
 import net.neczpal.interstellarwar.desktop.ui.models.RoomsDataTableModel;
 import net.neczpal.interstellarwar.desktop.ui.models.UserListModel;
 

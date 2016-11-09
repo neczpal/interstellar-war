@@ -1,4 +1,4 @@
-package net.neczpal.interstellarwar.common;
+package net.neczpal.interstellarwar.common.game;
 
 import java.io.*;
 import java.util.ArrayList;

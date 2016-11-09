@@ -1,4 +1,4 @@
-package net.neczpal.interstellarwar.common;
+package net.neczpal.interstellarwar.common.connection;
 
 import java.io.Serializable;
 
@@ -21,6 +21,11 @@ public class Command implements Serializable {
 		System.arraycopy (header_data, 0, tempData, 0, header_data.length);
 		System.arraycopy (data, 0, tempData, header_data.length, data.length);
 		this.data = tempData;
+	}
+
+	@Override
+	public String toString () {
+		return type.toString () + "[" + data.length + "]";
 	}
 
 	public enum Type {

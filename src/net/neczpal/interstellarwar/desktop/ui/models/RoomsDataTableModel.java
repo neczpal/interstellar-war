@@ -1,6 +1,6 @@
 package net.neczpal.interstellarwar.desktop.ui.models;
 
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.common.connection.RoomData;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -21,15 +21,18 @@ public class RoomsDataTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt (int rowIndex, int columnIndex) {
-		RoomData roomData = mRoomDatas.get (rowIndex);
-		switch (columnIndex) {
-			case 0:
-				return roomData.getMapName ();
-			case 1:
-				return roomData.getUsers ().size () + "/" + roomData.getMaxUserCount ();
-			default: // case 3:
-				return roomData.isRunning ();
+		if (rowIndex < mRoomDatas.size ()) {
+			RoomData roomData = mRoomDatas.get (rowIndex);
+			switch (columnIndex) {
+				case 0:
+					return roomData.getMapName ();
+				case 1:
+					return roomData.getUsers ().size () + "/" + roomData.getMaxUserCount ();
+				default: // case 3:
+					return roomData.isRunning ();
+			}
 		}
+		return "";
 	}
 
 	@Override

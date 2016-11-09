@@ -1,12 +1,13 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.Command;
-import net.neczpal.interstellarwar.common.Log;
+import net.neczpal.interstellarwar.common.connection.Command;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Client extends Thread {
 	private ServerConnection mServerConnection;
@@ -18,25 +19,21 @@ public class Client extends Thread {
 	private int mPort;
 	private boolean mIsRunning;
 
-	private Log log = new Log (this);
+	private Logger mLogger = Logger.getLogger (Client.class.getCanonicalName ());
 
 
-	public Client (ServerConnection server, Socket socket) {
+	public Client (ServerConnection server, Socket socket) throws IOException {
 		this.mSocket = socket;
 		this.mServerConnection = server;
 
 		mPort = socket.getPort ();
 
-		try {
-			mOut = new ObjectOutputStream (socket.getOutputStream ());
-			mIn = new ObjectInputStream (socket.getInputStream ());
-		} catch (IOException e) {
-			log.e ("Client bibi" + e.getMessage ());
-		}
+		mOut = new ObjectOutputStream (socket.getOutputStream ());
+		mIn = new ObjectInputStream (socket.getInputStream ());
 	}
 
 	public void run () {
-		log.i ("Client ready, mPort: " + mPort);
+		mLogger.log (Level.INFO, "Client ready with the Port (" + mPort + ")");
 		mIsRunning = true;
 		try {
 			while (mIsRunning) {
@@ -45,27 +42,26 @@ public class Client extends Thread {
 					if (object instanceof Command) {
 						Command command = (Command) object;
 						mServerConnection.receive (command, mPort);
+					} else {
+						mLogger.log (Level.WARNING, "-> Couldn't read " + object + ", because it wasn't a " + Command.class.getSimpleName ());
 					}
 				} catch (ClassNotFoundException ex) {
-					System.err.println (ex.getMessage ());
+					mLogger.log (Level.SEVERE, "-> Couldn't read an object: " + ex.getMessage ());
 				}
 			}
-		} catch (IOException e) {
+		} catch (IOException ex2) {
+			mLogger.log (Level.WARNING, "Client stopped: " + ex2.getMessage ());
 			stopClient ();
-			try {
-				close ();
-			} catch (IOException e1) {
-				e1.printStackTrace ();
-			}
 		}
 	}
 
 	public void stopClient () {
 		mIsRunning = false;
-	}
-
-	public void close () throws IOException {
-		mSocket.close ();
+		try {
+			mSocket.close ();
+		} catch (IOException ex) {
+			mLogger.log (Level.WARNING, "Coulnd't close socket: " + ex.getMessage ());
+		}
 	}
 
 	public int getPort () {
@@ -78,10 +74,10 @@ public class Client extends Thread {
 				mOut.writeObject (command);
 				return true;
 			} else {
-				log.w ("Socket is closed cannot send " + command.type);
+				mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + "), because socket was closed.");
 			}
-		} catch (IOException e) {
-			log.e ("Nem sikerült elküldeni ezt: " + command.type + "\n" + e.toString ());
+		} catch (IOException ex) {
+			mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + "): " + ex.getMessage ());
 		}
 		return false;
 	}
