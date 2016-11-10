@@ -23,13 +23,16 @@ public class Client extends Thread {
 
 
 	public Client (ServerConnection server, Socket socket) throws IOException {
-		this.mSocket = socket;
-		this.mServerConnection = server;
+		mSocket = socket;
+		mServerConnection = server;
 
 		mPort = socket.getPort ();
 
 		mOut = new ObjectOutputStream (socket.getOutputStream ());
 		mIn = new ObjectInputStream (socket.getInputStream ());
+
+		mLogger.setParent (Logger.getLogger (ServerConnection.class.getCanonicalName ()));
+		mLogger.setLevel (null);
 	}
 
 	public void run () {

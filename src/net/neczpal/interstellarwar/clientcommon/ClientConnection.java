@@ -177,7 +177,7 @@ public class ClientConnection extends Thread {
 				mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + "), because socket was closed.");
 			}
 		} catch (IOException ex) {
-			mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + ")" + ex.getMessage ());
+			mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + "): " + ex.getMessage ());
 		}
 	}
 

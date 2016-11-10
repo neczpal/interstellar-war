@@ -38,6 +38,7 @@ public class ServerConnection extends Thread {
 		super ("ServerConnection");
 		mPort = port;
 		mRoomServer = new RoomServer (this);
+
 		try {
 			mServerSocket = new ServerSocket (mPort);
 		} catch (IOException e) {
@@ -87,6 +88,7 @@ public class ServerConnection extends Thread {
 			Room room = new Room (this, mapName);
 			room.setRoomId (mRoomIdCounter);
 			mRooms.put (mRoomIdCounter++, room);
+			mLogger.log (Level.INFO, "New room created with the Map (" + mapName + ")");
 		} catch (IOException ex) {
 			mLogger.log (Level.WARNING, "Server couldn't add Room, because Map (" + mapName + ") couldn't load: " + ex.getMessage ());
 		}
