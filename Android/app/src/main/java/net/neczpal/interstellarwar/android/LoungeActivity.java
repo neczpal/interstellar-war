@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import net.neczpal.interstellarwar.client.UserInterface;
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.clientcommon.UserInterface;
+import net.neczpal.interstellarwar.common.connection.RoomData;
+
+import java.util.ArrayList;
 
 public class LoungeActivity extends Activity implements UserInterface {
 
@@ -52,11 +54,11 @@ public class LoungeActivity extends Activity implements UserInterface {
 	}
 
 	@Override
-	public void listRooms (final RoomData[] roomDatas) {
+	public void listRooms (final ArrayList <RoomData> arrayList) {
 		runOnUiThread (new Runnable () {
 			@Override
 			public void run () {
-				mRoomsListView.setAdapter (new RoomDataArrayAdapter (LoungeActivity.this, R.layout.view_roomlist_element, roomDatas));
+				mRoomsListView.setAdapter (new RoomDataArrayAdapter (LoungeActivity.this, R.layout.view_roomlist_element, arrayList));
 			}
 		});
 	}

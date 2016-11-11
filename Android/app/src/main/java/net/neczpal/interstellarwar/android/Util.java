@@ -7,19 +7,19 @@ public class Util {
 	//
 	//	private static final Color DEFAULT_COLOR = Color.WHITE;
 	//
-	//	public static void drawString (GL10 gl10, String string, double x, double y) {
+	//	public static void drawString (GL10 gl10, String string, float x, float y) {
 	//		drawString (string, x, y, DEFAULT_FONTSIZE);
 	//	}
 	//
-	//	public static void drawString (GL10 gl10, String string, double x, double y, int fontSize) {
+	//	public static void drawString (GL10 gl10, String string, float x, float y, int fontSize) {
 	//		drawString (string, x, y, fontSize, DEFAULT_COLOR);
 	//	}
 	//
-	//	public static void drawString (GL10 gl10, String string, double x, double y, Color color) {
+	//	public static void drawString (GL10 gl10, String string, float x, float y, Color color) {
 	//		drawString (string, x, y, DEFAULT_FONTSIZE, color);
 	//	}
 	//
-	//	public static void drawString (GL10 gl10, String string, double x, double y, int fontSize, Color color) {
+	//	public static void drawString (GL10 gl10, String string, float x, float y, int fontSize, Color color) {
 	//		color.setGLColor ();
 	//		x -= string.length () * fontSize / 2;//TO THE CENTER
 	//		y -= fontSize / 2;//TO THE CENTER
@@ -28,8 +28,8 @@ public class Util {
 	//		}
 	//	}
 	//
-	//	public static void drawRect (GL10 gl10, double x, double y, double w, double h, int tex) {
-	//		double wx = w + x, hy = h + y;
+	//	public static void drawRect (GL10 gl10, float x, float y, float w, float h, int tex) {
+	//		float wx = w + x, hy = h + y;
 	//
 	//		glBindTexture (GL_TEXTURE_2D, tex);
 	//		glBegin (GL_QUADS);
@@ -46,21 +46,21 @@ public class Util {
 	//		glEnd ();
 	//	}
 	//
-	//	public static void drawCircle (GL10 gl10, double x, double y, double r) {
+	//	public static void drawCircle (GL10 gl10, float x, float y, float r) {
 	//		drawCircle (x, y, r, DEFAULT_COLOR);
 	//	}
 	//
-	//	public static void drawCircle (GL10 gl10, double x, double y, double r, Color color) {
+	//	public static void drawCircle (GL10 gl10, float x, float y, float r, Color color) {
 	//		//		drawCircle (x, y, r, color, -1);
 	//		glDisable (GL_TEXTURE_2D);
 	//		color.setGLColor ();
 	//		glBegin (GL_POLYGON);
 	//
 	//		for (float angle = 0.0f; angle < 360.0f; angle += 2.0f) {
-	//			double radian = angle * (Math.PI / 180.0f);
+	//			float radian = angle * (Math.PI / 180.0f);
 	//
-	//			double xcos = Math.cos (radian);
-	//			double ysin = Math.sin (radian);
+	//			float xcos = Math.cos (radian);
+	//			float ysin = Math.sin (radian);
 	//			glVertex2d (xcos * r + x, ysin * r + y);
 	//		}
 	//
@@ -68,21 +68,21 @@ public class Util {
 	//		glEnable (GL_TEXTURE_2D);
 	//	}
 	//
-	//	public static void drawCircle (GL10 gl10, double x, double y, double r, Color color, int tex) {
+	//	public static void drawCircle (GL10 gl10, float x, float y, float r, Color color, int tex) {
 	//		glBindTexture (GL_TEXTURE_2D, tex);
 	//		color.setGLColor ();
 	//
 	//		glBegin (GL_POLYGON);
 	//
 	//		for (float angle = 0.0f; angle < 360.0f; angle += 2.0f) {
-	//			double radian = angle * (Math.PI / 180.0f);
+	//			float radian = angle * (Math.PI / 180.0f);
 	//
-	//			double xcos = Math.cos (radian);
-	//			double ysin = Math.sin (radian);
-	//			double rx = xcos * r + x;
-	//			double ry = ysin * r + y;
-	//			double tx = xcos * 0.5 + 0.5;
-	//			double ty = ysin * 0.5 + 0.5;
+	//			float xcos = Math.cos (radian);
+	//			float ysin = Math.sin (radian);
+	//			float rx = xcos * r + x;
+	//			float ry = ysin * r + y;
+	//			float tx = xcos * 0.5 + 0.5;
+	//			float ty = ysin * 0.5 + 0.5;
 	//			glTexCoord2d (tx, ty);
 	//			glVertex2d (rx, ry);
 	//		}
@@ -160,11 +160,11 @@ public class Util {
 	//	}
 	//
 	//	public static void drawArrow (GL10 gl10, Point a, Point b, Color color, int arrowSize) {
-	//		double length = a.distance (b);
-	//		double lx = b.getX () - a.getX ();
-	//		double ly = b.getY () - a.getY ();
-	//		double hx = lx / length * arrowSize;
-	//		double hy = ly / length * arrowSize;
+	//		float length = a.distance (b);
+	//		float lx = b.getX () - a.getX ();
+	//		float ly = b.getY () - a.getY ();
+	//		float hx = lx / length * arrowSize;
+	//		float hy = ly / length * arrowSize;
 	//
 	//		Point ta = new Point (b.getX (), b.getY ());
 	//		Point tb = new Point (b.getX () - hx / 2, b.getY () - hy / 2);

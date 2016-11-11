@@ -4,8 +4,10 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import net.neczpal.interstellarwar.client.UserInterface;
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.clientcommon.UserInterface;
+import net.neczpal.interstellarwar.common.connection.RoomData;
+
+import java.util.ArrayList;
 
 public class InterstellarWarActivity extends Activity implements UserInterface, Runnable {
 
@@ -34,6 +36,12 @@ public class InterstellarWarActivity extends Activity implements UserInterface, 
 	}
 
 	@Override
+	public void onBackPressed () {
+		super.onBackPressed ();
+		LoginActivity.mConnection.leaveRoom ();
+	}
+
+	@Override
 	public void connectionReady () {
 	}
 
@@ -43,7 +51,7 @@ public class InterstellarWarActivity extends Activity implements UserInterface, 
 	}
 
 	@Override
-	public void listRooms (RoomData[] roomDatas) {
+	public void listRooms (ArrayList <RoomData> arrayList) {
 
 	}
 

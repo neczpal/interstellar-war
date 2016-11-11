@@ -7,11 +7,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import net.neczpal.interstellarwar.client.ClientConnection;
-import net.neczpal.interstellarwar.client.UserInterface;
-import net.neczpal.interstellarwar.common.RoomData;
+import net.neczpal.interstellarwar.clientcommon.ClientConnection;
+import net.neczpal.interstellarwar.clientcommon.UserInterface;
+import net.neczpal.interstellarwar.common.connection.RoomData;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class LoginActivity extends Activity implements UserInterface {
 
@@ -58,7 +59,8 @@ public class LoginActivity extends Activity implements UserInterface {
 	}
 
 	@Override
-	public void listRooms (RoomData[] roomDatas) {
+	public void listRooms (ArrayList <RoomData> arrayList) {
+
 	}
 
 	@Override
