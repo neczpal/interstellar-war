@@ -1,7 +1,7 @@
 package net.neczpal.interstellarwar.desktop.ui.frames;
 
 import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
-import net.neczpal.interstellarwar.desktop.Textures;
+import net.neczpal.interstellarwar.desktop.GLUtil;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -20,9 +20,9 @@ public class GameFrame extends Thread {
 
 	private InterstellarWarPanel mGamePanel;
 
-	public GameFrame (String mTitle, int displayModeIndex, InterstellarWarClient client) {
-		super (mTitle);
-		this.mName = mTitle;
+	public GameFrame (String name, int displayModeIndex, InterstellarWarClient client) {
+		super (name);
+		this.mName = name;
 		this.mDisplayModeIndex = displayModeIndex;
 		this.mGamePanel = new InterstellarWarPanel (client);
 		this.mIsGameFrameRunning = false;
@@ -30,15 +30,13 @@ public class GameFrame extends Thread {
 
 	@Override
 	public void run () {
+		mIsGameFrameRunning = true;
+
 		initDisplay ();
 		initGL ();
-		try {
-			Textures.loadTextures ();
-		} catch (IOException ex) {
-			ex.printStackTrace ();//#TODO LOG
-		}
-		mGamePanel.init ();
-		mIsGameFrameRunning = true;
+		initTextures ();
+		mGamePanel.initGame ();
+
 		while (!Display.isCloseRequested () && mIsGameFrameRunning) {
 			glClear (GL_COLOR_BUFFER_BIT);
 
@@ -52,8 +50,6 @@ public class GameFrame extends Thread {
 			Display.update ();
 		}
 		clean ();
-		mGamePanel.getInterstellarWarClient ().getCore ().stopGame ();
-		mGamePanel.getInterstellarWarClient ().leaveRoom ();
 	}
 
 	private void initDisplay () {
@@ -86,10 +82,24 @@ public class GameFrame extends Thread {
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
+	private void initTextures () {
+		try {
+			GLUtil.init ();
+			mGamePanel.initTextures ();
+		} catch (IOException ex) {
+			System.err.println ("Textures failed to load.");
+		}
+	}
+
 	private void clean () {
+		mIsGameFrameRunning = false;
+
 		Display.destroy ();
 		Keyboard.destroy ();
 		Mouse.destroy ();
+
+		mGamePanel.getInterstellarWarClient ().getCore ().stopGame ();
+		mGamePanel.getInterstellarWarClient ().leaveRoom ();
 	}
 
 	public void stopGameFrame () {

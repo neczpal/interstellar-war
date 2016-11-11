@@ -1,6 +1,6 @@
 package net.neczpal.interstellarwar.desktop.geom;
 
-import net.neczpal.interstellarwar.desktop.Util;
+import net.neczpal.interstellarwar.desktop.GLUtil;
 
 public class Rect {
 
@@ -19,7 +19,7 @@ public class Rect {
 
 	public void draw () {
 		mColor.setGLColor ();
-		Util.drawRect (x, y, width, height, mTexture);
+		GLUtil.drawRect (x, y, width, height, mTexture);
 	}
 
 	public boolean isInside (Point point) {

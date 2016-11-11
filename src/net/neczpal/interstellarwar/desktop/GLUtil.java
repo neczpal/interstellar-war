@@ -3,15 +3,26 @@ package net.neczpal.interstellarwar.desktop;
 import net.neczpal.interstellarwar.desktop.geom.Color;
 import net.neczpal.interstellarwar.desktop.geom.Point;
 
+import java.io.IOException;
+
 import static org.lwjgl.opengl.GL11.*;
 
-public class Util {
+public final class GLUtil {
 
 	private static final int DEFAULT_FONTSIZE = 16;
 	private static final int DEFAULT_ARROWSIZE = 40;
 
 	private static final Color DEFAULT_COLOR = Color.WHITE;
 	private static final Color DEFAULT_FONT_COLOR = Color.WHITE;
+
+	private static int[] characters;
+
+	private GLUtil () {
+	}
+
+	public static void init () throws IOException {
+		characters = Loader.loadTextures ("res/textures/font64.png", 64, 64);
+	}
 
 	public static void drawString (String string, float x, float y) {
 		drawString (string, x, y, DEFAULT_FONTSIZE);
@@ -30,7 +41,7 @@ public class Util {
 		x -= string.length () * fontSize / 2;//TO THE CENTER
 		y -= fontSize / 2;//TO THE CENTER
 		for (int i = 0; i < string.length (); i++) {
-			drawRect (x + i * fontSize, y, fontSize, fontSize, Textures.characters[string.charAt (i)]);
+			drawRect (x + i * fontSize, y, fontSize, fontSize, characters[string.charAt (i)]);
 		}
 	}
 
@@ -178,8 +189,7 @@ public class Util {
 		tb.rotate (b, -45);
 		tc.rotate (b, 45);
 
-		color.setGLColor ();
-		drawLine (a, b);
-		drawTriangle (ta, tb, tc);
+		drawLine (a, b, color);
+		drawTriangle (ta, tb, tc, color);
 	}
 }

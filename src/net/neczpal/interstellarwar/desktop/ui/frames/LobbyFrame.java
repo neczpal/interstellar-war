@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RoomsFrame extends JFrame {
+public class LobbyFrame extends JFrame {
 	private JTable mRoomsTable;
 	private JLabel mRoomPicture;//#TODO
 	private JList mRoomUserList;
@@ -36,7 +36,7 @@ public class RoomsFrame extends JFrame {
 
 	private HashMap <Integer, ArrayList <String>> mAllRoomUsers = new HashMap <> ();
 
-	public RoomsFrame (ClientConnection clientConnection) {
+	public LobbyFrame (ClientConnection clientConnection) {
 		super ("Rooms");
 
 		mConnection = clientConnection;
@@ -77,9 +77,9 @@ public class RoomsFrame extends JFrame {
 				}
 			}
 		});
-		mRoomsTable.setDefaultRenderer (String.class, new RoomTableCellRenderer (mRoomsTable.getDefaultRenderer (String.class)));
-		mRoomsTable.setDefaultRenderer (Integer.class, new RoomTableCellRenderer (mRoomsTable.getDefaultRenderer (Integer.class)));
+		//		mRoomsTable.setDefaultRenderer (String.class, new RoomTableCellRenderer (mRoomsTable.getDefaultRenderer (String.class)));
 		mRoomsTable.setDefaultRenderer (Boolean.class, new RoomTableCellRenderer (mRoomsTable.getDefaultRenderer (Boolean.class)));
+		mRoomsTable.setDefaultRenderer (Object.class, new RoomTableCellRenderer (mRoomsTable.getDefaultRenderer (Object.class)));
 
 		leftPanel.add (new JScrollPane (mRoomsTable));
 

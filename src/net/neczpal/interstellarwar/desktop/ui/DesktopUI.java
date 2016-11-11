@@ -4,15 +4,15 @@ import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.clientcommon.UserInterface;
 import net.neczpal.interstellarwar.common.connection.RoomData;
 import net.neczpal.interstellarwar.desktop.ui.frames.GameFrame;
+import net.neczpal.interstellarwar.desktop.ui.frames.LobbyFrame;
 import net.neczpal.interstellarwar.desktop.ui.frames.LoginFrame;
-import net.neczpal.interstellarwar.desktop.ui.frames.RoomsFrame;
 
 import javax.swing.*;
 import java.util.ArrayList;
 
 public class DesktopUI implements UserInterface {
 	private LoginFrame mLoginFrame;
-	private RoomsFrame mRoomsFrame;
+	private LobbyFrame mRoomsFrame;
 	private GameFrame mGameFrame;
 	private ClientConnection mConnection;
 
@@ -32,7 +32,7 @@ public class DesktopUI implements UserInterface {
 	@Override
 	public void connectionReady () {
 		mLoginFrame.dispose ();
-		mRoomsFrame = new RoomsFrame (mConnection);
+		mRoomsFrame = new LobbyFrame (mConnection);
 		mRoomsFrame.setVisible (true);
 	}
 

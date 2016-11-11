@@ -5,8 +5,8 @@ import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
 import net.neczpal.interstellarwar.common.game.Planet;
 import net.neczpal.interstellarwar.common.game.Road;
 import net.neczpal.interstellarwar.common.game.SpaceShip;
-import net.neczpal.interstellarwar.desktop.Textures;
-import net.neczpal.interstellarwar.desktop.Util;
+import net.neczpal.interstellarwar.desktop.GLUtil;
+import net.neczpal.interstellarwar.desktop.Loader;
 import net.neczpal.interstellarwar.desktop.geom.Color;
 import net.neczpal.interstellarwar.desktop.geom.Point;
 import net.neczpal.interstellarwar.desktop.geom.Rect;
@@ -15,8 +15,11 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 
 public class InterstellarWarPanel {
 	private static final int EDGE_MOVE_DISTANCE = 20;
@@ -31,19 +34,25 @@ public class InterstellarWarPanel {
 	private Planet mSelectedPlanetFrom = null;
 	private Planet mSelectedPlanetTo = null;
 
+	private Textures mTextures;
+
 	public InterstellarWarPanel (InterstellarWarClient client) {
 		mCore = client.getCore ();
 		mInterstellarWarClient = client;
 	}
 
-	public void init () {
+	public void initTextures () throws IOException {
+		mTextures = new Textures ();
+	}
+
+	public void initGame () {
 		initBackground ();
 		initViewPort ();
 	}
 
 	private void initBackground () {
 		mBackground = new Rect (0, 0, Display.getWidth (), Display.getHeight ());
-		mBackground.setTexture (Textures.InterstellarWar.background[mCore.getBackgroundTextureIndex ()]);
+		mBackground.setTexture (mTextures.background[mCore.getBackgroundTextureIndex ()]);
 	}
 
 	private void initViewPort () {
@@ -139,10 +148,10 @@ public class InterstellarWarPanel {
 		GL11.glTranslated (mViewPort.getX (), mViewPort.getY (), 0);
 
 		if (mSelectedPlanetFrom != null) {
-			Util.drawCircle (mSelectedPlanetFrom.getX (), mSelectedPlanetFrom.getY (), mSelectedPlanetFrom.getRadius (), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+			GLUtil.drawCircle (mSelectedPlanetFrom.getX (), mSelectedPlanetFrom.getY (), mSelectedPlanetFrom.getRadius (), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 		if (mSelectedPlanetTo != null) {
-			Util.drawCircle (mSelectedPlanetTo.getX (), mSelectedPlanetTo.getY (), mSelectedPlanetTo.getRadius (), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+			GLUtil.drawCircle (mSelectedPlanetTo.getX (), mSelectedPlanetTo.getY (), mSelectedPlanetTo.getRadius (), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 
 		for (Road road : roads) {
@@ -154,16 +163,12 @@ public class InterstellarWarPanel {
 			drawPlanet (planet);
 		}
 
-		try {
-			for (SpaceShip spaceShip : spaceShips) {
-				drawSpaceShip (spaceShip);
-			}
-		} catch (ConcurrentModificationException ex) {
+		for (SpaceShip spaceShip : spaceShips) {
+			drawSpaceShip (spaceShip);
 		}
-		//#TODO ConcurrentModificationException toDel list delete here??
 
 		if (mSelectedPlanetTo != null) {
-			Util.drawArrow (new Point (mSelectedPlanetFrom.getX (), mSelectedPlanetFrom.getY ()),
+			GLUtil.drawArrow (new Point (mSelectedPlanetFrom.getX (), mSelectedPlanetFrom.getY ()),
 					new Point (mSelectedPlanetTo.getX (), mSelectedPlanetTo.getY ()),
 					Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
@@ -172,26 +177,20 @@ public class InterstellarWarPanel {
 	}
 
 	private void drawRoad (Road road) {
-		Util.drawLine (new Point (road.getFrom ().getX (), road.getFrom ().getY ()),
+		GLUtil.drawLine (new Point (road.getFrom ().getX (), road.getFrom ().getY ()),
 				new Point (road.getTo ().getX (), road.getTo ().getY ()));
 	}
 
 	private void drawPlanet (Planet planet) {
-		Util.drawCircle (planet.getX (), planet.getY (), planet.getRadius (), Color.values ()[planet.getOwnedBy ()], Textures.InterstellarWar.planet[planet.getTextureIndex ()]);
-		Util.drawString (Integer.toString (planet.getUnitsNumber ()), planet.getX (), planet.getY (), Color.values ()[planet.getOwnedBy ()]);
+		GLUtil.drawCircle (planet.getX (), planet.getY (), planet.getRadius (), Color.values ()[planet.getOwnedBy ()], mTextures.planet[planet.getTextureIndex ()]);
+		GLUtil.drawString (Integer.toString (planet.getUnitsNumber ()), planet.getX (), planet.getY (), Color.values ()[planet.getOwnedBy ()]);
 	}
 
-	private void drawSpaceShip (SpaceShip spaceShip) {//#TODO do it with hashmap
-		if (spaceShip == null)
-			return;
+	private void drawSpaceShip (SpaceShip spaceShip) {
+		int spaceshipType = spaceShip.getTextureIndex ();
 
-		int spaceshipType = spaceShip.getUnitsNumber () / 10;
-		if (spaceshipType > 10) {
-			spaceshipType = 10;
-		}
-
-		float w = Textures.InterstellarWar.spaceshipDimens[spaceshipType][0];
-		float h = Textures.InterstellarWar.spaceshipDimens[spaceshipType][1];
+		float w = mTextures.spaceshipDimens[spaceshipType][0];
+		float h = mTextures.spaceshipDimens[spaceshipType][1];
 
 		Planet from = spaceShip.getFromPlanet ();
 		Planet to = spaceShip.getToPlanet ();
@@ -215,12 +214,38 @@ public class InterstellarWarPanel {
 		GL11.glPushMatrix ();
 		GL11.glTranslated (spaceShip.getCurrentTick () * spaceShip.getVx (), spaceShip.getCurrentTick () * spaceShip.getVy (), 0);
 
-		Util.drawQuad (a, b, c, d, Color.values ()[spaceShip.getOwnedBy ()], Textures.InterstellarWar.spaceship[spaceshipType]);
+		GLUtil.drawQuad (a, b, c, d, Color.values ()[spaceShip.getOwnedBy ()], mTextures.spaceship[spaceshipType]);
 
 		GL11.glPopMatrix ();
 	}
 
 	public InterstellarWarClient getInterstellarWarClient () {
 		return mInterstellarWarClient;
+	}
+
+	private class Textures {
+		public int[] planet;
+		public int[] spaceship;
+		public float[][] spaceshipDimens;
+		public int[] background;
+
+		public Textures () throws IOException {
+			planet = new int[Planet.PLANET_TYPES];
+			for (int i = 0; i < planet.length; i++) {
+				planet[i] = Loader.loadTexture ("res/textures/planet" + (i + 1) + ".png");
+			}
+			spaceship = new int[SpaceShip.SPACESHIP_TYPES];
+			spaceshipDimens = new float[SpaceShip.SPACESHIP_TYPES][2];
+			for (int i = 0; i < spaceship.length; i++) {
+				spaceship[i] = Loader.loadTexture ("res/textures/spaceship" + (i + 1) + ".png");
+				BufferedImage image = ImageIO.read (new File ("res/textures/spaceship" + (i + 1) + ".png"));
+				spaceshipDimens[i][0] = image.getWidth () / 4.0f;
+				spaceshipDimens[i][1] = image.getHeight () / 4.0f;
+			}
+			background = new int[InterstellarWarCore.BACKGROUND_TYPES];
+			for (int i = 0; i < background.length; i++) {
+				background[i] = Loader.loadTexture ("res/textures/background" + (i + 1) + ".png");
+			}
+		}
 	}
 }
