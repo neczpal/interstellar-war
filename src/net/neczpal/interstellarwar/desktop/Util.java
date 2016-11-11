@@ -13,19 +13,19 @@ public class Util {
 	private static final Color DEFAULT_COLOR = Color.WHITE;
 	private static final Color DEFAULT_FONT_COLOR = Color.WHITE;
 
-	public static void drawString (String string, double x, double y) {
+	public static void drawString (String string, float x, float y) {
 		drawString (string, x, y, DEFAULT_FONTSIZE);
 	}
 
-	public static void drawString (String string, double x, double y, int fontSize) {
+	public static void drawString (String string, float x, float y, int fontSize) {
 		drawString (string, x, y, fontSize, DEFAULT_FONT_COLOR);
 	}
 
-	public static void drawString (String string, double x, double y, Color color) {
+	public static void drawString (String string, float x, float y, Color color) {
 		drawString (string, x, y, DEFAULT_FONTSIZE, color);
 	}
 
-	public static void drawString (String string, double x, double y, int fontSize, Color color) {
+	public static void drawString (String string, float x, float y, int fontSize, Color color) {
 		color.setGLColor ();
 		x -= string.length () * fontSize / 2;//TO THE CENTER
 		y -= fontSize / 2;//TO THE CENTER
@@ -34,63 +34,63 @@ public class Util {
 		}
 	}
 
-	public static void drawRect (double x, double y, double w, double h, int tex) {
-		double wx = w + x, hy = h + y;
+	public static void drawRect (float x, float y, float w, float h, int tex) {
+		float wx = w + x, hy = h + y;
 
 		glBindTexture (GL_TEXTURE_2D, tex);
 		glBegin (GL_QUADS);
 		{
 			glTexCoord2f (0, 1);
-			glVertex2d (x, y);
+			glVertex2f (x, y);
 			glTexCoord2f (1, 1);
-			glVertex2d (wx, y);
+			glVertex2f (wx, y);
 			glTexCoord2f (1, 0);
-			glVertex2d (wx, hy);
+			glVertex2f (wx, hy);
 			glTexCoord2f (0, 0);
-			glVertex2d (x, hy);
+			glVertex2f (x, hy);
 		}
 		glEnd ();
 	}
 
-	public static void drawCircle (double x, double y, double r) {
+	public static void drawCircle (float x, float y, float r) {
 		drawCircle (x, y, r, DEFAULT_COLOR);
 	}
 
-	public static void drawCircle (double x, double y, double r, Color color) {
+	public static void drawCircle (float x, float y, float r, Color color) {
 		//		drawCircle (x, y, r, color, -1);
 		glDisable (GL_TEXTURE_2D);
 		color.setGLColor ();
 		glBegin (GL_POLYGON);
 
 		for (float angle = 0.0f; angle < 360.0f; angle += 2.0f) {
-			double radian = angle * (Math.PI / 180.0f);
+			float radian = (float) (angle * (Math.PI / 180.0f));
 
-			double xcos = Math.cos (radian);
-			double ysin = Math.sin (radian);
-			glVertex2d (xcos * r + x, ysin * r + y);
+			float xcos = (float) Math.cos (radian);
+			float ysin = (float) Math.sin (radian);
+			glVertex2f (xcos * r + x, ysin * r + y);
 		}
 
 		glEnd ();
 		glEnable (GL_TEXTURE_2D);
 	}
 
-	public static void drawCircle (double x, double y, double r, Color color, int tex) {
+	public static void drawCircle (float x, float y, float r, Color color, int tex) {
 		glBindTexture (GL_TEXTURE_2D, tex);
 		color.setGLColor ();
 
 		glBegin (GL_POLYGON);
 
 		for (float angle = 0.0f; angle < 360.0f; angle += 2.0f) {
-			double radian = angle * (Math.PI / 180.0f);
+			float radian = (float) (angle * (Math.PI / 180.0f));
 
-			double xcos = Math.cos (radian);
-			double ysin = Math.sin (radian);
-			double rx = xcos * r + x;
-			double ry = ysin * r + y;
-			double tx = xcos * 0.5 + 0.5;
-			double ty = ysin * 0.5 + 0.5;
-			glTexCoord2d (tx, ty);
-			glVertex2d (rx, ry);
+			float xcos = (float) Math.cos (radian);
+			float ysin = (float) Math.sin (radian);
+			float rx = xcos * r + x;
+			float ry = ysin * r + y;
+			float tx = xcos * 0.5f + 0.5f;
+			float ty = ysin * 0.5f + 0.5f;
+			glTexCoord2f (tx, ty);
+			glVertex2f (rx, ry);
 		}
 
 		glEnd ();
@@ -105,8 +105,8 @@ public class Util {
 		color.setGLColor ();
 		glBegin (GL_LINES);
 		{
-			glVertex2d (a.getX (), a.getY ());
-			glVertex2d (b.getX (), b.getY ());
+			glVertex2f (a.getX (), a.getY ());
+			glVertex2f (b.getX (), b.getY ());
 		}
 		glEnd ();
 		glEnable (GL_TEXTURE_2D);
@@ -123,9 +123,9 @@ public class Util {
 
 		glBegin (GL_TRIANGLES);
 		{
-			glVertex2d (a.getX (), a.getY ());
-			glVertex2d (b.getX (), b.getY ());
-			glVertex2d (c.getX (), c.getY ());
+			glVertex2f (a.getX (), a.getY ());
+			glVertex2f (b.getX (), b.getY ());
+			glVertex2f (c.getX (), c.getY ());
 		}
 		glEnd ();
 		glEnable (GL_TEXTURE_2D);
@@ -146,13 +146,13 @@ public class Util {
 		glBegin (GL_QUADS);
 		{
 			glTexCoord2f (0, 1);
-			glVertex2d (a.getX (), a.getY ());
+			glVertex2f (a.getX (), a.getY ());
 			glTexCoord2f (1, 1);
-			glVertex2d (b.getX (), b.getY ());
+			glVertex2f (b.getX (), b.getY ());
 			glTexCoord2f (1, 0);
-			glVertex2d (c.getX (), c.getY ());
+			glVertex2f (c.getX (), c.getY ());
 			glTexCoord2f (0, 0);
-			glVertex2d (d.getX (), d.getY ());
+			glVertex2f (d.getX (), d.getY ());
 		}
 		glEnd ();
 	}
@@ -166,11 +166,11 @@ public class Util {
 	}
 
 	public static void drawArrow (Point a, Point b, Color color, int arrowSize) {
-		double length = a.distance (b);
-		double lx = b.getX () - a.getX ();
-		double ly = b.getY () - a.getY ();
-		double hx = lx / length * arrowSize;
-		double hy = ly / length * arrowSize;
+		float length = a.distance (b);
+		float lx = b.getX () - a.getX ();
+		float ly = b.getY () - a.getY ();
+		float hx = lx / length * arrowSize;
+		float hy = ly / length * arrowSize;
 
 		Point ta = new Point (b.getX (), b.getY ());
 		Point tb = new Point (b.getX () - hx / 2, b.getY () - hy / 2);

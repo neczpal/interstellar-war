@@ -3,6 +3,7 @@ package net.neczpal.interstellarwar.common.game;
 import java.io.Serializable;
 
 public class SpaceShip implements Serializable {
+	public static final int SPACESHIP_TYPES = 11;
 	private static final long serialVersionUID = 3683452581122892189L;
 	private static final int SPACE_SHIP_SPEED = 6;
 
@@ -14,9 +15,13 @@ public class SpaceShip implements Serializable {
 	private Planet mFromPlanet;
 	private Planet mToPlanet;
 
-	private double vx, vy;
+	private float vx, vy;
+
+	private int mTextureIndex;
 
 	public SpaceShip (Planet fromPlanet, Planet toPlanet, int currentTick, int unitsNumber) {
+		mTextureIndex = (int) (Math.random () * SPACESHIP_TYPES);
+
 		mUnitsNumber = unitsNumber;
 		mCurrentTick = currentTick;
 		mFromPlanet = fromPlanet;
@@ -24,9 +29,9 @@ public class SpaceShip implements Serializable {
 
 		mOwnedBy = mFromPlanet.getOwnedBy ();
 
-		double lx = toPlanet.getX () - fromPlanet.getX ();
-		double ly = toPlanet.getY () - fromPlanet.getY ();
-		double length = fromPlanet.distance (toPlanet);
+		float lx = toPlanet.getX () - fromPlanet.getX ();
+		float ly = toPlanet.getY () - fromPlanet.getY ();
+		float length = fromPlanet.distance (toPlanet);
 
 		mMaxTick = (int) (length / SPACE_SHIP_SPEED);
 
@@ -82,12 +87,16 @@ public class SpaceShip implements Serializable {
 		mToPlanet = toPlanet;
 	}
 
-	public double getVx () {
+	public float getVx () {
 		return vx;
 	}
 
-	public double getVy () {
+	public float getVy () {
 		return vy;
+	}
+
+	public int getTextureIndex () {
+		return mTextureIndex;
 	}
 
 	public void tick () {
@@ -97,4 +106,5 @@ public class SpaceShip implements Serializable {
 	public boolean isArrived () {
 		return mCurrentTick >= mMaxTick;
 	}
+
 }

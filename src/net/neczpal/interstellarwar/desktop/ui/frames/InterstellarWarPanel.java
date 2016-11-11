@@ -31,8 +31,6 @@ public class InterstellarWarPanel {
 	private Planet mSelectedPlanetFrom = null;
 	private Planet mSelectedPlanetTo = null;
 
-	private int[] mPlanetTextures;
-
 	public InterstellarWarPanel (InterstellarWarClient client) {
 		mCore = client.getCore ();
 		mInterstellarWarClient = client;
@@ -40,16 +38,12 @@ public class InterstellarWarPanel {
 
 	public void init () {
 		initBackground ();
-		mPlanetTextures = new int[mCore.getPlanets ().size ()];
-		for (int i = 0; i < mPlanetTextures.length; i++) {
-			mPlanetTextures[i] = Textures.InterstellarWar.planet[(int) (Math.random () * Textures.InterstellarWar.planet.length)];
-		}
 		initViewPort ();
 	}
 
 	private void initBackground () {
 		mBackground = new Rect (0, 0, Display.getWidth (), Display.getHeight ());
-		mBackground.setTexture (Textures.InterstellarWar.background[(int) (Math.random () * Textures.InterstellarWar.background.length)]);
+		mBackground.setTexture (Textures.InterstellarWar.background[mCore.getBackgroundTextureIndex ()]);
 	}
 
 	private void initViewPort () {
@@ -157,7 +151,7 @@ public class InterstellarWarPanel {
 
 		for (int i = 0; i < planets.size (); i++) {
 			Planet planet = planets.get (i);
-			drawPlanet (planet, mPlanetTextures[i]);
+			drawPlanet (planet);
 		}
 
 		try {
@@ -182,8 +176,8 @@ public class InterstellarWarPanel {
 				new Point (road.getTo ().getX (), road.getTo ().getY ()));
 	}
 
-	private void drawPlanet (Planet planet, int tex) {
-		Util.drawCircle (planet.getX (), planet.getY (), planet.getRadius (), Color.values ()[planet.getOwnedBy ()], tex);
+	private void drawPlanet (Planet planet) {
+		Util.drawCircle (planet.getX (), planet.getY (), planet.getRadius (), Color.values ()[planet.getOwnedBy ()], Textures.InterstellarWar.planet[planet.getTextureIndex ()]);
 		Util.drawString (Integer.toString (planet.getUnitsNumber ()), planet.getX (), planet.getY (), Color.values ()[planet.getOwnedBy ()]);
 	}
 
@@ -196,15 +190,15 @@ public class InterstellarWarPanel {
 			spaceshipType = 10;
 		}
 
-		double w = Textures.InterstellarWar.spaceshipDimens[spaceshipType][0];
-		double h = Textures.InterstellarWar.spaceshipDimens[spaceshipType][1];
+		float w = Textures.InterstellarWar.spaceshipDimens[spaceshipType][0];
+		float h = Textures.InterstellarWar.spaceshipDimens[spaceshipType][1];
 
 		Planet from = spaceShip.getFromPlanet ();
 		Planet to = spaceShip.getToPlanet ();
 
-		double lx = to.getX () - from.getX ();
-		double ly = to.getY () - from.getY ();
-		double angle = Math.atan (ly / lx);
+		float lx = to.getX () - from.getX ();
+		float ly = to.getY () - from.getY ();
+		float angle = (float) Math.atan (ly / lx);
 
 		Point a = new Point (from.getX () - w / 2, from.getY () + h / 2);
 		Point b = new Point (from.getX () + w / 2, from.getY () + h / 2);

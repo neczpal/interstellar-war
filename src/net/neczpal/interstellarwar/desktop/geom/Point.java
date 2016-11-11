@@ -3,9 +3,9 @@ package net.neczpal.interstellarwar.desktop.geom;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Point {
-	double x, y;
+	float x, y;
 
-	public Point (double x, double y) {
+	public Point (float x, float y) {
 		setPosition (x, y);
 	}
 
@@ -17,42 +17,42 @@ public class Point {
 		glEnd ();
 	}
 
-	public void move (double dx, double dy) {
+	public void move (float dx, float dy) {
 		x += dx;
 		y += dy;
 	}
 
-	public void rotate (Point p, double angle) {
-		double lx = p.x - x;
-		double ly = p.y - y;
-		double cos = Math.cos (angle);
-		double sin = Math.sin (angle);
+	public void rotate (Point p, float angle) {
+		float lx = p.x - x;
+		float ly = p.y - y;
+		float cos = (float) Math.cos (angle);
+		float sin = (float) Math.sin (angle);
 
 		x = p.x - (int) (lx * cos - ly * sin);
 		y = p.y - (int) (lx * sin + ly * cos);
 	}
 
-	public double distance (Point p) {
-		return Math.sqrt (Math.pow (p.x - x, 2) + Math.pow (p.y - y, 2));
+	public float distance (Point p) {
+		return (float) Math.sqrt (Math.pow (p.x - x, 2) + Math.pow (p.y - y, 2));
 	}
 
-	public double getX () {
+	public float getX () {
 		return x;
 	}
 
-	public void setX (double x) {
+	public void setX (float x) {
 		this.x = x;
 	}
 
-	public double getY () {
+	public float getY () {
 		return y;
 	}
 
-	public void setY (double y) {
+	public void setY (float y) {
 		this.y = y;
 	}
 
-	public final void setPosition (double x, double y) {
+	public final void setPosition (float x, float y) {
 		setX (x);
 		setY (y);
 	}

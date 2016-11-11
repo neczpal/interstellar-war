@@ -3,12 +3,12 @@ package net.neczpal.interstellarwar.desktop.geom;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Circle extends Point {
-	private double r;
+	private float r;
 
 	private Color mColor = Color.WHITE;
 	private int mTexture = -1;
 
-	public Circle (double x, double y, double r) {
+	public Circle (float x, float y, float r) {
 		super (x, y);
 		this.r = r;
 	}
@@ -20,14 +20,14 @@ public class Circle extends Point {
 		glBegin (GL_POLYGON);
 
 		for (float angle = 0.0f; angle < 360.0f; angle += 2.0f) {
-			double radian = angle * (Math.PI / 180.0f);
+			float radian = (float) (angle * (Math.PI / 180.0f));
 
-			double xcos = Math.cos (radian);
-			double ysin = Math.sin (radian);
-			double x = xcos * r + this.x;
-			double y = ysin * r + this.y;
-			double tx = xcos * 0.5 + 0.5;
-			double ty = ysin * 0.5 + 0.5;
+			float xcos = (float) Math.cos (radian);
+			float ysin = (float) Math.sin (radian);
+			float x = xcos * r + this.x;
+			float y = ysin * r + this.y;
+			float tx = xcos * 0.5f + 0.5f;
+			float ty = ysin * 0.5f + 0.5f;
 			glTexCoord2d (tx, ty);
 			glVertex2d (x, y);
 		}
@@ -47,11 +47,11 @@ public class Circle extends Point {
 		return Math.pow ((p.x - x), 2) + Math.pow ((p.y - y), 2) <= r * r;
 	}
 
-	public double getRadius () {
+	public float getRadius () {
 		return r;
 	}
 
-	public void setRadius (double radius) {
+	public void setRadius (float radius) {
 		this.r = radius;
 	}
 

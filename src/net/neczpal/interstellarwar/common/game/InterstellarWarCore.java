@@ -5,12 +5,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class InterstellarWarCore extends Thread {
+	public static final int BACKGROUND_TYPES = 5;
+
 	private String mMapName;
 	private int mMaxUsers;
 
 	private ArrayList <Planet> mPlanets;
 	private ArrayList <Road> mRoads;
 	private ArrayList <SpaceShip> mSpaceShips;
+
+	private int mBackgroundTextureIndex;
 
 	private int mTickNumber = 0;
 	private boolean mIsRunning = false;
@@ -25,6 +29,8 @@ public class InterstellarWarCore extends Thread {
 
 	// DATA FUNCTIONS
 	private void loadMap (String fileName) throws IOException {
+		mBackgroundTextureIndex = (int) (Math.random () * BACKGROUND_TYPES);
+
 		mPlanets = new ArrayList <> ();
 		mRoads = new ArrayList <> ();
 		mSpaceShips = new ArrayList <> ();
@@ -43,7 +49,7 @@ public class InterstellarWarCore extends Thread {
 		for (int i = 0; i < planetNumber; i++) {
 			String[] params = bufferedReader.readLine ().split (" ");
 
-			mPlanets.add (new Planet (Double.parseDouble (params[0]), Double.parseDouble (params[1]), Double.parseDouble (params[2]), Integer.parseInt (params[3]), Integer.parseInt (params[4])));
+			mPlanets.add (new Planet (Float.parseFloat (params[0]), Float.parseFloat (params[1]), Float.parseFloat (params[2]), Integer.parseInt (params[3]), Integer.parseInt (params[4])));
 		}
 		for (int i = 0; i < connectionNumber; i++) {
 			String[] params = bufferedReader.readLine ().split (" ");
@@ -60,6 +66,8 @@ public class InterstellarWarCore extends Thread {
 
 	public ArrayList <Serializable> getData () {
 		ArrayList <Serializable> list = new ArrayList <> ();
+
+		list.add (mBackgroundTextureIndex);
 
 		list.add (mMapName);
 		list.add (mMaxUsers);
@@ -82,11 +90,14 @@ public class InterstellarWarCore extends Thread {
 	}
 
 	public void setData (ArrayList <Serializable> data) {
+		int i = 0;
+
+		mBackgroundTextureIndex = (int) data.get (i++);
+
 		mPlanets = new ArrayList <> ();
 		mRoads = new ArrayList <> ();
 		mSpaceShips = new ArrayList <> ();
 
-		int i = 0;
 
 		mMapName = (String) data.get (i++);
 		mMaxUsers = (int) data.get (i++);
@@ -196,6 +207,10 @@ public class InterstellarWarCore extends Thread {
 		return mSpaceShips;
 	}
 
+	public int getBackgroundTextureIndex () {
+		return mBackgroundTextureIndex;
+	}
+
 	public int getTickNumber () {
 		return mTickNumber;
 	}
@@ -203,4 +218,6 @@ public class InterstellarWarCore extends Thread {
 	public boolean isRunning () {
 		return mIsRunning;
 	}
+
+
 }

@@ -4,13 +4,13 @@ import net.neczpal.interstellarwar.desktop.Util;
 
 public class Rect {
 
-	private double x, y;
-	private double width, height;
+	private float x, y;
+	private float width, height;
 
 	private Color mColor = Color.WHITE;
 	private int mTexture = -1;
 
-	public Rect (double x, double y, double w, double h) {
+	public Rect (float x, float y, float w, float h) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
@@ -34,39 +34,39 @@ public class Rect {
 		this.mTexture = texture;
 	}
 
-	public double getX () {
+	public float getX () {
 		return x;
 	}
 
-	public void setX (double x) {
+	public void setX (float x) {
 		this.x = x;
 	}
 
-	public double getY () {
+	public float getY () {
 		return y;
 	}
 
-	public void setY (double y) {
+	public void setY (float y) {
 		this.y = y;
 	}
 
-	public double getWidth () {
+	public float getWidth () {
 		return width;
 	}
 
-	public void setWidth (double width) {
+	public void setWidth (float width) {
 		this.width = width;
 	}
 
-	public double getHeight () {
+	public float getHeight () {
 		return height;
 	}
 
-	public void setHeight (double height) {
+	public void setHeight (float height) {
 		this.height = height;
 	}
 
-	public void setPosition (double x, double y) {
+	public void setPosition (float x, float y) {
 		setX (x);
 		setY (y);
 	}

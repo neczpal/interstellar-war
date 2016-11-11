@@ -33,12 +33,12 @@ public class Line {
 		b.move (dx, dy);
 	}
 
-	public void rotate (Point p, double angle) {
+	public void rotate (Point p, float angle) {
 		a.rotate (p, angle);
 		b.rotate (p, angle);
 	}
 
-	public double getLength () {
+	public float getLength () {
 		return a.distance (b);
 	}
 

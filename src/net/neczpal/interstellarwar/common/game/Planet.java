@@ -4,17 +4,22 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Planet implements Serializable {
+	public static final int PLANET_TYPES = 18;
 	private static final long serialVersionUID = 2683452581122892189L;
 
-	private double mX;
-	private double mY;
-	private double mRadius;
+	private float mX;
+	private float mY;
+	private float mRadius;
+
+	private int mTextureIndex;
 
 	private int mOwnedBy;
 	private int mUnitsNumber;
 	private ArrayList <Planet> mNeighbors;
 
-	public Planet (double x, double y, double radius, int ownedBy, int unitsNumber) {
+	public Planet (float x, float y, float radius, int ownedBy, int unitsNumber) {
+		mTextureIndex = (int) (Math.random () * PLANET_TYPES);
+
 		mX = x;
 		mY = y;
 		mRadius = radius;
@@ -28,27 +33,27 @@ public class Planet implements Serializable {
 		other.mNeighbors.add (this);
 	}
 
-	public double getX () {
+	public float getX () {
 		return mX;
 	}
 
-	public void setX (double x) {
+	public void setX (float x) {
 		mX = x;
 	}
 
-	public double getY () {
+	public float getY () {
 		return mY;
 	}
 
-	public void setY (double y) {
+	public void setY (float y) {
 		mY = y;
 	}
 
-	public double getRadius () {
+	public float getRadius () {
 		return mRadius;
 	}
 
-	public void setRadius (double radius) {
+	public void setRadius (float radius) {
 		mRadius = radius;
 	}
 
@@ -68,11 +73,15 @@ public class Planet implements Serializable {
 		this.mUnitsNumber = unitsNumber;
 	}
 
-	public double distance (Planet p) {
-		return Math.sqrt (Math.pow (p.getX () - getX (), 2) + Math.pow (p.getY () - getY (), 2));
+	public int getTextureIndex () {
+		return mTextureIndex;
 	}
 
-	public boolean isInside (double px, double py) {
+	public float distance (Planet p) {
+		return (float) Math.sqrt (Math.pow (p.getX () - getX (), 2) + Math.pow (p.getY () - getY (), 2));
+	}
+
+	public boolean isInside (float px, float py) {
 		return Math.pow (px - mX, 2) + Math.pow ((py - mY), 2) <= mRadius * mRadius;
 	}
 
@@ -97,4 +106,5 @@ public class Planet implements Serializable {
 			}
 		}
 	}
+
 }

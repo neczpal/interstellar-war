@@ -30,13 +30,13 @@ public class Triangle {
 		glEnable (GL_TEXTURE_2D);
 	}
 
-	public void move (double dx, double dy) {
+	public void move (float dx, float dy) {
 		a.move (dx, dy);
 		b.move (dx, dy);
 		c.move (dx, dy);
 	}
 
-	public void rotate (Point p, double angle) {
+	public void rotate (Point p, float angle) {
 		a.rotate (p, angle);
 		b.rotate (p, angle);
 		c.rotate (p, angle);
