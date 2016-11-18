@@ -15,6 +15,8 @@ public class User {
 		mRoomIndex = 0;
 	}
 
+	// GETTERS, SETTERS
+
 	public int getId () {
 		return mId;
 	}

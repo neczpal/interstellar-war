@@ -36,6 +36,11 @@ public class LobbyFrame extends JFrame {
 
 	private HashMap <Integer, ArrayList <String>> mAllRoomUsers = new HashMap <> ();
 
+	/**
+	 * Erstellt das Zimmer
+	 *
+	 * @param clientConnection Die Client-Verbindung
+	 */
 	public LobbyFrame (ClientConnection clientConnection) {
 		super ("Rooms");
 
@@ -134,6 +139,11 @@ public class LobbyFrame extends JFrame {
 		add (rightPanel, BorderLayout.LINE_END);
 	}
 
+	/**
+	 * Ladet die Zimmerdaten
+	 *
+	 * @param roomDataList Die Zimmerdaten
+	 */
 	public void loadRoomData (List <RoomData> roomDataList) {
 		if (roomDataList.isEmpty ()) {
 			return;
@@ -167,6 +177,11 @@ public class LobbyFrame extends JFrame {
 		mRoomsTable.setRowSelectionInterval (newSelection, newSelection);
 	}
 
+	/**
+	 * Stellt ein, ob der Benutzer in einem Zimmer ist
+	 *
+	 * @param isInRoom Ist es in einem Zimmer?
+	 */
 	public void setIsInRoom (boolean isInRoom) {
 		this.mIsInRoom = isInRoom;
 		if (isInRoom) {
@@ -178,17 +193,20 @@ public class LobbyFrame extends JFrame {
 		}
 	}
 
-
 	private class RoomTableCellRenderer extends DefaultTableCellRenderer {
 		private TableCellRenderer mRenderer;
 
+		/**
+		 * Erstellt ein Zimmertaballerenderer
+		 * @param renderer Der Tabellerenderer
+		 */
 		RoomTableCellRenderer (TableCellRenderer renderer) {
 			mRenderer = renderer;
 		}
 
 		@Override
 		public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			Component component = mRenderer.getTableCellRendererComponent (table, value, isSelected, hasFocus, row, column);
+			Component component = mRenderer.getTableCellRendererComponent (table, value, isSelected, hasFocus, row, column);//#TODO throws ClassCastException
 			if (component instanceof JComponent) {
 				JComponent jComponent = (JComponent) component;
 				jComponent.setBorder (noFocusBorder);

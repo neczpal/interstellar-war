@@ -16,6 +16,9 @@ public class DesktopUI implements UserInterface {
 	private GameFrame mGameFrame;
 	private ClientConnection mConnection;
 
+	/**
+	 * Erstellt das UI
+	 */
 	public DesktopUI () {
 		openLogin ();
 	}
@@ -24,6 +27,9 @@ public class DesktopUI implements UserInterface {
 		new DesktopUI ();
 	}
 
+	/**
+	 * Öffnet die Anmeldungsframe
+	 */
 	private void openLogin () {
 		mLoginFrame = new LoginFrame (this);
 		mLoginFrame.setVisible (true);
@@ -70,6 +76,11 @@ public class DesktopUI implements UserInterface {
 		}
 	}
 
+	/**
+	 * Einstellt das Verbindung
+	 *
+	 * @param connection Die Client-Verbindung
+	 */
 	public void setConnection (ClientConnection connection) {
 		mConnection = connection;
 		mConnection.setUserInterface (this);

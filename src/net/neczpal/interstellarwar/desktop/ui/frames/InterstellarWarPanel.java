@@ -5,9 +5,9 @@ import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
 import net.neczpal.interstellarwar.common.game.Planet;
 import net.neczpal.interstellarwar.common.game.Road;
 import net.neczpal.interstellarwar.common.game.SpaceShip;
-import net.neczpal.interstellarwar.desktop.GLUtil;
 import net.neczpal.interstellarwar.desktop.Loader;
 import net.neczpal.interstellarwar.desktop.geom.Color;
+import net.neczpal.interstellarwar.desktop.geom.GLUtil;
 import net.neczpal.interstellarwar.desktop.geom.Point;
 import net.neczpal.interstellarwar.desktop.geom.Rect;
 import org.lwjgl.input.Keyboard;
@@ -15,9 +15,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -36,25 +34,44 @@ public class InterstellarWarPanel {
 
 	private Textures mTextures;
 
+	/**
+	 * Erstellt das Spielpanel
+	 *
+	 * @param client Das Spiel-Klient
+	 */
 	public InterstellarWarPanel (InterstellarWarClient client) {
 		mCore = client.getCore ();
 		mInterstellarWarClient = client;
 	}
 
+	/**
+	 * Initialisiert die Texturen
+	 *
+	 * @throws IOException falls die Texturefiles kann nicht eingeladet werden
+	 */
 	public void initTextures () throws IOException {
 		mTextures = new Textures ();
 	}
 
+	/**
+	 * Initialisiert das Spiel
+	 */
 	public void initGame () {
 		initBackground ();
 		initViewPort ();
 	}
 
+	/**
+	 * Initialisiert das Hintergrund
+	 */
 	private void initBackground () {
 		mBackground = new Rect (0, 0, Display.getWidth (), Display.getHeight ());
 		mBackground.setTexture (mTextures.background[mCore.getBackgroundTextureIndex ()]);
 	}
 
+	/**
+	 * Initialisiert das Ansichtsfenster
+	 */
 	private void initViewPort () {
 		for (Planet planet : mCore.getPlanets ()) {
 			if (planet.getOwnedBy () == getInterstellarWarClient ().getRoomIndex ()) {
@@ -63,11 +80,17 @@ public class InterstellarWarPanel {
 		}
 	}
 
+	/**
+	 * Eingang events
+	 */
 	public void inputEvents () {
 		moveViewPort ();
 		selectPlanets ();
 	}
 
+	/**
+	 * Wählt das Planet aus, und schikt ein Raumschiff zu dem ausgewählte Planet
+	 */
 	private void selectPlanets () {
 
 		if (Mouse.isButtonDown (0) && !mWasMouseDown) {
@@ -121,6 +144,9 @@ public class InterstellarWarPanel {
 		}
 	}
 
+	/**
+	 * Bewegt das Ansichtsfenster
+	 */
 	private void moveViewPort () {
 		if (Mouse.getX () < EDGE_MOVE_DISTANCE || Keyboard.isKeyDown (Keyboard.KEY_LEFT)) {
 			mViewPort.move (EDGE_MOVE_UNIT, 0);
@@ -134,10 +160,16 @@ public class InterstellarWarPanel {
 		}
 	}
 
+	/**
+	 * @return Die Position der Maus
+	 */
 	private Point getMousePosition () {
 		return new Point (Mouse.getX () - mViewPort.getX (), Mouse.getY () - mViewPort.getY ());
 	}
 
+	/**
+	 * Malt das Spiel aus
+	 */
 	public void draw () {
 		mBackground.draw ();
 		ArrayList <Road> roads = mCore.getRoads ();
@@ -176,16 +208,31 @@ public class InterstellarWarPanel {
 		GL11.glPopMatrix ();
 	}
 
+	/**
+	 * Malt ein Weg aus
+	 *
+	 * @param road Das Weg
+	 */
 	private void drawRoad (Road road) {
 		GLUtil.drawLine (new Point (road.getFrom ().getX (), road.getFrom ().getY ()),
 				new Point (road.getTo ().getX (), road.getTo ().getY ()));
 	}
 
+	/**
+	 * Malt ein Planet aus
+	 *
+	 * @param planet Das Planet
+	 */
 	private void drawPlanet (Planet planet) {
 		GLUtil.drawCircle (planet.getX (), planet.getY (), planet.getRadius (), Color.values ()[planet.getOwnedBy ()], mTextures.planet[planet.getTextureIndex ()]);
 		GLUtil.drawString (Integer.toString (planet.getUnitsNumber ()), planet.getX (), planet.getY (), Color.values ()[planet.getOwnedBy ()]);
 	}
 
+	/**
+	 * Malt ein Raumschiff aus
+	 *
+	 * @param spaceShip Das Raumschiff
+	 */
 	private void drawSpaceShip (SpaceShip spaceShip) {
 		int spaceshipType = spaceShip.getTextureIndex ();
 
@@ -219,6 +266,8 @@ public class InterstellarWarPanel {
 		GL11.glPopMatrix ();
 	}
 
+	//GETTERS
+
 	public InterstellarWarClient getInterstellarWarClient () {
 		return mInterstellarWarClient;
 	}
@@ -229,6 +278,11 @@ public class InterstellarWarPanel {
 		public float[][] spaceshipDimens;
 		public int[] background;
 
+		/**
+		 * Ladet die Texturen ein
+		 *
+		 * @throws IOException falls die Texturen kann nicht eingeladet werden
+		 */
 		public Textures () throws IOException {
 			planet = new int[Planet.PLANET_TYPES];
 			for (int i = 0; i < planet.length; i++) {
@@ -238,7 +292,7 @@ public class InterstellarWarPanel {
 			spaceshipDimens = new float[SpaceShip.SPACESHIP_TYPES][2];
 			for (int i = 0; i < spaceship.length; i++) {
 				spaceship[i] = Loader.loadTexture ("res/textures/spaceship" + (i + 1) + ".png");
-				BufferedImage image = ImageIO.read (new File ("res/textures/spaceship" + (i + 1) + ".png"));
+				BufferedImage image = Loader.loadImage ("res/textures/spaceship" + (i + 1) + ".png");
 				spaceshipDimens[i][0] = image.getWidth () / 4.0f;
 				spaceshipDimens[i][1] = image.getHeight () / 4.0f;
 			}

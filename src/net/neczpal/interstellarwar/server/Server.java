@@ -11,6 +11,11 @@ public class Server extends Thread {
 	private ServerConnection mServerConnection;
 	private Scanner mScanner;
 
+	/**
+	 * Erstellt ein Server
+	 *
+	 * @param port Das Port des Servers
+	 */
 	public Server (int port) {
 		mServerConnection = new ServerConnection (port);
 		mScanner = new Scanner (System.in);
@@ -21,11 +26,19 @@ public class Server extends Thread {
 		server.start ();
 	}
 
+	/**
+	 * Beendet das Server
+	 */
 	private void stopServer () {
 		mServerConnection.stopServerConnection ();
 		System.exit (0);
 	}
 
+	/**
+	 * Einstellt das Log-Stuffe
+	 *
+	 * @param level Die Stuffe der Logging
+	 */
 	private void setLogLevel (String level) {
 		Logger logger = Logger.getLogger (ServerConnection.class.getCanonicalName ());
 		switch (level) {
@@ -47,10 +60,18 @@ public class Server extends Thread {
 		}
 	}
 
+	/**
+	 * Addiert ein Zimmer zu dem Server
+	 *
+	 * @param mapName Der Name der Mappe-File
+	 */
 	private void addRoom (String mapName) {
 		mServerConnection.addRoom (mapName);
 	}
 
+	/**
+	 * Listet die Benutzer, die auf dem Server sind
+	 */
 	private void listUsers () {
 		System.out.println ("USERS:");
 		for (Integer id : mServerConnection.getClients ().keySet ()) {
@@ -60,6 +81,9 @@ public class Server extends Thread {
 		}
 	}
 
+	/**
+	 * Listet die Zimmer, die auf dem Server sind
+	 */
 	private void listRooms () {
 		System.out.println ("ROOMS:");
 		for (RoomData room : mServerConnection.getRoomData ()) {
@@ -67,6 +91,9 @@ public class Server extends Thread {
 		}
 	}
 
+	/**
+	 * Interpretiert die Command-Line-Befehle
+	 */
 	@Override
 	public void run () {
 		String[] command;
@@ -77,7 +104,7 @@ public class Server extends Thread {
 			switch (command[0]) {
 				case "stop":
 					stopServer ();
-					break;
+					return;
 				case "log":
 					if (command.length > 1)
 						setLogLevel (command[1]);

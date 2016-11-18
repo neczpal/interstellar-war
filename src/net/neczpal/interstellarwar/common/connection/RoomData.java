@@ -12,6 +12,15 @@ public class RoomData implements Serializable {
 	private int mMaxUserCount;
 	private boolean mIsRunning;
 
+	/**
+	 * Erstellt ein Zimmerdatei
+	 *
+	 * @param mRoomId       Die ID von Zimmer
+	 * @param mMapName      Der Name von der Mappe
+	 * @param mUsers        Die Namen der Benutzer
+	 * @param mMaxUserCount Die maximum Anzahl der Benutzer
+	 * @param mIsRunning    Ob dieses Zimmer schon beginnt hat
+	 */
 	public RoomData (int mRoomId, String mMapName, ArrayList <String> mUsers, int mMaxUserCount, boolean mIsRunning) {
 		this.mRoomId = mRoomId;
 		this.mMapName = mMapName;
@@ -19,6 +28,8 @@ public class RoomData implements Serializable {
 		this.mMaxUserCount = mMaxUserCount;
 		this.mIsRunning = mIsRunning;
 	}
+
+	//GETTERS
 
 	public int getRoomId () {
 		return mRoomId;

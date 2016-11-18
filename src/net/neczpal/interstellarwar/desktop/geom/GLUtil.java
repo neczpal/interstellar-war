@@ -1,7 +1,6 @@
-package net.neczpal.interstellarwar.desktop;
+package net.neczpal.interstellarwar.desktop.geom;
 
-import net.neczpal.interstellarwar.desktop.geom.Color;
-import net.neczpal.interstellarwar.desktop.geom.Point;
+import net.neczpal.interstellarwar.desktop.Loader;
 
 import java.io.IOException;
 
@@ -17,25 +16,65 @@ public final class GLUtil {
 
 	private static int[] characters;
 
+	/**
+	 * Kann nicht Instantiieren
+	 */
 	private GLUtil () {
 	}
 
+	/**
+	 * Initalisiert die Charakter-Texturen
+	 *
+	 * @throws IOException falls das File kann nicht geöffnet werden
+	 */
 	public static void init () throws IOException {
 		characters = Loader.loadTextures ("res/textures/font64.png", 64, 64);
 	}
 
+	/**
+	 * Malt ein Charackterkette an dem Bildschirm aus
+	 *
+	 * @param string Das Charackterkette
+	 * @param x      Die Position der X-Achse
+	 * @param y      Die Position der Y-Achse
+	 */
 	public static void drawString (String string, float x, float y) {
 		drawString (string, x, y, DEFAULT_FONTSIZE);
 	}
 
+	/**
+	 * Malt ein Charackterkette an dem Bildschirm aus
+	 *
+	 * @param string   Das Charackterkette
+	 * @param x        Die Position der X-Achse
+	 * @param y        Die Position der Y-Achse
+	 * @param fontSize Die Größe der Charackter
+	 */
 	public static void drawString (String string, float x, float y, int fontSize) {
 		drawString (string, x, y, fontSize, DEFAULT_FONT_COLOR);
 	}
 
+	/**
+	 * Malt ein Charackterkette an dem Bildschirm aus
+	 *
+	 * @param string Das Charackterkette
+	 * @param x      Die Position der X-Achse
+	 * @param y      Die Position der Y-Achse
+	 * @param color  Die Farbe der Charackter
+	 */
 	public static void drawString (String string, float x, float y, Color color) {
 		drawString (string, x, y, DEFAULT_FONTSIZE, color);
 	}
 
+	/**
+	 * Malt ein Charackterkette an dem Bildschirm aus
+	 *
+	 * @param string   Das Charackterkette
+	 * @param x        Die Position der X-Achse
+	 * @param y        Die Position der Y-Achse
+	 * @param fontSize Die Größe der Charackter
+	 * @param color    Die Farbe der Charackter
+	 */
 	public static void drawString (String string, float x, float y, int fontSize, Color color) {
 		color.setGLColor ();
 		x -= string.length () * fontSize / 2;//TO THE CENTER
@@ -45,6 +84,15 @@ public final class GLUtil {
 		}
 	}
 
+	/**
+	 * Malt ein Rechteck aus
+	 *
+	 * @param x   Die Position der X-Achse
+	 * @param y   Die Position der Y-Achse
+	 * @param w   Die Breite der Rechteck
+	 * @param h   Die Höhe der Rechteck
+	 * @param tex Die Texture
+	 */
 	public static void drawRect (float x, float y, float w, float h, int tex) {
 		float wx = w + x, hy = h + y;
 
@@ -63,10 +111,25 @@ public final class GLUtil {
 		glEnd ();
 	}
 
+	/**
+	 * Malt ein Kreis aus
+	 *
+	 * @param x Die Position der X-Achse
+	 * @param y Die Position der Y-Achse
+	 * @param r Die Radius der Kreis
+	 */
 	public static void drawCircle (float x, float y, float r) {
 		drawCircle (x, y, r, DEFAULT_COLOR);
 	}
 
+	/**
+	 * Malt ein Kreis aus
+	 *
+	 * @param x     Die Position der X-Achse
+	 * @param y     Die Position der Y-Achse
+	 * @param r     Die Radius der Kreis
+	 * @param color Die Farbe der Charackter
+	 */
 	public static void drawCircle (float x, float y, float r, Color color) {
 		//		drawCircle (x, y, r, color, -1);
 		glDisable (GL_TEXTURE_2D);
@@ -85,6 +148,15 @@ public final class GLUtil {
 		glEnable (GL_TEXTURE_2D);
 	}
 
+	/**
+	 * Malt ein Kreis aus
+	 *
+	 * @param x     Die Position der X-Achse
+	 * @param y     Die Position der Y-Achse
+	 * @param r     Die Radius der Kreis
+	 * @param color Die Farbe der Charackter
+	 * @param tex   Die Texture
+	 */
 	public static void drawCircle (float x, float y, float r, Color color, int tex) {
 		glBindTexture (GL_TEXTURE_2D, tex);
 		color.setGLColor ();
@@ -107,10 +179,23 @@ public final class GLUtil {
 		glEnd ();
 	}
 
+	/**
+	 * Malt ein Linie aus
+	 *
+	 * @param a Die Position der eine Punkt
+	 * @param b Die Position der andere Punkt
+	 */
 	public static void drawLine (Point a, Point b) {
 		drawLine (a, b, DEFAULT_COLOR);
 	}
 
+	/**
+	 * Malt ein Linie aus
+	 *
+	 * @param a     Die Position der eine Punkt
+	 * @param b     Die Position der andere Punkt
+	 * @param color Die Farbe der Linie
+	 */
 	public static void drawLine (Point a, Point b, Color color) {
 		glDisable (GL_TEXTURE_2D);
 		color.setGLColor ();
@@ -123,10 +208,25 @@ public final class GLUtil {
 		glEnable (GL_TEXTURE_2D);
 	}
 
+	/**
+	 * Malt ein Deieck aus
+	 *
+	 * @param a Die Position der eine Gipfel
+	 * @param b Die Position der zweite Gipfel
+	 * @param c Die Position der dritte Gipfel
+	 */
 	public static void drawTriangle (Point a, Point b, Point c) {
 		drawTriangle (a, b, c, DEFAULT_COLOR);
 	}
 
+	/**
+	 * Malt ein Deieck aus
+	 *
+	 * @param a     Die Position der eine Gipfel
+	 * @param b     Die Position der zweite Gipfel
+	 * @param c     Die Position der dritte Gipfel
+	 * @param color Die Farbe der Dreieck
+	 */
 	public static void drawTriangle (Point a, Point b, Point c, Color color) {
 		glDisable (GL_TEXTURE_2D);
 
@@ -142,14 +242,41 @@ public final class GLUtil {
 		glEnable (GL_TEXTURE_2D);
 	}
 
+	/**
+	 * Malt ein Quadrat aus
+	 *
+	 * @param a Erste Gipfel
+	 * @param b Zweite Gipfel
+	 * @param c Dritte Gipfel
+	 * @param d Vierte Gipfel
+	 */
 	public static void drawQuad (Point a, Point b, Point c, Point d) {
 		drawQuad (a, b, c, d, DEFAULT_COLOR);
 	}
 
+	/**
+	 * Malt ein Quadrat aus
+	 *
+	 * @param a     Erste Gipfel
+	 * @param b     Zweite Gipfel
+	 * @param c     Dritte Gipfel
+	 * @param d     Vierte Gipfel
+	 * @param color Der Farbe der Quadrat
+	 */
 	public static void drawQuad (Point a, Point b, Point c, Point d, Color color) {
 		drawQuad (a, b, c, d, color, -1);
 	}
 
+	/**
+	 * Malt ein Quadrat aus
+	 *
+	 * @param a     Erste Gipfel
+	 * @param b     Zweite Gipfel
+	 * @param c     Dritte Gipfel
+	 * @param d     Vierte Gipfel
+	 * @param color Der Farbe der Quadrat
+	 * @param tex   Die Texture
+	 */
 	public static void drawQuad (Point a, Point b, Point c, Point d, Color color, int tex) {
 		glBindTexture (GL_TEXTURE_2D, tex);
 		color.setGLColor ();
@@ -168,14 +295,35 @@ public final class GLUtil {
 		glEnd ();
 	}
 
+	/**
+	 * Malt ein Pfeil aus
+	 *
+	 * @param a Der Anfangspunkt
+	 * @param b Der Endpunkt
+	 */
 	public static void drawArrow (Point a, Point b) {
 		drawArrow (a, b, DEFAULT_COLOR);
 	}
 
+	/**
+	 * Malt ein Pfeil aus
+	 *
+	 * @param a     Der Anfangspunkt
+	 * @param b     Der Endpunkt
+	 * @param color Der Farbe der Pfeige
+	 */
 	public static void drawArrow (Point a, Point b, Color color) {
 		drawArrow (a, b, color, DEFAULT_ARROWSIZE);
 	}
 
+	/**
+	 * Malt ein Pfeil aus
+	 *
+	 * @param a         Der Anfangspunkt
+	 * @param b         Der Endpunkt
+	 * @param color     Der Farbe der Pfeige
+	 * @param arrowSize Die Größe der Pfeige
+	 */
 	public static void drawArrow (Point a, Point b, Color color, int arrowSize) {
 		float length = a.distance (b);
 		float lx = b.getX () - a.getX ();

@@ -21,7 +21,14 @@ public class Client extends Thread {
 
 	private Logger mLogger = Logger.getLogger (Client.class.getCanonicalName ());
 
-
+	/**
+	 * Macht eine Klient-Verbindung bei dem server,
+	 * damit kann das Server mit Klienten kommunizieren
+	 *
+	 * @param server Die Server-Verbindung
+	 * @param socket Die Socket der Server
+	 * @throws IOException falls es kann nicht verbinden
+	 */
 	public Client (ServerConnection server, Socket socket) throws IOException {
 		mSocket = socket;
 		mServerConnection = server;
@@ -35,6 +42,11 @@ public class Client extends Thread {
 		mLogger.setLevel (null);
 	}
 
+	/**
+	 * Kommunizierung Schleife,
+	 * liest die einkommende Befehle zu dem Server
+	 */
+	@Override
 	public void run () {
 		mLogger.log (Level.INFO, "Client ready with the Port (" + mPort + ")");
 		mIsRunning = true;
@@ -58,6 +70,9 @@ public class Client extends Thread {
 		}
 	}
 
+	/**
+	 * Beendet das Kommunikation
+	 */
 	public void stopClient () {
 		mIsRunning = false;
 		try {
@@ -67,10 +82,11 @@ public class Client extends Thread {
 		}
 	}
 
-	public int getPort () {
-		return mPort;
-	}
-
+	/**
+	 * Sendet ein Befehl zu dem Klient
+	 * @param command der Befehl
+	 * @return ob es gesendet ist oder gibt es eine Fehler
+	 */
 	public boolean send (Command command) {
 		try {
 			if (!mSocket.isClosed ()) {
@@ -84,4 +100,11 @@ public class Client extends Thread {
 		}
 		return false;
 	}
+
+	//GETTERS
+
+	public int getPort () {
+		return mPort;
+	}
+
 }

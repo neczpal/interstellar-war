@@ -17,7 +17,16 @@ public class Planet implements Serializable {
 	private int mUnitsNumber;
 	private ArrayList <Planet> mNeighbors;
 
-	public Planet (float x, float y, float radius, int ownedBy, int unitsNumber) {
+	/**
+	 * Erstellt einen Planet
+	 *
+	 * @param x           Position auf dem X-Achse
+	 * @param y           Position auf dem Y-Achse
+	 * @param radius      Radius von dem Planet
+	 * @param ownedBy     Die Nummer von Spieler, die diesem Planet dominiert
+	 * @param unitsNumber Die Anzahl der Einheit auf dem Planet
+	 */
+	Planet (float x, float y, float radius, int ownedBy, int unitsNumber) {
 		mTextureIndex = (int) (Math.random () * PLANET_TYPES);
 
 		mX = x;
@@ -28,41 +37,82 @@ public class Planet implements Serializable {
 		mNeighbors = new ArrayList <> ();
 	}
 
-	public void linkTo (Planet other) {
+	/**
+	 * Verbindet dieses Planet mit ein anderen Planet
+	 *
+	 * @param other Der andere Planet
+	 */
+	void linkTo (Planet other) {
 		mNeighbors.add (other);
 		other.mNeighbors.add (this);
 	}
 
-	public float getX () {
-		return mX;
+	/**
+	 * Schafft Einheit auf dem Planet, falls es dominiert ist
+	 */
+	void spawnUnit () {
+		if (mOwnedBy > 0)
+			mUnitsNumber++;
 	}
 
-	public void setX (float x) {
-		mX = x;
+	/**
+	 * Ein Raumschiff ist auf diesem Planet angekommt
+	 *
+	 * @param spaceShip Das Raumschiff, das angekommt ist
+	 */
+	void spaceShipArrived (SpaceShip spaceShip) {
+		if (spaceShip.getOwnedBy () == mOwnedBy) {
+			mUnitsNumber += spaceShip.getUnitsNumber ();
+		} else {
+			mUnitsNumber -= spaceShip.getUnitsNumber ();
+			if (mUnitsNumber < 0) {
+				mOwnedBy = spaceShip.getOwnedBy ();
+				mUnitsNumber = Math.abs (mUnitsNumber);
+			}
+		}
+	}
+
+	/**
+	 * @param p der andere Planet
+	 * @return Die Entfernung von dem anderen Planet
+	 */
+	public float distance (Planet p) {
+		return (float) Math.sqrt (Math.pow (p.getX () - getX (), 2) + Math.pow (p.getY () - getY (), 2));
+	}
+
+	/**
+	 * @param px Position auf dem X-Achse
+	 * @param py Position auf dem Y-Achse
+	 * @return Entscheidet ob ein Punkt (px, py) innerhalb ist
+	 */
+	public boolean isInside (float px, float py) {
+		return Math.pow (px - mX, 2) + Math.pow ((py - mY), 2) <= mRadius * mRadius;
+	}
+
+	/**
+	 * @param planet die andere Planet
+	 * @return Entscheidet ob die andere Planet Nachbar von diesem Planet ist
+	 */
+	public boolean isNeighbor (Planet planet) {
+		return mNeighbors.contains (planet);
+	}
+
+	//SETTER, GETTERS
+
+	public float getX () {
+		return mX;
 	}
 
 	public float getY () {
 		return mY;
 	}
 
-	public void setY (float y) {
-		mY = y;
-	}
-
 	public float getRadius () {
 		return mRadius;
 	}
 
-	public void setRadius (float radius) {
-		mRadius = radius;
-	}
-
 	public int getOwnedBy () {
 		return mOwnedBy;
-	}
-
-	public void setOwnedBy (int ownedBy) {
-		this.mOwnedBy = ownedBy;
 	}
 
 	public int getUnitsNumber () {
@@ -75,36 +125,6 @@ public class Planet implements Serializable {
 
 	public int getTextureIndex () {
 		return mTextureIndex;
-	}
-
-	public float distance (Planet p) {
-		return (float) Math.sqrt (Math.pow (p.getX () - getX (), 2) + Math.pow (p.getY () - getY (), 2));
-	}
-
-	public boolean isInside (float px, float py) {
-		return Math.pow (px - mX, 2) + Math.pow ((py - mY), 2) <= mRadius * mRadius;
-	}
-
-
-	public boolean isNeighbor (Planet planet) {
-		return mNeighbors.contains (planet);
-	}
-
-	public void spawnUnit () {
-		if (mOwnedBy > 0)
-			mUnitsNumber++;
-	}
-
-	public void spaceShipArrived (SpaceShip spaceShip) {
-		if (spaceShip.getOwnedBy () == mOwnedBy) {
-			mUnitsNumber += spaceShip.getUnitsNumber ();
-		} else {
-			mUnitsNumber -= spaceShip.getUnitsNumber ();
-			if (mUnitsNumber < 0) {
-				mOwnedBy = spaceShip.getOwnedBy ();
-				mUnitsNumber = Math.abs (mUnitsNumber);
-			}
-		}
 	}
 
 }

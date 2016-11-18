@@ -1,7 +1,7 @@
 package net.neczpal.interstellarwar.desktop.ui.frames;
 
 import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
-import net.neczpal.interstellarwar.desktop.GLUtil;
+import net.neczpal.interstellarwar.desktop.geom.GLUtil;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -20,6 +20,13 @@ public class GameFrame extends Thread {
 
 	private InterstellarWarPanel mGamePanel;
 
+	/**
+	 * Erstellt das Spielfenster
+	 *
+	 * @param name             Der Name des Fensters
+	 * @param displayModeIndex Das Index der Bildschirmmode
+	 * @param client           Das Spiel-Client
+	 */
 	public GameFrame (String name, int displayModeIndex, InterstellarWarClient client) {
 		super (name);
 		this.mName = name;
@@ -28,6 +35,9 @@ public class GameFrame extends Thread {
 		this.mIsGameFrameRunning = false;
 	}
 
+	/**
+	 * Initialisiert das Bildschirm, GLContext, Texturen und Spiel und malt das Spielfenster mit 80 FPS
+	 */
 	@Override
 	public void run () {
 		mIsGameFrameRunning = true;
@@ -52,6 +62,9 @@ public class GameFrame extends Thread {
 		clean ();
 	}
 
+	/**
+	 * Initialisiert das Bildschirm
+	 */
 	private void initDisplay () {
 		try {
 			Display.setDisplayMode (Display.getAvailableDisplayModes ()[mDisplayModeIndex]);
@@ -68,6 +81,9 @@ public class GameFrame extends Thread {
 		}
 	}
 
+	/**
+	 * Initialisiert das GLContext
+	 */
 	private void initGL () {
 		glMatrixMode (GL_PROJECTION);
 		glLoadIdentity ();
@@ -82,6 +98,9 @@ public class GameFrame extends Thread {
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
+	/**
+	 * Initailisiert die Texturen
+	 */
 	private void initTextures () {
 		try {
 			GLUtil.init ();
@@ -91,6 +110,9 @@ public class GameFrame extends Thread {
 		}
 	}
 
+	/**
+	 * Lösch LWJGL
+	 */
 	private void clean () {
 		mIsGameFrameRunning = false;
 
@@ -102,6 +124,9 @@ public class GameFrame extends Thread {
 		mGamePanel.getInterstellarWarClient ().leaveRoom ();
 	}
 
+	/**
+	 * Beendet das Spielfenster
+	 */
 	public void stopGameFrame () {
 		mIsGameFrameRunning = false;
 		mGamePanel.getInterstellarWarClient ().getCore ().stopGame ();

@@ -11,6 +11,12 @@ public class InterstellarWarClient {
 	private InterstellarWarCore mInterstellarWarCore;
 	private ClientConnection mClientConnection;
 
+	/**
+	 * Erstellt ein Spiel-Klient
+	 *
+	 * @param interstellarWarCore Das Spiel-Core
+	 * @param clientConnection    Das Verbindung durch es kommunizieren kann
+	 */
 	public InterstellarWarClient (InterstellarWarCore interstellarWarCore, ClientConnection clientConnection) {
 		mInterstellarWarCore = interstellarWarCore;
 		mClientConnection = clientConnection;
@@ -18,6 +24,11 @@ public class InterstellarWarClient {
 
 	// RECEIVE
 
+	/**
+	 * Bekommt ein Befehl
+	 *
+	 * @param command Der Befehl
+	 */
 	public void receive (Command command) {
 		switch ((InterstellarWarCommand) command.data[0]) {
 			case START_MOVE_SPACESHIP:
@@ -30,15 +41,27 @@ public class InterstellarWarClient {
 	}
 
 	// SEND
+
+	/**
+	 * Sendet zu dem Server, das ein Raumschiff abfährt
+	 *
+	 * @param fromIndex  Index der Planet woher das Raumschiff abfährt
+	 * @param toIndex    Index der Planet wohin das Raumschiff fährt
+	 * @param tickNumber die Zeitvariable
+	 * @param unitNumber die Anzahl der Einheiten des Raumschiffes
+	 */
 	public void startMoveSpaceShip (int fromIndex, int toIndex, int tickNumber, int unitNumber) {
 		mClientConnection.send (Command.Type.GAME_COMMAND, InterstellarWarCommand.START_MOVE_SPACESHIP, fromIndex, toIndex, tickNumber, unitNumber);
 	}
 
+	/**
+	 * Verlasst das Zimmer
+	 */
 	public void leaveRoom () {
 		mClientConnection.leaveRoom ();
 	}
 
-	//OTHER
+	//GETTERS
 
 	public int getRoomIndex () {
 		return mClientConnection.getRoomIndex ();

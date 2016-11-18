@@ -19,15 +19,33 @@ public class InterstellarWarCore extends Thread {
 	private int mTickNumber = 0;
 	private boolean mIsRunning = false;
 
+	/**
+	 * Erstellt ein Spiel-Core durch einen File
+	 *
+	 * @param fileName der Name von der File
+	 * @throws IOException falls die File nicht erreichbar ist
+	 * @see InterstellarWarCore#loadMap(String)
+	 */
 	public InterstellarWarCore (String fileName) throws IOException {
 		loadMap (fileName);
 	}
 
+	/**
+	 * Erstellt ein Spiel-Core durch einen List
+	 *
+	 * @param data der List
+	 * @see InterstellarWarCore#setData(ArrayList)
+	 */
 	public InterstellarWarCore (ArrayList <Serializable> data) {
 		setData (data);
 	}
 
-	// DATA FUNCTIONS
+	/**
+	 * Einladet ein Spiel von einem File
+	 *
+	 * @param fileName der Name von der File
+	 * @throws IOException falls die File nicht erreichbar ist
+	 */
 	private void loadMap (String fileName) throws IOException {
 		mBackgroundTextureIndex = (int) (Math.random () * BACKGROUND_TYPES);
 
@@ -64,6 +82,9 @@ public class InterstellarWarCore extends Thread {
 		}
 	}
 
+	/**
+	 * @return Der List die enthält die Spieldata
+	 */
 	public ArrayList <Serializable> getData () {
 		ArrayList <Serializable> list = new ArrayList <> ();
 
@@ -89,6 +110,11 @@ public class InterstellarWarCore extends Thread {
 		return list;
 	}
 
+	/**
+	 * Einstellt die Spieldata durch der List
+	 *
+	 * @param data Der List die enthält die Spieldata
+	 */
 	public void setData (ArrayList <Serializable> data) {
 		int i = 0;
 
@@ -130,6 +156,13 @@ public class InterstellarWarCore extends Thread {
 	}
 
 	//GAME FUNCTION
+
+	/**
+	 * @param from       Der Planet woher das Raumschiff abfahrt
+	 * @param to         Der Planet wohin das Raumschiff ankommt
+	 * @param tickNumber Die aktuelle Zeit
+	 * @param unitNumber Die Anzahl von Einheiten
+	 */
 	public void startMoveSpaceShip (int from, int to, int tickNumber, int unitNumber) {
 		Planet fromPlanet = mPlanets.get (from);
 		Planet toPlanet = mPlanets.get (to);
@@ -139,6 +172,9 @@ public class InterstellarWarCore extends Thread {
 		fromPlanet.setUnitsNumber (fromPlanet.getUnitsNumber () - unitNumber);
 	}
 
+	/**
+	 * Incrementiert die Zeitvariable von allem Raumschiff, und entfernt, falls es angekommt ist.
+	 */
 	private void moveSpaceShips () {
 		for (SpaceShip spaceShip : mSpaceShips) {
 			spaceShip.tick ();
@@ -154,13 +190,19 @@ public class InterstellarWarCore extends Thread {
 		}
 	}
 
+	/**
+	 * Schafft Einheiten auf alle Planeten
+	 */
 	private void spawnUnits () {
 		for (Planet planet : mPlanets) {
 			planet.spawnUnit ();
 		}
 	}
 
-	//GAME LOOP
+
+	/**
+	 * Das Spiel-Thread
+	 */
 	@Override
 	public void run () {
 		mIsRunning = true;
@@ -181,12 +223,15 @@ public class InterstellarWarCore extends Thread {
 		}
 	}
 
+	/**
+	 * Beendet das Spiel
+	 */
 	public void stopGame () {
 		mIsRunning = false;
 	}
 
-	//GETTERS
 
+	//GETTERS
 	public String getMapName () {
 		return mMapName;
 	}

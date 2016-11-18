@@ -19,6 +19,14 @@ public class SpaceShip implements Serializable {
 
 	private int mTextureIndex;
 
+	/**
+	 * Erstellt ein Raumschiff
+	 *
+	 * @param fromPlanet  Der Planet woher das Raumschiff beginnt
+	 * @param toPlanet    Der planet wohin das Raumschiff einfahrt
+	 * @param currentTick Die aktuelle Zeitvariable des Raumschiffs
+	 * @param unitsNumber Die Anzahl der Einheits, die transportiert wird
+	 */
 	public SpaceShip (Planet fromPlanet, Planet toPlanet, int currentTick, int unitsNumber) {
 		mTextureIndex = (int) (Math.random () * SPACESHIP_TYPES);
 
@@ -39,52 +47,40 @@ public class SpaceShip implements Serializable {
 		vy = ly / length * SPACE_SHIP_SPEED;
 	}
 
-	public int getUnitsNumber () {
-		return mUnitsNumber;
+	/**
+	 * Incrementiert die Zeitvariable
+	 */
+	void tick () {
+		mCurrentTick++;
 	}
 
-	public void setUnitsNumber (int unitsNumber) {
-		mUnitsNumber = unitsNumber;
+	/**
+	 * @return Entscheidet ob das Raumschiff angekommt ist.
+	 */
+	boolean isArrived () {
+		return mCurrentTick >= mMaxTick;
+	}
+
+	// GETTERS
+
+	public int getUnitsNumber () {
+		return mUnitsNumber;
 	}
 
 	public int getOwnedBy () {
 		return mOwnedBy;
 	}
 
-	public void setOwnedBy (int ownedBy) {
-		mOwnedBy = ownedBy;
-	}
-
-	public int getMaxTick () {
-		return mMaxTick;
-	}
-
-	public void setMaxTick (int maxTick) {
-		mMaxTick = maxTick;
-	}
-
 	public int getCurrentTick () {
 		return mCurrentTick;
-	}
-
-	public void setCurrentTick (int currentTick) {
-		mCurrentTick = currentTick;
 	}
 
 	public Planet getFromPlanet () {
 		return mFromPlanet;
 	}
 
-	public void setFromPlanet (Planet fromPlanet) {
-		mFromPlanet = fromPlanet;
-	}
-
 	public Planet getToPlanet () {
 		return mToPlanet;
-	}
-
-	public void setToPlanet (Planet toPlanet) {
-		mToPlanet = toPlanet;
 	}
 
 	public float getVx () {
@@ -97,14 +93,6 @@ public class SpaceShip implements Serializable {
 
 	public int getTextureIndex () {
 		return mTextureIndex;
-	}
-
-	public void tick () {
-		mCurrentTick++;
-	}
-
-	public boolean isArrived () {
-		return mCurrentTick >= mMaxTick;
 	}
 
 }

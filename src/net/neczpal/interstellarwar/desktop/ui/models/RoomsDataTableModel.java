@@ -63,11 +63,20 @@ public class RoomsDataTableModel extends AbstractTableModel {
 		return false;
 	}
 
+	/**
+	 * Stellt die Zimmer-Daten ein
+	 *
+	 * @param roomDatas Die Zimmer-Daten
+	 */
 	public void setRoomDatas (List <RoomData> roomDatas) {
 		mRoomDatas = roomDatas;
 		fireTableDataChanged ();
 	}
 
+	/**
+	 * @param rowIndex Das Reiheindex
+	 * @return Die ID des Zimmers in der rowIndex-ste Reihe.
+	 */
 	public int getId (int rowIndex) {
 		return mRoomDatas.get (rowIndex).getRoomId ();
 	}

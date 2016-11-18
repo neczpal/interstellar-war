@@ -5,11 +5,21 @@ public class RoomServer extends Thread {
 	ServerConnection mServerConnection;
 	private boolean mIsRunning;
 
+	/**
+	 * Erstellt ein Zimmer-Server,
+	 * die sendet die Zimmer-Daten
+	 *
+	 * @param serverConnection Die Server-Verbindung
+	 */
 	public RoomServer (ServerConnection serverConnection) {
 		this.mServerConnection = serverConnection;
 		mIsRunning = false;
 	}
 
+	/**
+	 * Sendet jede 10 Sekunde die Zimmer-Daten
+	 */
+	@Override
 	public void run () {
 		mIsRunning = true;
 		while (mIsRunning) {
@@ -22,6 +32,9 @@ public class RoomServer extends Thread {
 		}
 	}
 
+	/**
+	 * Beendet das Zimmer-Server
+	 */
 	public void stopRoomServer () {
 		mIsRunning = false;
 	}

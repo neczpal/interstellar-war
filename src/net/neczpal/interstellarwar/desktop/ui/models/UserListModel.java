@@ -17,7 +17,11 @@ public class UserListModel extends AbstractListModel <String> {
 		return mUserNames.get (index);
 	}
 
-
+	/**
+	 * Stellt die Benutzernamen ein
+	 *
+	 * @param userNames Die Liste der Benutzernamen
+	 */
 	public void setUserNames (List <String> userNames) {
 		mUserNames = userNames;
 		fireContentsChanged (this, 0, mUserNames.size () - 1);

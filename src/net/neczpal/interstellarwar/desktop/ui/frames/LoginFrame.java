@@ -27,6 +27,11 @@ public class LoginFrame extends JFrame implements ActionListener {
 
 	private Properties mProperties;
 
+	/**
+	 * Erstellt das Anmeldungsframe
+	 *
+	 * @param userInterface Die Benutzerschnittstelle
+	 */
 	public LoginFrame (DesktopUI userInterface) {
 		super ("Login");
 		mUserInterface = userInterface;
@@ -42,6 +47,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 		} catch (IOException e) {
 			e.printStackTrace ();
 		}
+
 		setSize (290, 320);
 		setResizable (false);
 		setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
@@ -92,8 +98,13 @@ public class LoginFrame extends JFrame implements ActionListener {
 
 	}
 
+	/**
+	 * Das Anmeldungsevent
+	 *
+	 * @param actionEvent Das Event
+	 */
 	@Override
-	public void actionPerformed (ActionEvent e) {
+	public void actionPerformed (ActionEvent actionEvent) {
 		if (ipAddressTextField.getText ().isEmpty ()) {
 			JOptionPane.showMessageDialog (this, "Please enter an IP-Address", "IP-Address missing!", JOptionPane.WARNING_MESSAGE);
 		} else if (userNameTextField.getText ().isEmpty ()) {
@@ -116,6 +127,9 @@ public class LoginFrame extends JFrame implements ActionListener {
 		}
 	}
 
+	/**
+	 * @return Das Bildschirmmodeindex
+	 */
 	public int getSelectedDisplayModeIndex () {
 		return availableResolutionsComboBox.getSelectedIndex ();
 	}
