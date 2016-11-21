@@ -23,7 +23,7 @@ public class ClientConnection extends Thread {
 
 	private String mUserName;
 
-	private boolean mIsRunning;
+	private volatile boolean mIsRunning;
 	private Socket mSocket;
 	private ObjectInputStream mIn;
 	private ObjectOutputStream mOut;
@@ -43,9 +43,7 @@ public class ClientConnection extends Thread {
 		mIsRunning = false;
 		String[] ipAndPort = adresse.split (":");
 
-		mSocket = (ipAndPort.length > 1) ?
-				new Socket (ipAndPort[0], Integer.parseInt (ipAndPort[1])) :
-				new Socket (ipAndPort[0], 23233);
+		mSocket = (ipAndPort.length > 1) ? new Socket (ipAndPort[0], Integer.parseInt (ipAndPort[1])) : new Socket (ipAndPort[0], 23233);
 
 		if (mSocket.isConnected ()) {
 			mIn = new ObjectInputStream (mSocket.getInputStream ());
@@ -91,7 +89,7 @@ public class ClientConnection extends Thread {
 	 */
 	public void stopClientConnection () {
 		mIsRunning = false;
-		send (Command.Type.EXIT_SERVER);
+		exitServer ();
 		try {
 			mSocket.close ();
 		} catch (IOException ex) {
@@ -194,13 +192,10 @@ public class ClientConnection extends Thread {
 	}
 
 	/**
-	 * Verlasst das Zimmer
+	 * Verlasst dem Server
 	 */
-	public void leaveRoom () {
-		mUserInterface.stopGame ();
-		send (Command.Type.LEAVE_ROOM);
-		mUserInterface.setIsInRoom (false);
-		mLogger.log (Level.INFO, "<- Leaving the Room");
+	public void exitServer () {
+		send (Command.Type.EXIT_SERVER);
 	}
 
 	/**
@@ -219,6 +214,16 @@ public class ClientConnection extends Thread {
 	public void startRoom () {
 		send (Command.Type.START_ROOM);
 		mLogger.log (Level.INFO, "<- Starting the Room");
+	}
+
+	/**
+	 * Verlasst das Zimmer
+	 */
+	public void leaveRoom () {
+		mUserInterface.stopGame ();
+		send (Command.Type.LEAVE_ROOM);
+		mUserInterface.setIsInRoom (false);
+		mLogger.log (Level.INFO, "<- Leaving the Room");
 	}
 
 	/**

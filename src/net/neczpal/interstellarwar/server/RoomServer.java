@@ -3,7 +3,7 @@ package net.neczpal.interstellarwar.server;
 public class RoomServer extends Thread {
 
 	ServerConnection mServerConnection;
-	private boolean mIsRunning;
+	private volatile boolean mIsRunning;
 
 	/**
 	 * Erstellt ein Zimmer-Server,

@@ -16,8 +16,8 @@ public class InterstellarWarCore extends Thread {
 
 	private int mBackgroundTextureIndex;
 
-	private int mTickNumber = 0;
-	private boolean mIsRunning = false;
+	private int mTickNumber = 1;
+	private volatile boolean mIsRunning = false;
 
 	/**
 	 * Erstellt ein Spiel-Core durch einen File

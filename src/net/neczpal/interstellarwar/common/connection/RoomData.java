@@ -10,7 +10,7 @@ public class RoomData implements Serializable {
 	private String mMapName;
 	private ArrayList <String> mUsers;
 	private int mMaxUserCount;
-	private boolean mIsRunning;
+	private volatile boolean mIsRunning;
 
 	/**
 	 * Erstellt ein Zimmerdatei

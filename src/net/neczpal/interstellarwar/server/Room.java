@@ -96,6 +96,7 @@ public class Room {
 
 	/**
 	 * Sendet ein Befehl zu den Klienten des Zimmers
+	 *
 	 * @param type Der Typ des Befehls
 	 */
 	public void send (Command.Type type) {
@@ -104,6 +105,7 @@ public class Room {
 
 	/**
 	 * Sendet ein Befehl zu den Klient des Zimmers
+	 *
 	 * @param type Der Typ des Befehls
 	 * @param data Der Data des Befehls
 	 */
@@ -113,6 +115,7 @@ public class Room {
 
 	/**
 	 * Sendet ein Befehl zu den Klient des Zimmers
+	 *
 	 * @param command Der Befehl
 	 */
 	public void send (Command command) {

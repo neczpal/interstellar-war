@@ -17,7 +17,7 @@ public class Client extends Thread {
 	private ObjectInputStream mIn;
 
 	private int mPort;
-	private boolean mIsRunning;
+	private volatile boolean mIsRunning;
 
 	private Logger mLogger = Logger.getLogger (Client.class.getCanonicalName ());
 
@@ -84,6 +84,7 @@ public class Client extends Thread {
 
 	/**
 	 * Sendet ein Befehl zu dem Klient
+	 *
 	 * @param command der Befehl
 	 * @return ob es gesendet ist oder gibt es eine Fehler
 	 */

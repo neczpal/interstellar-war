@@ -30,7 +30,7 @@ public class ServerConnection extends Thread {
 
 	private HashMap <Integer, User> mUsers = new HashMap <> ();
 
-	private boolean mIsRunning = false;
+	private volatile boolean mIsRunning = false;
 	private Logger mLogger = Logger.getLogger (ServerConnection.class.getCanonicalName ());
 
 	/**
@@ -46,7 +46,7 @@ public class ServerConnection extends Thread {
 		try {
 			mServerSocket = new ServerSocket (mPort);
 		} catch (IOException e) {
-			mLogger.log (Level.SEVERE, "Server couldn't been created", e);
+			mLogger.log (Level.SEVERE, "Server couldn't be created", e);
 		}
 		this.start ();
 	}
@@ -83,14 +83,13 @@ public class ServerConnection extends Thread {
 	public void stopServerConnection () {
 		mRoomServer.stopRoomServer ();
 		mIsRunning = false;
-		for (Client client : mClients.values ()) {
-			client.stopClient ();
-		}
 		try {
 			mServerSocket.close ();
 		} catch (IOException ex) {
 			mLogger.log (Level.WARNING, "ServerSocket couldn't close: " + ex.getMessage ());
 		}
+		mClientIdCounter = 1;
+		mRoomIdCounter = 1;
 	}
 
 	/**
@@ -215,27 +214,6 @@ public class ServerConnection extends Thread {
 	}
 
 	/**
-	 * Der Benutzer verlasst das Zimmer
-	 *
-	 * @param user Der Benutzer
-	 */
-	private void leaveRoom (User user) {
-		int roomId = user.getRoomId ();
-		if (roomId != 0) {
-			Room room = getRoom (roomId);
-			room.removeUser (user);
-			if (room.isEmpty () && room.isMapRunning ()) {
-				room.stopGame ();
-				mRooms.remove (roomId);
-			}
-			user.setRoomId (0);
-
-			listRoom ();
-			mLogger.log (Level.INFO, "-> User (" + user + ") left the Room (" + room + ")");
-		}
-	}
-
-	/**
 	 * Der Benutzer tirtt in dem Zimmer ein
 	 *
 	 * @param user Der Benutzer
@@ -271,6 +249,27 @@ public class ServerConnection extends Thread {
 			mLogger.log (Level.INFO, "-> User (" + user + ") started the game in the Room (" + room + ")");
 		} else {
 			mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not yet full/running/not existing");
+		}
+	}
+
+	/**
+	 * Der Benutzer verlasst das Zimmer
+	 *
+	 * @param user Der Benutzer
+	 */
+	private void leaveRoom (User user) {
+		int roomId = user.getRoomId ();
+		if (roomId != 0) {
+			Room room = getRoom (roomId);
+			room.removeUser (user);
+			if (room.isEmpty () && room.isMapRunning ()) {
+				room.stopGame ();
+				mRooms.remove (roomId);
+			}
+			user.setRoomId (0);
+
+			listRoom ();
+			mLogger.log (Level.INFO, "-> User (" + user + ") left the Room (" + room + ")");
 		}
 	}
 
@@ -384,7 +383,7 @@ public class ServerConnection extends Thread {
 	 *
 	 * @param command Der Befehl
 	 */
-	public void send (Command command) {
+	public synchronized void send (Command command) {
 		Iterator <HashMap.Entry <Integer, Client>> iterator = mClients.entrySet ().iterator ();
 		while (iterator.hasNext () && mIsRunning) {
 			HashMap.Entry <Integer, Client> entry = iterator.next ();
