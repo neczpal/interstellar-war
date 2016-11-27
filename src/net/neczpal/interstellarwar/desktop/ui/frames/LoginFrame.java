@@ -22,6 +22,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 	private JTextField ipAddressTextField;
 	private JButton loginButton;
 	private JComboBox <String> availableResolutionsComboBox;
+	private JCheckBox fullScreenCheckBox;
 
 	private Properties mProperties;
 
@@ -46,13 +47,13 @@ public class LoginFrame extends JFrame implements ActionListener {
 			e.printStackTrace ();
 		}
 
-		setSize (290, 320);
+		setSize (290, 350);
 		setResizable (false);
 		setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
 		setLocationByPlatform (true);
 
 		JPanel panel = new JPanel ();
-		panel.setLayout (new GridLayout (8, 1));
+		panel.setLayout (new GridLayout (9, 1));
 		panel.setBorder (BorderFactory.createEmptyBorder (10, 10, 10, 10));
 
 		JLabel userNameLabel = new JLabel ("USERNAME:");
@@ -81,19 +82,20 @@ public class LoginFrame extends JFrame implements ActionListener {
 		} catch (LWJGLException e) {
 			e.printStackTrace ();
 		}
+		fullScreenCheckBox = new JCheckBox ("FULLSCREEN");
 
+		panel.add (fullScreenCheckBox);
+
+		JLabel gap = new JLabel ("");
+		panel.add (gap);
 
 		loginButton = new JButton ("Login");
 		loginButton.addActionListener (this);
 		getRootPane ().setDefaultButton (loginButton);
 
-		JLabel gap = new JLabel ("");
-		panel.add (gap);
-
 		panel.add (loginButton);
 
 		add (panel);
-
 	}
 
 	/**
@@ -130,5 +132,12 @@ public class LoginFrame extends JFrame implements ActionListener {
 	 */
 	public int getSelectedDisplayModeIndex () {
 		return availableResolutionsComboBox.getSelectedIndex ();
+	}
+
+	/**
+	 * @return Ob es zu Fullscreen einstellt ist
+	 */
+	public boolean isFullscreen () {
+		return fullScreenCheckBox.isSelected ();
 	}
 }

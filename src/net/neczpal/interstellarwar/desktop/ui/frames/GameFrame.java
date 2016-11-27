@@ -14,6 +14,8 @@ import static org.lwjgl.opengl.GL11.*;
 public class GameFrame extends Thread {
 
 	private int mDisplayModeIndex;
+	private boolean mFullScreen;
+
 	private int mWidth, mHeight;
 	private String mName;
 	private boolean mIsGameFrameRunning;
@@ -27,10 +29,11 @@ public class GameFrame extends Thread {
 	 * @param displayModeIndex Das Index der Bildschirmmode
 	 * @param client           Das Spiel-Client
 	 */
-	public GameFrame (String name, int displayModeIndex, InterstellarWarClient client) {
+	public GameFrame (String name, boolean fullScreen, int displayModeIndex, InterstellarWarClient client) {
 		super (name);
 		this.mName = name;
 		this.mDisplayModeIndex = displayModeIndex;
+		this.mFullScreen = fullScreen;
 		this.mGamePanel = new InterstellarWarPanel (client);
 		this.mIsGameFrameRunning = false;
 	}
@@ -71,7 +74,7 @@ public class GameFrame extends Thread {
 			mWidth = Display.getDisplayMode ().getWidth ();
 			mHeight = Display.getDisplayMode ().getHeight ();
 
-			Display.setFullscreen (true);
+			Display.setFullscreen (mFullScreen);
 			Display.setTitle (mName);
 
 			Display.create ();

@@ -64,7 +64,7 @@ public class DesktopUI implements UserInterface {
 
 	@Override
 	public void startGame (String mapName) {
-		mGameFrame = new GameFrame ("Interstellar War : " + mapName, mLoginFrame.getSelectedDisplayModeIndex (), mConnection.getGameClient ());
+		mGameFrame = new GameFrame ("Interstellar War : " + mapName, mLoginFrame.isFullscreen (), mLoginFrame.getSelectedDisplayModeIndex (), mConnection.getGameClient ());
 		mGameFrame.start ();
 	}
 
