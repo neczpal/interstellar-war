@@ -2,6 +2,7 @@ package net.neczpal.interstellarwar.desktop.ui.frames;
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.common.connection.RoomData;
+import net.neczpal.interstellarwar.desktop.Loader;
 import net.neczpal.interstellarwar.desktop.ui.models.RoomsDataTableModel;
 import net.neczpal.interstellarwar.desktop.ui.models.UserListModel;
 
@@ -15,13 +16,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class LobbyFrame extends JFrame {
 	private JTable mRoomsTable;
-	private JLabel mRoomPicture;//#TODO
 	private JList mRoomUserList;
 	private JButton mJoinOrLeaveButton;
 	private JButton mStartButton;
@@ -45,6 +46,12 @@ public class LobbyFrame extends JFrame {
 		super ("Rooms");
 
 		mConnection = clientConnection;
+
+		try {
+			setIconImage (Loader.loadImage ("res/icon.png"));
+		} catch (IOException e) {
+			e.printStackTrace ();
+		}
 
 		setLayout (new BorderLayout ());
 		setLocationByPlatform (true);
@@ -82,7 +89,6 @@ public class LobbyFrame extends JFrame {
 				}
 			}
 		});
-		//		mRoomsTable.setDefaultRenderer (String.class, new RoomTableCellRenderer (mRoomsTable.getDefaultRenderer (String.class)));
 		mRoomsTable.setDefaultRenderer (Boolean.class, new RoomTableCellRenderer (mRoomsTable.getDefaultRenderer (Boolean.class)));
 		mRoomsTable.setDefaultRenderer (Object.class, new RoomTableCellRenderer (mRoomsTable.getDefaultRenderer (Object.class)));
 
@@ -91,9 +97,6 @@ public class LobbyFrame extends JFrame {
 		JPanel rightPanel = new JPanel ();
 		rightPanel.setBorder (BorderFactory.createEmptyBorder (20, 10, 20, 20));
 		rightPanel.setLayout (new GridLayout (3, 1));
-
-		//		ImageIcon image = new ImageIcon ("res/interstellarwar/planet5.png");// #TODO image for every interstellarwar
-		//		mRoomPicture = new JLabel ("", image, JLabel.CENTER);
 
 		mUserListModel = new UserListModel ();
 
@@ -159,8 +162,7 @@ public class LobbyFrame extends JFrame {
 			if (roomData.getRoomId () == mSelectedRoomId) {
 				newSelection = i;
 
-				if (roomData.getUsers ().size () == roomData.getMaxUserCount () && mIsInRoom &&
-						!roomData.isRunning ()) {
+				if (roomData.getUsers ().size () == roomData.getMaxUserCount () && mIsInRoom && !roomData.isRunning ()) {
 					mStartButton.setEnabled (true);
 				} else {
 					mStartButton.setEnabled (false);
@@ -198,6 +200,7 @@ public class LobbyFrame extends JFrame {
 
 		/**
 		 * Erstellt ein Zimmertaballerenderer
+		 *
 		 * @param renderer Der Tabellerenderer
 		 */
 		RoomTableCellRenderer (TableCellRenderer renderer) {

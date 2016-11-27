@@ -7,12 +7,10 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -43,7 +41,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 		}
 
 		try {
-			setIconImage (ImageIO.read (new File ("res/textures/planet5.png")));// #TODO useful icon
+			setIconImage (Loader.loadImage ("res/icon.png"));
 		} catch (IOException e) {
 			e.printStackTrace ();
 		}

@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL11;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 public class InterstellarWarPanel {
 	private static final int EDGE_MOVE_DISTANCE = 20;
@@ -196,13 +197,14 @@ public class InterstellarWarPanel {
 		}
 
 		for (SpaceShip spaceShip : spaceShips) {
-			drawSpaceShip (spaceShip);
+			try {
+				drawSpaceShip (spaceShip);
+			} catch (ConcurrentModificationException ex) {
+			}
 		}
 
 		if (mSelectedPlanetTo != null) {
-			GLUtil.drawArrow (new Point (mSelectedPlanetFrom.getX (), mSelectedPlanetFrom.getY ()),
-					new Point (mSelectedPlanetTo.getX (), mSelectedPlanetTo.getY ()),
-					Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
+			GLUtil.drawArrow (new Point (mSelectedPlanetFrom.getX (), mSelectedPlanetFrom.getY ()), new Point (mSelectedPlanetTo.getX (), mSelectedPlanetTo.getY ()), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 
 		GL11.glPopMatrix ();
@@ -214,8 +216,7 @@ public class InterstellarWarPanel {
 	 * @param road Das Weg
 	 */
 	private void drawRoad (Road road) {
-		GLUtil.drawLine (new Point (road.getFrom ().getX (), road.getFrom ().getY ()),
-				new Point (road.getTo ().getX (), road.getTo ().getY ()));
+		GLUtil.drawLine (new Point (road.getFrom ().getX (), road.getFrom ().getY ()), new Point (road.getTo ().getX (), road.getTo ().getY ()));
 	}
 
 	/**
@@ -262,6 +263,7 @@ public class InterstellarWarPanel {
 		GL11.glTranslated (spaceShip.getCurrentTick () * spaceShip.getVx (), spaceShip.getCurrentTick () * spaceShip.getVy (), 0);
 
 		GLUtil.drawQuad (a, b, c, d, Color.values ()[spaceShip.getOwnedBy ()], mTextures.spaceship[spaceshipType]);
+		GLUtil.drawString (Integer.toString (spaceShip.getUnitsNumber ()), fromPoint.getX (), fromPoint.getY () + 20);
 
 		GL11.glPopMatrix ();
 	}

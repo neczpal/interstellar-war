@@ -122,8 +122,8 @@ public final class Loader {
 	/**
 	 * Ladet ein Bild von einem File ein
 	 *
-	 * @param filepath Der Bild
-	 * @return OpenGL Index der Texture
+	 * @param filepath Der File
+	 * @return Das Bild
 	 * @throws IOException falls das File kann nicht geöffnet werden
 	 */
 	public static BufferedImage loadImage (String filepath) throws IOException {
