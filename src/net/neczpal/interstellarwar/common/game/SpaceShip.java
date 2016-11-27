@@ -15,7 +15,7 @@ public class SpaceShip implements Serializable {
 	private Planet mFromPlanet;
 	private Planet mToPlanet;
 
-	private float vx, vy;
+	private float mVx, mVy;
 
 	private int mTextureIndex;
 
@@ -23,15 +23,14 @@ public class SpaceShip implements Serializable {
 	 * Erstellt ein Raumschiff
 	 *
 	 * @param fromPlanet  Der Planet woher das Raumschiff beginnt
-	 * @param toPlanet    Der planet wohin das Raumschiff einfahrt
-	 * @param currentTick Die aktuelle Zeitvariable des Raumschiffs
+	 * @param toPlanet    Der Planet wohin das Raumschiff einfahrt
 	 * @param unitsNumber Die Anzahl der Einheits, die transportiert wird
 	 */
-	public SpaceShip (Planet fromPlanet, Planet toPlanet, int currentTick, int unitsNumber) {
+	SpaceShip (Planet fromPlanet, Planet toPlanet, int unitsNumber) {
 		mTextureIndex = (int) (Math.random () * SPACESHIP_TYPES);
 
 		mUnitsNumber = unitsNumber;
-		mCurrentTick = currentTick;
+		mCurrentTick = 0;
 		mFromPlanet = fromPlanet;
 		mToPlanet = toPlanet;
 
@@ -43,8 +42,33 @@ public class SpaceShip implements Serializable {
 
 		mMaxTick = (int) (length / SPACE_SHIP_SPEED);
 
-		vx = lx / length * SPACE_SHIP_SPEED;
-		vy = ly / length * SPACE_SHIP_SPEED;
+		mVx = lx / length * SPACE_SHIP_SPEED;
+		mVy = ly / length * SPACE_SHIP_SPEED;
+	}
+
+	/**
+	 * Erstellt ein Raumschiff
+	 *
+	 * @param fromPlanet   Der Planet woher das Raumschiff beginnt
+	 * @param toPlanet     Der Planet wohin das Raumschiff einfahrt
+	 * @param vx           Die Geschwindigkeit von dem Raumshiff auf dem X-Achse
+	 * @param vy           Die Geschwindigkeit von dem Raumshiff auf dem Y-Achse
+	 * @param ownedBy      Die Nummer von Spieler, die diesem Raumschiff dominiert
+	 * @param unitsNumber  Die Anzahl der Einheits, die transportiert wird
+	 * @param currentTick  Die akutelle Zeitvariable
+	 * @param maxTick      Die maximalle Zeitvariable
+	 * @param textureIndex Das Index der Texture
+	 */
+	SpaceShip (Planet fromPlanet, Planet toPlanet, float vx, float vy, int ownedBy, int unitsNumber, int currentTick, int maxTick, int textureIndex) {
+		mTextureIndex = textureIndex;
+		mUnitsNumber = unitsNumber;
+		mCurrentTick = currentTick;
+		mMaxTick = maxTick;
+		mFromPlanet = fromPlanet;
+		mToPlanet = toPlanet;
+		mVx = vx;
+		mVy = vy;
+		mOwnedBy = ownedBy;
 	}
 
 	/**
@@ -84,11 +108,15 @@ public class SpaceShip implements Serializable {
 	}
 
 	public float getVx () {
-		return vx;
+		return mVx;
 	}
 
 	public float getVy () {
-		return vy;
+		return mVy;
+	}
+
+	public int getMaxTick () {
+		return mMaxTick;
 	}
 
 	public int getTextureIndex () {

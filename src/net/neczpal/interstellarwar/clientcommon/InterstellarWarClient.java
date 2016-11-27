@@ -31,9 +31,6 @@ public class InterstellarWarClient {
 	 */
 	public void receive (Command command) {
 		switch ((InterstellarWarCommand) command.data[0]) {
-			case START_MOVE_SPACESHIP:
-				mInterstellarWarCore.startMoveSpaceShip ((int) command.data[1], (int) command.data[2], (int) command.data[3], (int) command.data[4]);
-				break;
 			case REFRESH_WHOLE_MAP:
 				mInterstellarWarCore.setData ((ArrayList <Serializable>) command.data[1]);
 				break;

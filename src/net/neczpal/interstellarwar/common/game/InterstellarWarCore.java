@@ -16,7 +16,7 @@ public class InterstellarWarCore extends Thread {
 
 	private int mBackgroundTextureIndex;
 
-	private int mTickNumber = 1;
+	private int mTickNumber;
 	private volatile boolean mIsRunning = false;
 
 	/**
@@ -98,14 +98,27 @@ public class InterstellarWarCore extends Thread {
 		list.add (mSpaceShips.size ());
 
 		for (Planet planet : mPlanets) {
-			list.add (planet);
+			list.add (planet.getX ());
+			list.add (planet.getY ());
+			list.add (planet.getRadius ());
+			list.add (planet.getOwnedBy ());
+			list.add (planet.getUnitsNumber ());
+			list.add (planet.getTextureIndex ());
 		}
 		for (Road road : mRoads) {
 			list.add (mPlanets.indexOf (road.getFrom ()));
 			list.add (mPlanets.indexOf (road.getTo ()));
 		}
 		for (SpaceShip spaceShip : mSpaceShips) {
-			list.add (spaceShip);
+			list.add (mPlanets.indexOf (spaceShip.getFromPlanet ()));
+			list.add (mPlanets.indexOf (spaceShip.getToPlanet ()));
+			list.add (spaceShip.getVx ());
+			list.add (spaceShip.getVy ());
+			list.add (spaceShip.getOwnedBy ());
+			list.add (spaceShip.getUnitsNumber ());
+			list.add (spaceShip.getCurrentTick ());
+			list.add (spaceShip.getMaxTick ());
+			list.add (spaceShip.getTextureIndex ());
 		}
 		return list;
 	}
@@ -133,8 +146,14 @@ public class InterstellarWarCore extends Thread {
 		int spaceShipNumber = (int) data.get (i++);
 
 		for (int j = 0; j < planetNumber; j++) {
-			Planet planet = (Planet) data.get (i++);
-			mPlanets.add (planet);
+			float x = (float) data.get (i++);
+			float y = (float) data.get (i++);
+			float r = (float) data.get (i++);
+			int ownedBy = (int) data.get (i++);
+			int unitNum = (int) data.get (i++);
+			int tex = (int) data.get (i++);
+
+			mPlanets.add (new Planet (x, y, r, ownedBy, unitNum, tex));
 		}
 
 		for (int j = 0; j < connectionNumber; j++) {
@@ -150,26 +169,38 @@ public class InterstellarWarCore extends Thread {
 			mRoads.add (road);
 		}
 		for (int j = 0; j < spaceShipNumber; j++) {
-			SpaceShip spaceship = (SpaceShip) data.get (i++);
-			mSpaceShips.add (spaceship);
+			int fromIndex = (int) data.get (i++);
+			int toIndex = (int) data.get (i++);
+
+			Planet from = mPlanets.get (fromIndex);
+			Planet to = mPlanets.get (toIndex);
+
+			float vx = (float) data.get (i++);
+			float vy = (float) data.get (i++);
+			int ownedBy = (int) data.get (i++);
+			int unitsNum = (int) data.get (i++);
+			int curTick = (int) data.get (i++);
+			int maxTick = (int) data.get (i++);
+			int tex = (int) data.get (i++);
+
+			mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
 		}
 	}
 
 	//GAME FUNCTION
 
 	/**
-	 * @param from       Der Planet woher das Raumschiff abfahrt
-	 * @param to         Der Planet wohin das Raumschiff ankommt
-	 * @param tickNumber Die aktuelle Zeit
-	 * @param unitNumber Die Anzahl von Einheiten
+	 * @param from Der Planet woher das Raumschiff abfahrt
+	 * @param to   Der Planet wohin das Raumschiff ankommt
 	 */
-	public void startMoveSpaceShip (int from, int to, int tickNumber, int unitNumber) {
+	public void startMoveSpaceShip (int from, int to) {
 		Planet fromPlanet = mPlanets.get (from);
 		Planet toPlanet = mPlanets.get (to);
-
-		mSpaceShips.add (new SpaceShip (fromPlanet, toPlanet, mTickNumber - tickNumber, unitNumber));
-
-		fromPlanet.setUnitsNumber (fromPlanet.getUnitsNumber () - unitNumber);
+		int unitNumber = fromPlanet.getUnitsNumber ();
+		if (unitNumber > 0) {
+			fromPlanet.setUnitsNumber (0);
+			mSpaceShips.add (new SpaceShip (fromPlanet, toPlanet, unitNumber));
+		}
 	}
 
 	/**
@@ -206,6 +237,7 @@ public class InterstellarWarCore extends Thread {
 	@Override
 	public void run () {
 		mIsRunning = true;
+		mTickNumber = 1;
 		while (mIsRunning) {
 			try {
 				Thread.sleep (50);

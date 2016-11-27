@@ -23,17 +23,15 @@ public class InterstellarWarServer {
 
 	/**
 	 * Bekommt ein Befehl von dem Spiel Klient
+	 *
 	 * @param command Der Spiel-Befehl
 	 */
 	public void receive (Command command) {
 		switch ((InterstellarWarCommand) command.data[1]) {
 			case START_MOVE_SPACESHIP:
-				if ((int) command.data[5] > 0) {
-					mInterstellarWarCore.startMoveSpaceShip ((int) command.data[2], (int) command.data[3], (int) command.data[4], (int) command.data[5]);
-					mConnection.send (Command.Type.GAME_COMMAND, InterstellarWarCommand.START_MOVE_SPACESHIP, command.data[2], command.data[3], command.data[4], command.data[5]);
+				mInterstellarWarCore.startMoveSpaceShip ((int) command.data[2], (int) command.data[3]);
 
-					mConnection.send (Command.Type.GAME_COMMAND, InterstellarWarCommand.REFRESH_WHOLE_MAP, mInterstellarWarCore.getData ());
-				}
+				mConnection.send (Command.Type.GAME_COMMAND, InterstellarWarCommand.REFRESH_WHOLE_MAP, mInterstellarWarCore.getData ());
 				break;
 		}
 	}

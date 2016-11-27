@@ -26,6 +26,15 @@ public class InterstellarWarCoreTest {
 	}
 
 	@Test
+	public void testMapLoading () throws Exception {
+		Assert.assertEquals ("Map name loaded", "Testmap", mCore.getMapName ());
+		Assert.assertEquals ("Maxuser loaded", 2, mCore.getMaxUsers ());
+		Assert.assertEquals ("Planets loaded", 17, mCore.getPlanets ().size ());
+		Assert.assertEquals ("Connections loaded", 18, mCore.getRoads ().size ());
+		Assert.assertEquals ("No spaceships", 0, mCore.getSpaceShips ().size ());
+	}
+
+	@Test
 	public void testCapturedPlanetSpawnUnit () throws Exception {
 		ArrayList <Planet> planets = mCore.getPlanets ();
 		int selectedPlanetIndex = 0;
@@ -54,12 +63,13 @@ public class InterstellarWarCoreTest {
 		ArrayList <Planet> planets = mCore.getPlanets ();
 		int selectedFromPlanetIndex = 0;
 		int selectedToPlanetIndex = 1;
-		int sentUnitNumber = 1;
 
 		int lastUnitsNumber = planets.get (selectedToPlanetIndex).getUnitsNumber ();
+		int fromUnitsNumber = planets.get (selectedFromPlanetIndex).getUnitsNumber ();
 
-		mCore.startMoveSpaceShip (selectedFromPlanetIndex, selectedToPlanetIndex, 0, sentUnitNumber);
+		mCore.startMoveSpaceShip (selectedFromPlanetIndex, selectedToPlanetIndex);
 
+		Assert.assertTrue ("From planet units are zero", planets.get (selectedFromPlanetIndex).getUnitsNumber () == 0);
 		Assert.assertTrue ("SpaceShip starts moving", mCore.getSpaceShips ().size () > 0);
 
 		int i = 0;
@@ -69,29 +79,7 @@ public class InterstellarWarCoreTest {
 		}
 		Assert.assertFalse ("SpaceShip arrived", i == 200);
 
-		Assert.assertEquals ("Neutral Planet unit number decreased", lastUnitsNumber - sentUnitNumber, planets.get (selectedToPlanetIndex).getUnitsNumber ());
+		Assert.assertEquals ("Neutral Planet unit number decreased", Math.abs (lastUnitsNumber - fromUnitsNumber), planets.get (selectedToPlanetIndex).getUnitsNumber ());
 	}
 
-	@Test
-	public void testSpaceShipMoveConquers () throws Exception {
-		ArrayList <Planet> planets = mCore.getPlanets ();
-		int selectedFromPlanetIndex = 0;
-		int selectedToPlanetIndex = 1;
-		int sentUnitNumber = 5;
-
-		int lastUnitsNumber = planets.get (selectedToPlanetIndex).getUnitsNumber ();
-
-		mCore.startMoveSpaceShip (selectedFromPlanetIndex, selectedToPlanetIndex, 0, sentUnitNumber);
-
-		Assert.assertTrue ("SpaceShip starts moving", mCore.getSpaceShips ().size () > 0);
-
-		int i = 0;
-		while (mCore.getSpaceShips ().size () > 0 && i < 200) { //WAIT UNTIL ARRIVE
-			Thread.sleep (10);
-			i++;
-		}
-		Assert.assertFalse ("SpaceShip arrived", i == 200);
-
-		Assert.assertEquals ("Neutral Planet conquered", Math.abs (lastUnitsNumber - sentUnitNumber), planets.get (selectedToPlanetIndex).getUnitsNumber ());
-	}
 }

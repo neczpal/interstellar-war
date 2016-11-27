@@ -129,7 +129,6 @@ public class ClientConnection extends Thread {
 	private void loadMap (int roomIndex, ArrayList <Serializable> mapData) {
 		mRoomIndex = roomIndex;
 		InterstellarWarCore core = new InterstellarWarCore (mapData);
-
 		mGameClient = new InterstellarWarClient (core, this);
 		mUserInterface.setIsInRoom (true);
 		mLogger.log (Level.INFO, "-> MapData loaded. RoomIndex (" + mRoomIndex + ")");

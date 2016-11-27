@@ -17,6 +17,7 @@ public class Planet implements Serializable {
 	private int mUnitsNumber;
 	private ArrayList <Planet> mNeighbors;
 
+
 	/**
 	 * Erstellt einen Planet
 	 *
@@ -27,7 +28,21 @@ public class Planet implements Serializable {
 	 * @param unitsNumber Die Anzahl der Einheit auf dem Planet
 	 */
 	Planet (float x, float y, float radius, int ownedBy, int unitsNumber) {
-		mTextureIndex = (int) (Math.random () * PLANET_TYPES);
+		this (x, y, radius, ownedBy, unitsNumber, (int) (Math.random () * PLANET_TYPES));
+	}
+
+	/**
+	 * Erstellt einen Planet
+	 *
+	 * @param x           Position auf dem X-Achse
+	 * @param y           Position auf dem Y-Achse
+	 * @param radius      Radius von dem Planet
+	 * @param ownedBy     Die Nummer von Spieler, die diesem Planet dominiert
+	 * @param unitsNumber Die Anzahl der Einheit auf dem Planet
+	 * @param tex         Die Texture des Planets
+	 */
+	Planet (float x, float y, float radius, int ownedBy, int unitsNumber, int tex) {
+		mTextureIndex = tex;
 
 		mX = x;
 		mY = y;
