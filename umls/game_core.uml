@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>net.neczpal.interstellarwar.server</OriginalElement>
+  <nodes>
+    <node x="853.5" y="-32.5">net.neczpal.interstellarwar.common.game.Planet</node>
+    <node x="1375.0" y="-21.5">net.neczpal.interstellarwar.common.game.SpaceShip</node>
+    <node x="-33.5" y="620.0">net.neczpal.interstellarwar.common.game.Road</node>
+    <node x="255.5" y="465.5">net.neczpal.interstellarwar.common.game.InterstellarWarCore</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="net.neczpal.interstellarwar.common.game.InterstellarWarCore" target="net.neczpal.interstellarwar.common.game.SpaceShip">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.common.game.Road" target="net.neczpal.interstellarwar.common.game.Planet">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.common.game.SpaceShip" target="net.neczpal.interstellarwar.common.game.Planet">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.common.game.InterstellarWarCore" target="net.neczpal.interstellarwar.common.game.Road">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.common.game.InterstellarWarCore" target="net.neczpal.interstellarwar.common.game.Planet">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.4" x="839.25" y="528.75" />
+  <SelectedNodes>
+    <node>net.neczpal.interstellarwar.common.game.Planet</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Constructors</Category>
+    <Category>Properties</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

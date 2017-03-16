@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>net.neczpal.interstellarwar.server.Client</OriginalElement>
+  <nodes>
+    <node x="128.5" y="1419.5">net.neczpal.interstellarwar.server.InterstellarWarServer</node>
+    <node x="816.5" y="2267.0">net.neczpal.interstellarwar.common.connection.RoomData</node>
+    <node x="3760.0" y="198.0">net.neczpal.interstellarwar.server.User</node>
+    <node x="3291.5" y="1422.5">net.neczpal.interstellarwar.server.Client</node>
+    <node x="593.5" y="1650.5">net.neczpal.interstellarwar.server.Room</node>
+    <node x="2376.5" y="518.5">net.neczpal.interstellarwar.server.ServerConnection</node>
+    <node x="3351.5" y="49.0">net.neczpal.interstellarwar.server.RoomServer</node>
+    <node x="1456.5" y="1427.0">net.neczpal.interstellarwar.common.connection.Command</node>
+    <node x="1821.5" y="1474.0">net.neczpal.interstellarwar.server.Server</node>
+    <node x="-24.5" y="1705.5">net.neczpal.interstellarwar.common.game.InterstellarWarCore</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="net.neczpal.interstellarwar.server.ServerConnection" target="net.neczpal.interstellarwar.server.Client">
+      <point x="423.5" y="40.0" />
+      <point x="3520.0" y="960.0" />
+      <point x="0.0" y="-137.5" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.Client" target="net.neczpal.interstellarwar.server.ServerConnection">
+      <point x="0.0" y="137.5" />
+      <point x="3520.0" y="1760.0" />
+      <point x="2800.0" y="1760.0" />
+      <point x="0.0" y="401.5" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.Room" target="net.neczpal.interstellarwar.server.ServerConnection">
+      <point x="40.0" y="-269.5" />
+      <point x="1000.0" y="920.0" />
+      <point x="-423.5" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.Room" target="net.neczpal.interstellarwar.common.connection.RoomData">
+      <point x="0.0" y="269.5" />
+      <point x="0.0" y="-93.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.RoomServer" target="net.neczpal.interstellarwar.server.ServerConnection">
+      <point x="0.0" y="71.0" />
+      <point x="3520.0" y="800.0" />
+      <point x="423.5" y="-120.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.ServerConnection" target="net.neczpal.interstellarwar.server.User">
+      <point x="423.5" y="-80.0" />
+      <point x="3880.0" y="840.0" />
+      <point x="0.0" y="82.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.InterstellarWarServer" target="net.neczpal.interstellarwar.common.game.InterstellarWarCore">
+      <point x="0.0" y="60.5" />
+      <point x="0.0" y="-214.5" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.Room" target="net.neczpal.interstellarwar.common.game.InterstellarWarCore">
+      <point x="-366.5" y="0.0" />
+      <point x="264.5" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.Server" target="net.neczpal.interstellarwar.server.ServerConnection">
+      <point x="0.0" y="-126.0" />
+      <point x="2040.0" y="1000.0" />
+      <point x="-423.5" y="80.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.ServerConnection" target="net.neczpal.interstellarwar.server.RoomServer">
+      <point x="423.5" y="-160.0" />
+      <point x="3280.0" y="760.0" />
+      <point x="3280.0" y="120.0" />
+      <point x="-168.5" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.Room" target="net.neczpal.interstellarwar.server.InterstellarWarServer">
+      <point x="-40.0" y="-269.5" />
+      <point x="920.0" y="1480.0" />
+      <point x="111.5" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.ServerConnection" target="net.neczpal.interstellarwar.common.connection.Command">
+      <point x="-423.5" y="40.0" />
+      <point x="1600.0" y="960.0" />
+      <point x="0.0" y="-93.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.InterstellarWarServer" target="net.neczpal.interstellarwar.server.Room">
+      <point x="0.0" y="-60.5" />
+      <point x="240.0" y="1360.0" />
+      <point x="960.0" y="1360.0" />
+      <point x="0.0" y="-269.5" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.Room" target="net.neczpal.interstellarwar.common.connection.Command">
+      <point x="80.0" y="-269.5" />
+      <point x="1040.0" y="1520.0" />
+      <point x="-143.5" y="0.0" />
+    </edge>
+    <edge source="net.neczpal.interstellarwar.server.ServerConnection" target="net.neczpal.interstellarwar.server.Room">
+      <point x="0.0" y="-401.5" />
+      <point x="2800.0" y="0.0" />
+      <point x="4120.0" y="0.0" />
+      <point x="4120.0" y="1920.0" />
+      <point x="366.5" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.5" x="1014.0" y="832.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Constructors</Category>
+    <Category>Properties</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
