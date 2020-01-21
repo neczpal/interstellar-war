@@ -20,17 +20,18 @@ public class DesktopUI implements UserInterface {
 	 * Erstellt das UI
 	 */
 	public DesktopUI () {
-		openLogin ();
+//		openLogin ();
 	}
 
 	public static void main (String[] args) {
-		new DesktopUI ();
+		DesktopUI mUI = new DesktopUI ();
+		mUI.openLogin();
 	}
 
 	/**
 	 * Öffnet die Anmeldungsframe
 	 */
-	private void openLogin () {
+	public void openLogin () {
 		mLoginFrame = new LoginFrame (this);
 		mLoginFrame.setVisible (true);
 	}
@@ -83,6 +84,6 @@ public class DesktopUI implements UserInterface {
 	 */
 	public void setConnection (ClientConnection connection) {
 		mConnection = connection;
-		mConnection.setUserInterface (this);
+//		mConnection.setUserInterface (this);
 	}
 }

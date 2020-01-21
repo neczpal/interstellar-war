@@ -18,6 +18,8 @@ public class ClientConnection extends Thread {
 	private UserInterface mUserInterface;
 	private InterstellarWarClient mGameClient;
 
+
+
 	private int mConnectionId;
 	private int mRoomIndex;
 
@@ -283,5 +285,9 @@ public class ClientConnection extends Thread {
 
 	public void setUserInterface (UserInterface userInterface) {
 		mUserInterface = userInterface;
+	}
+
+	public int getConnectionId() {
+		return mConnectionId;
 	}
 }

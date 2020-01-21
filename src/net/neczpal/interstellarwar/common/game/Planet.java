@@ -2,6 +2,7 @@ package net.neczpal.interstellarwar.common.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Planet implements Serializable {
 	public static final int PLANET_TYPES = 18;
@@ -15,7 +16,12 @@ public class Planet implements Serializable {
 
 	private int mOwnedBy;
 	private int mUnitsNumber;
-	private ArrayList <Planet> mNeighbors;
+
+	public List<Planet> getNeighbors() {
+		return mNeighbors;
+	}
+
+	private List<Planet> mNeighbors;
 
 
 	/**

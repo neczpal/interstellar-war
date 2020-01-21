@@ -273,15 +273,15 @@ public class InterstellarWarCore extends Thread {
 	}
 
 	public ArrayList <Planet> getPlanets () {
-		return mPlanets;
+		return new ArrayList<>(mPlanets);
 	}
 
 	public ArrayList <Road> getRoads () {
-		return mRoads;
+		return new ArrayList<>(mRoads);
 	}
 
 	public ArrayList <SpaceShip> getSpaceShips () {
-		return mSpaceShips;
+		return new ArrayList<>(mSpaceShips);
 	}
 
 	public int getBackgroundTextureIndex () {

@@ -42,7 +42,7 @@ public class InterstellarWarCoreTest {
 		Planet selectedPlanet = planets.get (selectedPlanetIndex);
 		int lastUnitsNumber = selectedPlanet.getUnitsNumber ();
 
-		Thread.sleep (1600);
+		Thread.sleep (1900);
 		Assert.assertEquals ("Unit spawned", lastUnitsNumber + 1, selectedPlanet.getUnitsNumber ());
 	}
 

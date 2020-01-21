@@ -35,6 +35,8 @@ public class InterstellarWarPanel {
 
 	private Textures mTextures;
 
+	private boolean isDrawing = false;//#TODO
+
 	/**
 	 * Erstellt das Spielpanel
 	 *
@@ -187,6 +189,7 @@ public class InterstellarWarPanel {
 			GLUtil.drawCircle (mSelectedPlanetTo.getX (), mSelectedPlanetTo.getY (), mSelectedPlanetTo.getRadius (), Color.values ()[mSelectedPlanetFrom.getOwnedBy ()]);
 		}
 
+		isDrawing = true;
 		for (Road road : roads) {
 			drawRoad (road);
 		}
@@ -208,6 +211,8 @@ public class InterstellarWarPanel {
 		}
 
 		GL11.glPopMatrix ();
+
+		isDrawing = false;
 	}
 
 	/**

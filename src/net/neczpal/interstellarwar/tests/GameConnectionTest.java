@@ -59,7 +59,7 @@ public class GameConnectionTest {
 	@After
 	public void tearDown () throws Exception {
 		mInterstellarWarClient1.getCore ().stopGame ();
-		mInterstellarWarClient1.getCore ().stopGame ();
+		mInterstellarWarClient2.getCore ().stopGame ();
 
 		mClientConnection1.stopClientConnection ();
 		mClientConnection2.stopClientConnection ();
