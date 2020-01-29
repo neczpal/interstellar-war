@@ -36,15 +36,15 @@ public class InterstellarWarCoreTest {
 
 	@Test
 	public void testCapturedPlanetSpawnUnit () throws Exception {
-		ArrayList <Planet> planets = mCore.getPlanets ();
-		int selectedPlanetIndex = 0;
+        ArrayList<Planet> planets = mCore.getPlanets ();
+        int selectedPlanetIndex = 0;
 
-		Planet selectedPlanet = planets.get (selectedPlanetIndex);
-		int lastUnitsNumber = selectedPlanet.getUnitsNumber ();
+        Planet selectedPlanet = planets.get (selectedPlanetIndex);
+        int lastUnitsNumber = selectedPlanet.getUnitsNumber ();
 
-		Thread.sleep (1600);
-		Assert.assertEquals ("Unit spawned", lastUnitsNumber + 1, selectedPlanet.getUnitsNumber ());
-	}
+        Thread.sleep (2000);
+        Assert.assertEquals ("Unit spawned", lastUnitsNumber + 1, selectedPlanet.getUnitsNumber ());
+    }
 
 	@Test
 	public void testUncapturedPlanetNotSpawnUnit () throws Exception {

@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,35 +24,35 @@ public class LobbyFrame extends JFrame {
 	private JTable mRoomsTable;
 	private JList mRoomUserList;
 	private JButton mJoinOrLeaveButton;
-	private JButton mStartButton;
+    private JButton mStartButton;
 
-	private RoomsDataTableModel mRoomsDataTableModel;
-	private UserListModel mUserListModel;
+    private RoomsDataTableModel mRoomsDataTableModel;
+    private UserListModel mUserListModel;
 
-	private ClientConnection mConnection;
+    private ClientConnection mConnection;
 
-	private int mSelectedRoomId = -1;
-	private boolean mIsInRoom = false;
+    private int mSelectedRoomId = -1;
+    private boolean mIsInRoom = false;
 
-	private HashMap <Integer, ArrayList <String>> mAllRoomUsers = new HashMap <> ();
+    private HashMap<Integer, List<String>> mAllRoomUsers = new HashMap<> ();
 
-	/**
-	 * Erstellt das Zimmer
-	 *
-	 * @param clientConnection Die Client-Verbindung
-	 */
-	public LobbyFrame (ClientConnection clientConnection) {
-		super ("Rooms");
+    /**
+     * Erstellt das Zimmer
+     *
+     * @param clientConnection Die Client-Verbindung
+     */
+    public LobbyFrame (ClientConnection clientConnection) {
+        super ("Rooms");
 
-		mConnection = clientConnection;
+        mConnection = clientConnection;
 
-		try {
-			setIconImage (Loader.loadImage ("res/icon.png"));
-		} catch (IOException e) {
-			e.printStackTrace ();
-		}
+        try {
+            setIconImage (Loader.loadImage ("res/icon.png"));
+        } catch (IOException e) {
+            e.printStackTrace ();
+        }
 
-		setLayout (new BorderLayout ());
+        setLayout (new BorderLayout ());
 		setLocationByPlatform (true);
 		setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
 		setSize (720, 500);

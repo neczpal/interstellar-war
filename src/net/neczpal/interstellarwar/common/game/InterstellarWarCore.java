@@ -1,8 +1,14 @@
 package net.neczpal.interstellarwar.common.game;
 
-import java.io.*;
+import org.json.JSONArray;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class InterstellarWarCore extends Thread {
 	public static final int BACKGROUND_TYPES = 5;
@@ -19,26 +25,31 @@ public class InterstellarWarCore extends Thread {
 	private int mTickNumber;
 	private volatile boolean mIsRunning = false;
 
-	/**
-	 * Erstellt ein Spiel-Core durch einen File
-	 *
-	 * @param fileName der Name von der File
-	 * @throws IOException falls die File nicht erreichbar ist
-	 * @see InterstellarWarCore#loadMap(String)
-	 */
-	public InterstellarWarCore (String fileName) throws IOException {
-		loadMap (fileName);
-	}
+    /**
+     * Erstellt ein Spiel-Core durch einen File
+     *
+     * @param fileName der Name von der File
+     * @throws IOException falls die File nicht erreichbar ist
+     * @see InterstellarWarCore#loadMap(String)
+     */
+    public InterstellarWarCore (String fileName) throws IOException {
+        loadMap (fileName);
+    }
 
-	/**
-	 * Erstellt ein Spiel-Core durch einen List
-	 *
-	 * @param data der List
-	 * @see InterstellarWarCore#setData(ArrayList)
-	 */
-	public InterstellarWarCore (ArrayList <Serializable> data) {
-		setData (data);
-	}
+
+    public InterstellarWarCore (JSONArray jsonArray) {
+        setData (jsonArray.toList ());
+    }
+
+    /**
+     * Erstellt ein Spiel-Core durch einen List
+     *
+     * @param data der List
+     * @see InterstellarWarCore#setData(List)
+     */
+    public InterstellarWarCore (List<Object> data) {
+        setData (data);
+    }
 
 	/**
 	 * Einladet ein Spiel von einem File
@@ -65,9 +76,9 @@ public class InterstellarWarCore extends Thread {
 		int connectionNumber = Integer.parseInt (bufferedReader.readLine ());
 
 		for (int i = 0; i < planetNumber; i++) {
-			String[] params = bufferedReader.readLine ().split (" ");
+            String[] params = bufferedReader.readLine ().split (" ");
 
-			mPlanets.add (new Planet (Float.parseFloat (params[0]), Float.parseFloat (params[1]), Float.parseFloat (params[2]), Integer.parseInt (params[3]), Integer.parseInt (params[4])));
+            mPlanets.add (new Planet (Integer.parseInt (params[0]), Integer.parseInt (params[1]), Integer.parseInt (params[2]), Integer.parseInt (params[3]), Integer.parseInt(params[4])));
 		}
 		for (int i = 0; i < connectionNumber; i++) {
 			String[] params = bufferedReader.readLine ().split (" ");
@@ -79,31 +90,31 @@ public class InterstellarWarCore extends Thread {
 
 			from.linkTo (to);
 			mRoads.add (new Road (from, to));
-		}
-	}
+        }
+    }
 
-	/**
-	 * @return Der List die enthält die Spieldata
-	 */
-	public ArrayList <Serializable> getData () {
-		ArrayList <Serializable> list = new ArrayList <> ();
+    /**
+     * @return Der List die enthält die Spieldata
+     */
+    public List<Object> getData () {
+        List<Object> list = new ArrayList<> ();
 
-		list.add (mBackgroundTextureIndex);
+        list.add (mBackgroundTextureIndex);
 
-		list.add (mMapName);
-		list.add (mMaxUsers);
+        list.add (mMapName);
+        list.add (mMaxUsers);
 
-		list.add (mPlanets.size ());
-		list.add (mRoads.size ());
-		list.add (mSpaceShips.size ());
+        list.add (mPlanets.size ());
+        list.add (mRoads.size ());
+        list.add (mSpaceShips.size ());
 
-		for (Planet planet : mPlanets) {
-			list.add (planet.getX ());
-			list.add (planet.getY ());
-			list.add (planet.getRadius ());
-			list.add (planet.getOwnedBy ());
-			list.add (planet.getUnitsNumber ());
-			list.add (planet.getTextureIndex ());
+        for (Planet planet : mPlanets) {
+            list.add (planet.getX ());
+            list.add (planet.getY ());
+            list.add (planet.getRadius ());
+            list.add (planet.getOwnedBy ());
+            list.add (planet.getUnitsNumber ());
+            list.add (planet.getTextureIndex ());
 		}
 		for (Road road : mRoads) {
 			list.add (mPlanets.indexOf (road.getFrom ()));
@@ -119,41 +130,41 @@ public class InterstellarWarCore extends Thread {
 			list.add (spaceShip.getCurrentTick ());
 			list.add (spaceShip.getMaxTick ());
 			list.add (spaceShip.getTextureIndex ());
-		}
-		return list;
-	}
+        }
+        return list;
+    }
 
-	/**
-	 * Einstellt die Spieldata durch der List
-	 *
-	 * @param data Der List die enthält die Spieldata
-	 */
-	public void setData (ArrayList <Serializable> data) {
-		int i = 0;
+    /**
+     * Einstellt die Spieldata durch der List
+     *
+     * @param data Der List die enthält die Spieldata
+     */
+    public void setData (List<Object> data) {
+        int i = 0;
 
-		mBackgroundTextureIndex = (int) data.get (i++);
+        mBackgroundTextureIndex = (int) data.get (i++);
 
-		mPlanets = new ArrayList <> ();
-		mRoads = new ArrayList <> ();
-		mSpaceShips = new ArrayList <> ();
+        mPlanets = new ArrayList<> ();
+        mRoads = new ArrayList<> ();
+        mSpaceShips = new ArrayList<> ();
 
 
-		mMapName = (String) data.get (i++);
-		mMaxUsers = (int) data.get (i++);
+        mMapName = (String) data.get (i++);
+        mMaxUsers = (int) data.get (i++);
 
-		int planetNumber = (int) data.get (i++);
-		int connectionNumber = (int) data.get (i++);
-		int spaceShipNumber = (int) data.get (i++);
+        int planetNumber = (int) data.get (i++);
+        int connectionNumber = (int) data.get (i++);
+        int spaceShipNumber = (int) data.get (i++);
 
-		for (int j = 0; j < planetNumber; j++) {
-			float x = (float) data.get (i++);
-			float y = (float) data.get (i++);
-			float r = (float) data.get (i++);
-			int ownedBy = (int) data.get (i++);
-			int unitNum = (int) data.get (i++);
-			int tex = (int) data.get (i++);
+        for (int j = 0; j < planetNumber; j++) {
+            int x = (int) data.get (i++);
+            int y = (int) data.get (i++);
+            int r = (int) data.get (i++);
+            int ownedBy = (int) data.get (i++);
+            int unitNum = (int) data.get (i++);
+            int tex = (int) data.get (i++);
 
-			mPlanets.add (new Planet (x, y, r, ownedBy, unitNum, tex));
+            mPlanets.add (new Planet(x, y, r, ownedBy, unitNum, tex));
 		}
 
 		for (int j = 0; j < connectionNumber; j++) {
@@ -167,23 +178,23 @@ public class InterstellarWarCore extends Thread {
 			Road road = new Road (from, to);
 
 			mRoads.add (road);
-		}
-		for (int j = 0; j < spaceShipNumber; j++) {
-			int fromIndex = (int) data.get (i++);
-			int toIndex = (int) data.get (i++);
+        }
+        for (int j = 0; j < spaceShipNumber; j++) {
+            int fromIndex = (int) data.get (i++);
+            int toIndex = (int) data.get (i++);
 
-			Planet from = mPlanets.get (fromIndex);
-			Planet to = mPlanets.get (toIndex);
+            Planet from = mPlanets.get (fromIndex);
+            Planet to = mPlanets.get (toIndex);
 
-			float vx = (float) data.get (i++);
-			float vy = (float) data.get (i++);
-			int ownedBy = (int) data.get (i++);
-			int unitsNum = (int) data.get (i++);
-			int curTick = (int) data.get (i++);
-			int maxTick = (int) data.get (i++);
-			int tex = (int) data.get (i++);
+            double vx = (double) data.get (i++);
+            double vy = (double) data.get (i++);
+            int ownedBy = (int) data.get (i++);
+            int unitsNum = (int) data.get (i++);
+            int curTick = (int) data.get (i++);
+            int maxTick = (int) data.get (i++);
+            int tex = (int) data.get (i++);
 
-			mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
+            mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
 		}
 	}
 

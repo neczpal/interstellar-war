@@ -1,11 +1,11 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.connection.Command;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,8 +13,8 @@ public class Client extends Thread {
 	private ServerConnection mServerConnection;
 	private Socket mSocket;
 
-	private ObjectOutputStream mOut;
-	private ObjectInputStream mIn;
+	private BufferedWriter mOut;
+	private BufferedReader mIn;
 
 	private int mPort;
 	private volatile boolean mIsRunning;
@@ -35,8 +35,8 @@ public class Client extends Thread {
 
 		mPort = socket.getPort ();
 
-		mOut = new ObjectOutputStream (socket.getOutputStream ());
-		mIn = new ObjectInputStream (socket.getInputStream ());
+		mOut = new BufferedWriter (new OutputStreamWriter (socket.getOutputStream (), StandardCharsets.UTF_8));
+		mIn = new BufferedReader (new InputStreamReader (socket.getInputStream (), StandardCharsets.UTF_8));
 
 		mLogger.setParent (Logger.getLogger (ServerConnection.class.getCanonicalName ()));
 		mLogger.setLevel (null);
@@ -53,15 +53,17 @@ public class Client extends Thread {
 		try {
 			while (mIsRunning) {
 				try {
-					Object object = mIn.readObject ();
-					if (object instanceof Command) {
-						Command command = (Command) object;
-						mServerConnection.receive (command, mPort);
-					} else {
-						mLogger.log (Level.WARNING, "-> Couldn't read " + object + ", because it wasn't a " + Command.class.getSimpleName ());
+
+					String line = mIn.readLine ();
+
+					if (line != null) {
+						mLogger.log (Level.INFO, "Read line: " + line);
+						JSONObject jsonObject = new JSONObject (line);
+						mServerConnection.receive (jsonObject, mPort);
 					}
-				} catch (ClassNotFoundException ex) {
-					mLogger.log (Level.SEVERE, "-> Couldn't read an object: " + ex.getMessage ());
+
+				} catch (JSONException ex) {
+					mLogger.log (Level.SEVERE, "-> Couldn't read an object: " + ex.getMessage());
 				}
 			}
 		} catch (IOException ex2) {
@@ -88,16 +90,17 @@ public class Client extends Thread {
 	 * @param command der Befehl
 	 * @return ob es gesendet ist oder gibt es eine Fehler
 	 */
-	public boolean send (Command command) {
+	public boolean send (JSONObject command) {
 		try {
 			if (!mSocket.isClosed ()) {
-				mOut.writeObject (command);
+				mOut.write (command.toString () + "\n");
+				mOut.flush ();
 				return true;
 			} else {
 				mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + "), because socket was closed.");
 			}
 		} catch (IOException ex) {
-			mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + "): " + ex.getMessage ());
+			mLogger.log (Level.WARNING, "<- Couldn't send Command (" + command + "): " + ex.getMessage());
 		}
 		return false;
 	}

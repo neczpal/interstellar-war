@@ -6,9 +6,11 @@ import net.neczpal.interstellarwar.common.connection.RoomData;
 import net.neczpal.interstellarwar.desktop.ui.frames.GameFrame;
 import net.neczpal.interstellarwar.desktop.ui.frames.LobbyFrame;
 import net.neczpal.interstellarwar.desktop.ui.frames.LoginFrame;
+import org.json.JSONArray;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DesktopUI implements UserInterface {
 	private LoginFrame mLoginFrame;
@@ -53,8 +55,14 @@ public class DesktopUI implements UserInterface {
 	}
 
 	@Override
-	public void listRooms (ArrayList <RoomData> roomData) {
-		mRoomsFrame.loadRoomData (roomData);
+	public void listRooms (JSONArray jsonAllRoomData) {
+		List<RoomData> allRoomData = new ArrayList<> ();
+
+		for (int i = 0; i < jsonAllRoomData.length (); i++) {
+			allRoomData.add (new RoomData (jsonAllRoomData.getJSONObject (i)));
+		}
+
+		mRoomsFrame.loadRoomData (allRoomData);
 	}
 
 	@Override

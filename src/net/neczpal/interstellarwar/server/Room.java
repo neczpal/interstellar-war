@@ -1,14 +1,14 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.connection.Command;
-import net.neczpal.interstellarwar.common.connection.RoomData;
+import net.neczpal.interstellarwar.common.connection.CommandParamKey;
 import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class Room {
 
@@ -57,7 +57,7 @@ public class Room {
 	 *
 	 * @param command Der Befehl
 	 */
-	public void receive (Command command) {
+	public void receive (JSONObject command) {
 		mGameServer.receive (command);
 	}
 
@@ -86,43 +86,51 @@ public class Room {
 	/**
 	 * @return Das Zimmer-Data des Zimmers
 	 */
-	public RoomData getData () {
-		ArrayList <String> mUsers = new ArrayList <> ();
+	public JSONObject getData () {
+		List<String> mUsers = new ArrayList<> ();
 		for (Integer key : mConnectionIds.keySet ()) {
 			mUsers.add (mServerConnection.getUser (key).getName ());
 		}
-		return new RoomData (mRoomId, getMapFantasyName (), mUsers, getMaxUserCount (), isMapRunning ());
+
+		JSONObject roomData = new JSONObject ();
+		roomData.put (CommandParamKey.ROOM_ID_KEY, mRoomId);
+		roomData.put (CommandParamKey.MAP_NAME_KEY, getMapFantasyName ());
+		roomData.put (CommandParamKey.USER_LIST_KEY, mUsers);
+		roomData.put (CommandParamKey.MAX_USER_COUNT_KEY, getMaxUserCount ());
+		roomData.put (CommandParamKey.IS_ROOM_RUNNING_KEY, isMapRunning ());
+
+		return roomData;
 	}
 
-	/**
-	 * Sendet ein Befehl zu den Klienten des Zimmers
-	 *
-	 * @param type Der Typ des Befehls
-	 */
-	public void send (Command.Type type) {
-		send (new Command (type));
-	}
-
-	/**
-	 * Sendet ein Befehl zu den Klient des Zimmers
-	 *
-	 * @param type Der Typ des Befehls
-	 * @param data Der Data des Befehls
-	 */
-	public void send (Command.Type type, Serializable... data) {
-		send (new Command (type, data));
-	}
+//	/**
+//	 * Sendet ein Befehl zu den Klienten des Zimmers
+//	 *
+//	 * @param type Der Typ des Befehls
+//	 */
+//	public void send (Command.Type type) {
+//		send (new Command (type));
+//	}
+//
+//	/**
+//	 * Sendet ein Befehl zu den Klient des Zimmers
+//	 *
+//	 * @param type Der Typ des Befehls
+//	 * @param data Der Data des Befehls
+//	 */
+//	public void send (Command.Type type, Serializable... data) {
+//		send (new Command (type, data));
+//	}
 
 	/**
 	 * Sendet ein Befehl zu den Klient des Zimmers
 	 *
 	 * @param command Der Befehl
 	 */
-	public void send (Command command) {
-		HashMap <Integer, Client> clients = mServerConnection.getClients ();
-		Iterator <HashMap.Entry <Integer, Client>> iterator = clients.entrySet ().iterator ();
+	public void send (JSONObject command) {
+		HashMap<Integer, Client> clients = mServerConnection.getClients ();
+		Iterator<HashMap.Entry<Integer, Client>> iterator = clients.entrySet ().iterator ();
 		while (iterator.hasNext () && mServerConnection.isAlive ()) {
-			HashMap.Entry <Integer, Client> entry = iterator.next ();
+			HashMap.Entry<Integer, Client> entry = iterator.next ();
 			if (mConnectionIds.containsKey (entry.getKey ())) {
 				if (!entry.getValue ().send (command)) {
 					iterator.remove ();
