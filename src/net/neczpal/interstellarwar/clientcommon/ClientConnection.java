@@ -263,16 +263,6 @@ public class ClientConnection extends Thread {
 
 		send (command);
 	}
-//
-//	/**
-//	 * Sendet ein Befehl
-//	 *
-//	 * @param type Der Typ des Befehls
-//	 * @param data Der Data des Befehls
-//	 */
-//	public void send (Command.Type type, Serializable... data) {
-//		send (new Command (type, data));
-//	}
 
 	/**
 	 * Sendet ein Befehl

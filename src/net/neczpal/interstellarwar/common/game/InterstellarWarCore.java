@@ -123,14 +123,14 @@ public class InterstellarWarCore extends Thread {
 		for (SpaceShip spaceShip : mSpaceShips) {
 			list.add (mPlanets.indexOf (spaceShip.getFromPlanet ()));
 			list.add (mPlanets.indexOf (spaceShip.getToPlanet ()));
-			list.add (spaceShip.getVx ());
-			list.add (spaceShip.getVy ());
+			list.add ((Double) spaceShip.getVx ());
+			list.add ((Double) spaceShip.getVy ());
 			list.add (spaceShip.getOwnedBy ());
 			list.add (spaceShip.getUnitsNumber ());
 			list.add (spaceShip.getCurrentTick ());
 			list.add (spaceShip.getMaxTick ());
 			list.add (spaceShip.getTextureIndex ());
-        }
+		}
         return list;
     }
 
@@ -180,22 +180,33 @@ public class InterstellarWarCore extends Thread {
 			mRoads.add (road);
         }
         for (int j = 0; j < spaceShipNumber; j++) {
-            int fromIndex = (int) data.get (i++);
-            int toIndex = (int) data.get (i++);
+	        int fromIndex = (int) data.get (i++);
+	        int toIndex = (int) data.get (i++);
 
-            Planet from = mPlanets.get (fromIndex);
-            Planet to = mPlanets.get (toIndex);
+	        Planet from = mPlanets.get (fromIndex);
+	        Planet to = mPlanets.get (toIndex);
+	        //Not nice but hopefully works #TODO nicer solution with JSONObjects
+	        double vx, vy;
+	        Object vxObj = data.get (i++);
+	        if (vxObj instanceof Integer) {
+		        vx = ((Integer) vxObj).doubleValue ();
+	        } else {
+		        vx = (Double) vxObj;
+	        }
+	        Object vyObj = data.get (i++);
+	        if (vxObj instanceof Integer) {
+		        vy = ((Integer) vyObj).doubleValue ();
+	        } else {
+		        vy = (Double) vyObj;
+	        }
+	        int ownedBy = (int) data.get (i++);
+	        int unitsNum = (int) data.get (i++);
+	        int curTick = (int) data.get (i++);
+	        int maxTick = (int) data.get (i++);
+	        int tex = (int) data.get (i++);
 
-            double vx = (double) data.get (i++);
-            double vy = (double) data.get (i++);
-            int ownedBy = (int) data.get (i++);
-            int unitsNum = (int) data.get (i++);
-            int curTick = (int) data.get (i++);
-            int maxTick = (int) data.get (i++);
-            int tex = (int) data.get (i++);
-
-            mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
-		}
+	        mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
+        }
 	}
 
 	//GAME FUNCTION

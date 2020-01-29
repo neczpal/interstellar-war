@@ -102,25 +102,6 @@ public class Room {
 		return roomData;
 	}
 
-//	/**
-//	 * Sendet ein Befehl zu den Klienten des Zimmers
-//	 *
-//	 * @param type Der Typ des Befehls
-//	 */
-//	public void send (Command.Type type) {
-//		send (new Command (type));
-//	}
-//
-//	/**
-//	 * Sendet ein Befehl zu den Klient des Zimmers
-//	 *
-//	 * @param type Der Typ des Befehls
-//	 * @param data Der Data des Befehls
-//	 */
-//	public void send (Command.Type type, Serializable... data) {
-//		send (new Command (type, data));
-//	}
-
 	/**
 	 * Sendet ein Befehl zu den Klient des Zimmers
 	 *

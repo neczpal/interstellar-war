@@ -375,27 +375,6 @@ public class ServerConnection extends Thread {
 		mLogger.log (Level.INFO, "<- Sending RoomDatas Size(" + allRoomData.size () + ")");
 	}
 
-//	/**
-//	 * Sendet ein Befehl zu dem Benutzer
-//	 *
-//	 * @param id   Das ID der Benutzer
-//	 * @param type Das Typ der Befehl
-//	 */
-//	public void sendToId (int id, Command.Type type) {
-//		sendToId (id, new Command (type));
-//	}
-//
-//	/**
-//	 * Sendet ein Befehl zu dem Benutzer
-//	 *
-//	 * @param id   Das ID der Benutzer
-//	 * @param type Das Typ der Befehl
-//	 * @param data Das Data der Befehl
-//	 */
-//	public void sendToId (int id, Command.Type type, Serializable... data) {
-//		sendToId (id, new Command (type, data));
-//	}
-
 	/**
 	 * Sendet ein Befehl zu dem Benutzer
 	 *
@@ -409,24 +388,6 @@ public class ServerConnection extends Thread {
 		}
 	}
 
-//	/**
-//	 * Sender ein Befehl zu den allen Benutzern
-//	 *
-//	 * @param type Das Typ der Befehl
-//	 */
-//	public void send (Command.Type type) {
-//		send (new Command (type));
-//	}
-//
-//	/**
-//	 * Sender ein Befehl zu den allen Benutzern
-//	 *
-//	 * @param type Das Typ der Befehl
-//	 * @param data Das Data der Befehl
-//	 */
-//	public void send (Command.Type type, Serializable... data) {
-//		send (new Command (type, data));
-//	}
 
 	/**
 	 * Sender ein Befehl zu den allen Benutzern
