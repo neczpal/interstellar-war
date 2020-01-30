@@ -108,7 +108,8 @@ public class ClientConnection extends Thread {
 	 */
 	private void connectionReady (int newConnectionId) {
 		mConnectionId = newConnectionId;
-		mUserInterface.connectionReady ();
+		if (mUserInterface != null)
+			mUserInterface.connectionReady ();
 		mLogger.log (Level.INFO, "-> Connected to the server. ID (" + mConnectionId + ")");
 	}
 

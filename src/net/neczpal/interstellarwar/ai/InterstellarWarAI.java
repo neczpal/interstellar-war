@@ -5,16 +5,12 @@ import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
 import net.neczpal.interstellarwar.clientcommon.UserInterface;
 import net.neczpal.interstellarwar.common.connection.RoomData;
 import net.neczpal.interstellarwar.common.game.Planet;
-import net.neczpal.interstellarwar.desktop.ui.DesktopUI;
 import net.neczpal.interstellarwar.desktop.ui.frames.GameFrame;
 import net.neczpal.interstellarwar.desktop.ui.frames.LobbyFrame;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-
-import static java.lang.Thread.sleep;
 
 public class InterstellarWarAI extends Thread implements UserInterface {
 
@@ -48,6 +44,7 @@ public class InterstellarWarAI extends Thread implements UserInterface {
 
             mGameClient = mConnection.getGameClient();
 
+            start ();
 
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
@@ -60,7 +57,7 @@ public class InterstellarWarAI extends Thread implements UserInterface {
     public void run() {
         while(true) {
             try {
-                sleep(1500);//WAIT FOR COMMAND
+                sleep (1000);//WAIT FOR COMMAND
 
                 //Search OWN nodes that has more POINT then any near NON-OWN nodes
                 //IF FOUND move all to there
@@ -87,11 +84,15 @@ public class InterstellarWarAI extends Thread implements UserInterface {
                     try {
                         if (target != null) {
                             if(planet.getOwnedBy() == mConnection.getConnectionId()) {
-                                mGameClient.startMoveSpaceShip(mGameClient.getCore().getPlanets().indexOf(planet),
-                                        mGameClient.getCore().getPlanets().indexOf(target),
-                                        mGameClient.getCore().getTickNumber(),
-                                        planet.getUnitsNumber());
-                                break;
+                                int fromIndex = mGameClient.getCore ().getPlanets ().indexOf (planet);
+                                int toIndex = mGameClient.getCore ().getPlanets ().indexOf (target);
+                                if (fromIndex != -1 && toIndex != -1) {
+                                    mGameClient.startMoveSpaceShip (fromIndex,
+                                            toIndex,
+                                            mGameClient.getCore ().getTickNumber (),
+                                            planet.getUnitsNumber ());
+                                    break;
+                                }
                             }
                         }
                     } catch (Exception ex) {
@@ -180,16 +181,16 @@ public class InterstellarWarAI extends Thread implements UserInterface {
 
     @Override
     public void startGame(String mapName) {
-        mGameFrame = new GameFrame("Interstellar War : " + mapName, false, 4, mConnection.getGameClient ());
-        mGameFrame.start ();
-        start();
+//        mGameFrame = new GameFrame("Interstellar War : " + mapName, false, 4, mConnection.getGameClient ());
+//        mGameFrame.start ();
+//        start();
     }
 
     @Override
     public void stopGame() {
-        if (mGameFrame != null) {
-            mGameFrame.stopGameFrame ();
-            mGameFrame = null;
-        }
+//        if (mGameFrame != null) {
+//            mGameFrame.stopGameFrame ();
+//            mGameFrame = null;
+//        }
     }
 }

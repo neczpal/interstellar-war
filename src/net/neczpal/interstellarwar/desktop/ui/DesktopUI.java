@@ -84,6 +84,6 @@ public class DesktopUI implements UserInterface {
 	 */
 	public void setConnection (ClientConnection connection) {
 		mConnection = connection;
-//		mConnection.setUserInterface (this);
+		mConnection.setUserInterface (this);
 	}
 }
