@@ -8,53 +8,37 @@
 
 import Foundation
 //### TODO TODO TODO
-//public class InterstellarWarCore extends Thread {
-//    public static final int BACKGROUND_TYPES = 5;
-//
-//    private String mMapName;
-//    private int mMaxUsers;
-//
-//    private ArrayList <Planet> mPlanets;
-//    private ArrayList <Road> mRoads;
-//    private ArrayList <SpaceShip> mSpaceShips;
-//
-//    private int mBackgroundTextureIndex;
-//
-//    private int mTickNumber;
-//    private volatile boolean mIsRunning = false;
-//
-//    /**
-//     * Erstellt ein Spiel-Core durch einen File
-//     *
-//     * @param fileName der Name von der File
-//     * @throws IOException falls die File nicht erreichbar ist
-//     * @see InterstellarWarCore#loadMap(String)
-//     */
-//    public InterstellarWarCore (String fileName) throws IOException {
+public class InterstellarWarCore {
+    public static let BACKGROUND_TYPES = 5;
+
+    private var mMapName : String;
+    private var mMaxUsers : Int;
+
+    private var mPlanets : [Planet];
+    private var mRoads : [Road];
+    private var mSpaceShips : [SpaceShip];
+
+    private var mBackgroundTextureIndex : Int;
+
+    private var mTickNumber : Int;
+    private var mIsRunning : Bool = false;
+
+    /**
+     * @Only server
+     */
+//    init (fileName : String)  {
 //        loadMap (fileName);
 //    }
-//
-//
-//    public InterstellarWarCore (JSONArray jsonArray) {
-//        setData (jsonArray.toList ());
-//    }
-//
-//    /**
-//     * Erstellt ein Spiel-Core durch einen List
-//     *
-//     * @param data der List
-//     * @see InterstellarWarCore#setData(List)
-//     */
-//    public InterstellarWarCore (List<Object> data) {
-//        setData (data);
-//    }
-//
-//    /**
-//     * Einladet ein Spiel von einem File
-//     *
-//     * @param fileName der Name von der File
-//     * @throws IOException falls die File nicht erreichbar ist
-//     */
+
+
+    init (jsonArray : [JSON]) {
+        setData(jsonArray)
+    }
+
+
+    /**
+     * @Only server
+     */
 //    private void loadMap (String fileName) throws IOException {
 //        mBackgroundTextureIndex = (int) (Math.random () * BACKGROUND_TYPES);
 //
@@ -91,10 +75,10 @@ import Foundation
 //        }
 //    }
 //
-//    /**
-//     * @return Der List die enthält die Spieldata
-//     */
-//    public List<Object> getData () {
+    /**
+     * @return Der List die enthält die Spieldata
+     */
+//    public func getData () -> [JSON] {#TODODODODODO
 //        List<Object> list = new ArrayList<> ();
 //
 //        list.add (mBackgroundTextureIndex);
@@ -137,7 +121,7 @@ import Foundation
 //     *
 //     * @param data Der List die enthält die Spieldata
 //     */
-//    public void setData (List<Object> data) {
+//    public func setData (data : [JSON]) {
 //        int i = 0;
 //
 //        mBackgroundTextureIndex = (int) data.get (i++);
@@ -206,115 +190,110 @@ import Foundation
 //            mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
 //        }
 //    }
-//
-//    //GAME FUNCTION
-//
-//    /**
-//     * @param from Der Planet woher das Raumschiff abfahrt
-//     * @param to   Der Planet wohin das Raumschiff ankommt
-//     */
-//    public void startMoveSpaceShip (int from, int to) {
-//        Planet fromPlanet = mPlanets.get (from);
-//        Planet toPlanet = mPlanets.get (to);
-//        int unitNumber = fromPlanet.getUnitsNumber ();
-//        if (unitNumber > 0) {
-//            fromPlanet.setUnitsNumber (0);
-//            mSpaceShips.add (new SpaceShip (fromPlanet, toPlanet, unitNumber));
-//        }
-//    }
-//
-//    /**
-//     * Incrementiert die Zeitvariable von allem Raumschiff, und entfernt, falls es angekommt ist.
-//     */
-//    private void moveSpaceShips () {
-//        for (SpaceShip spaceShip : mSpaceShips) {
-//            spaceShip.tick ();
-//        }
-//
-//        Iterator <SpaceShip> iterator = mSpaceShips.iterator ();
-//        while (iterator.hasNext ()) {
-//            SpaceShip spaceShip = iterator.next ();
-//            if (spaceShip.isArrived ()) {
-//                spaceShip.getToPlanet ().spaceShipArrived (spaceShip);
-//                iterator.remove ();
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Schafft Einheiten auf alle Planeten
-//     */
-//    private void spawnUnits () {
-//        for (Planet planet : mPlanets) {
-//            planet.spawnUnit ();
-//        }
-//    }
-//
-//
-//    /**
-//     * Das Spiel-Thread
-//     */
-//    @Override
-//    public void run () {
-//        mIsRunning = true;
-//        mTickNumber = 1;
-//        while (mIsRunning) {
+
+    //GAME FUNCTION
+
+    /**
+     * @param from Der Planet woher das Raumschiff abfahrt
+     * @param to   Der Planet wohin das Raumschiff ankommt
+     */
+    public func startMoveSpaceShip (fromIndex : Int, toIndex : Int) {
+        let fromPlanet = mPlanets[fromIndex];
+        let toPlanet = mPlanets[toIndex];
+        let unitNumber = fromPlanet.getUnitsNumber ();
+        if (unitNumber > 0) {
+            fromPlanet.setUnitsNumber (0);
+            mSpaceShips.append(SpaceShip(from: fromPlanet, to: toPlanet, numberOfUnits: unitNumber))
+        }
+    }
+
+    /**
+     * Incrementiert die Zeitvariable von allem Raumschiff, und entfernt, falls es angekommt ist.
+     */
+    private func moveSpaceShips () {
+        for spaceShip in mSpaceShips {
+            spaceShip.tick ();
+            if(spaceShip.isArrived ()) {
+                spaceShip.getToPlanet ().spaceShipArrived (spaceShip);
+            }
+        }
+        
+        mSpaceShips = mSpaceShips.filter {!$0.isArrived()}
+    }
+
+    /**
+     * Schafft Einheiten auf alle Planeten
+     */
+    private func spawnUnits () {
+        for planet in self.mPlanets {
+            planet.spawnUnit ()
+        }
+    }
+
+
+    /**
+     * Das Spiel-Thread
+     */
+    public func run () {
+        mIsRunning = true;
+        mTickNumber = 1;
+        while (mIsRunning) {
 //            try {
-//                Thread.sleep (50);
-//                mTickNumber++;
-//
-//                moveSpaceShips ();
-//
-//                if (mTickNumber % 32 == 0) {
-//                    spawnUnits ();
-//                }
-//
+                Thread.sleep (50);
+                mTickNumber++;
+
+                moveSpaceShips ();
+
+                if (mTickNumber % 32 == 0) {
+                    spawnUnits ();
+                }
+
 //            } catch (InterruptedException e) {
 //                e.printStackTrace ();
 //            }
-//        }
-//    }
-//
-//    /**
-//     * Beendet das Spiel
-//     */
-//    public void stopGame () {
-//        mIsRunning = false;
-//    }
-//
-//
-//    //GETTERS
-//    public String getMapName () {
-//        return mMapName;
-//    }
-//
-//    public int getMaxUsers () {
-//        return mMaxUsers;
-//    }
-//
-//    public ArrayList <Planet> getPlanets () {
-//        return mPlanets;
-//    }
-//
-//    public ArrayList <Road> getRoads () {
-//        return mRoads;
-//    }
-//
-//    public ArrayList <SpaceShip> getSpaceShips () {
-//        return mSpaceShips;
-//    }
-//
-//    public int getBackgroundTextureIndex () {
-//        return mBackgroundTextureIndex;
-//    }
-//
-//    public int getTickNumber () {
-//        return mTickNumber;
-//    }
-//
-//    public boolean isRunning () {
-//        return mIsRunning;
-//    }
-//
-//
-//}
+        }
+    }
+
+    /**
+     * Beendet das Spiel
+     */
+    public func stopGame () {
+        mIsRunning = false;
+    }
+
+
+    //GETTERS
+    public func getMapName () -> String{
+        return mMapName;
+    }
+
+    public func getMaxUsers () -> Int{
+        return mMaxUsers;
+    }
+
+    public func getPlanets () -> [Planet]{
+        return mPlanets;
+    }
+
+    public func getRoads ()  -> [Road]{
+        return mRoads;
+    }
+
+    public func getSpaceShips () -> [SpaceShip]{
+        return mSpaceShips;
+    }
+
+    public func getBackgroundTextureIndex () -> Int {
+        return mBackgroundTextureIndex;
+    }
+
+    public func getTickNumber () -> Int {
+        return mTickNumber;
+    }
+
+    public func isRunning () -> Bool{
+        return mIsRunning;
+    }
+
+
+}
