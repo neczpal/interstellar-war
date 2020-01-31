@@ -168,7 +168,7 @@ public class ClientConnection extends Thread {
 
 		switch (type) {
 			case CONNECTION_READY: {
-				Integer userId = command.getInt (CommandParamKey.USER_ID_KEY);
+				int userId = command.getInt (CommandParamKey.USER_ID_KEY);
 				connectionReady (userId);
 				break;
 			}
@@ -178,7 +178,7 @@ public class ClientConnection extends Thread {
 				break;
 			}
 			case GET_MAP_DATA: {
-				Integer userId = command.getInt (USER_ID_KEY);
+				int userId = command.getInt (USER_ID_KEY);
 				JSONObject mapData = command.getJSONObject (MAP_DATA_KEY);
 				loadMap (userId, mapData);
 				break;
