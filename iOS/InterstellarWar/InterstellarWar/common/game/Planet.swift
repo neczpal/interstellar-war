@@ -52,7 +52,7 @@ public class Planet : Equatable {
         }
     }
 
-    func spaceShipArrived (spaceShip : SpaceShip) {
+    func spaceShipArrived (_ spaceShip : SpaceShip) {
         if (spaceShip.getOwnedBy () == mOwnedBy) {
             mUnitsNumber += spaceShip.getUnitsNumber ();
         } else {
@@ -98,7 +98,7 @@ public class Planet : Equatable {
         return mUnitsNumber;
     }
 
-    public func setUnitsNumber (unitsNumber : Int) {
+    public func setUnitsNumber (_ unitsNumber : Int) {
         self.mUnitsNumber = unitsNumber;
     }
 

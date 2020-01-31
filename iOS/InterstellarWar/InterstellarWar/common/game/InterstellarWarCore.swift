@@ -7,7 +7,7 @@
 //
 
 import Foundation
-//### TODO TODO TODO
+
 public class InterstellarWarCore {
     public static let BACKGROUND_TYPES = 5;
 
@@ -22,6 +22,8 @@ public class InterstellarWarCore {
 
     private var mTickNumber : Int;
     private var mIsRunning : Bool = false;
+    
+    private typealias PK = InterstellarWarCommandParamKey
 
     /**
      * @Only server
@@ -31,8 +33,18 @@ public class InterstellarWarCore {
 //    }
 
 
-    init (jsonArray : [JSON]) {
-        setData(jsonArray)
+    init (jsonData : JSON) {
+        mMapName = ""
+        mMaxUsers = -1
+        mPlanets = [Planet]()
+        mRoads = [Road]()
+        mSpaceShips = [SpaceShip]()
+        mBackgroundTextureIndex = -1
+        
+        mTickNumber = 0
+        mIsRunning = false
+        
+        setData(data: jsonData)
     }
 
 
@@ -75,121 +87,134 @@ public class InterstellarWarCore {
 //        }
 //    }
 //
+    public func getData () -> JSON {
+        var data = JSON()
+        
+        data[PK.BG_TEXTURE_INDEX_KEY].int = mBackgroundTextureIndex
+        data[PK.MAP_NAME_KEY].string = mMapName
+        data[PK.MAP_MAX_USER_COUNT_KEY].int = mMaxUsers
+        
+        
+        var jsonPlanets = [JSON]()
+        
+        for planet in mPlanets {
+            var planetJson = JSON()
+            
+            planetJson[PK.POSITION_X_KEY].int = planet.getX()
+            planetJson[PK.POSITION_Y_KEY].int = planet.getY()
+            planetJson[PK.RADIUS_KEY].int = planet.getRadius()
+            planetJson[PK.OWNER_KEY].int = planet.getOwnedBy()
+            planetJson[PK.UNIT_NUMBER_KEY].int = planet.getUnitsNumber()
+            planetJson[PK.TEXTURE_INDEX_KEY].int = planet.getTextureIndex()
+            
+            jsonPlanets.append(planetJson)
+        }
+        data[PK.PLANETS_KEY].arrayObject = jsonPlanets
+        
+        
+        
+        var jsonRoads = [JSON]()
+        
+        for road in mRoads {
+            var roadJson = JSON()
+            
+            roadJson[PK.FROM_INDEX_KEY].int = mPlanets.firstIndex(of: road.getFrom())
+            roadJson[PK.TO_INDEX_KEY].int = mPlanets.firstIndex(of: road.getTo())
+            
+            jsonRoads.append(roadJson)
+        }
+        data[PK.ROADS_KEY].arrayObject = jsonRoads
+        
+        
+        
+        
+        var jsonSpaceships = [JSON]()
+        
+        for spaceShip in mSpaceShips {
+            var spaceShipJson = JSON()
+            
+            spaceShipJson[PK.FROM_INDEX_KEY].int = mPlanets.firstIndex(of: spaceShip.getFromPlanet())
+            spaceShipJson[PK.TO_INDEX_KEY].int = mPlanets.firstIndex(of: spaceShip.getToPlanet())
+            
+            spaceShipJson[PK.VELOCITY_X_KEY].double = spaceShip.getVx()
+            spaceShipJson[PK.VELOCITY_Y_KEY].double = spaceShip.getVy()
+            
+            spaceShipJson[PK.OWNER_KEY].int = spaceShip.getOwnedBy()
+            spaceShipJson[PK.UNIT_NUMBER_KEY].int = spaceShip.getUnitsNumber()
+            
+            spaceShipJson[PK.CURRENT_TICK_NUMBER_KEY].int = spaceShip.getCurrentTick()
+            spaceShipJson[PK.MAXIMUM_TICK_NUMBER_KEY].int = spaceShip.getMaxTick()
+            
+            spaceShipJson[PK.TEXTURE_INDEX_KEY].int = spaceShip.getTextureIndex()
+            
+            jsonSpaceships.append(spaceShipJson)
+        }
+        
+        data[PK.SPACESHIPS_KEY].arrayObject = jsonSpaceships
+        
+        return data
+    }
+
     /**
-     * @return Der List die enthält die Spieldata
+     * Einstellt die Spieldata durch der List
+     *
+     * @param data Der List die enthält die Spieldata
      */
-//    public func getData () -> [JSON] {#TODODODODODO
-//        List<Object> list = new ArrayList<> ();
-//
-//        list.add (mBackgroundTextureIndex);
-//
-//        list.add (mMapName);
-//        list.add (mMaxUsers);
-//
-//        list.add (mPlanets.size ());
-//        list.add (mRoads.size ());
-//        list.add (mSpaceShips.size ());
-//
-//        for (Planet planet : mPlanets) {
-//            list.add (planet.getX ());
-//            list.add (planet.getY ());
-//            list.add (planet.getRadius ());
-//            list.add (planet.getOwnedBy ());
-//            list.add (planet.getUnitsNumber ());
-//            list.add (planet.getTextureIndex ());
-//        }
-//        for (Road road : mRoads) {
-//            list.add (mPlanets.indexOf (road.getFrom ()));
-//            list.add (mPlanets.indexOf (road.getTo ()));
-//        }
-//        for (SpaceShip spaceShip : mSpaceShips) {
-//            list.add (mPlanets.indexOf (spaceShip.getFromPlanet ()));
-//            list.add (mPlanets.indexOf (spaceShip.getToPlanet ()));
-//            list.add ((Double) spaceShip.getVx ());
-//            list.add ((Double) spaceShip.getVy ());
-//            list.add (spaceShip.getOwnedBy ());
-//            list.add (spaceShip.getUnitsNumber ());
-//            list.add (spaceShip.getCurrentTick ());
-//            list.add (spaceShip.getMaxTick ());
-//            list.add (spaceShip.getTextureIndex ());
-//        }
-//        return list;
-//    }
-//
-//    /**
-//     * Einstellt die Spieldata durch der List
-//     *
-//     * @param data Der List die enthält die Spieldata
-//     */
-//    public func setData (data : [JSON]) {
-//        int i = 0;
-//
-//        mBackgroundTextureIndex = (int) data.get (i++);
-//
-//        mPlanets = new ArrayList<> ();
-//        mRoads = new ArrayList<> ();
-//        mSpaceShips = new ArrayList<> ();
-//
-//
-//        mMapName = (String) data.get (i++);
-//        mMaxUsers = (int) data.get (i++);
-//
-//        int planetNumber = (int) data.get (i++);
-//        int connectionNumber = (int) data.get (i++);
-//        int spaceShipNumber = (int) data.get (i++);
-//
-//        for (int j = 0; j < planetNumber; j++) {
-//            int x = (int) data.get (i++);
-//            int y = (int) data.get (i++);
-//            int r = (int) data.get (i++);
-//            int ownedBy = (int) data.get (i++);
-//            int unitNum = (int) data.get (i++);
-//            int tex = (int) data.get (i++);
-//
-//            mPlanets.add (new Planet(x, y, r, ownedBy, unitNum, tex));
-//        }
-//
-//        for (int j = 0; j < connectionNumber; j++) {
-//            int fromIndex = (int) data.get (i++);
-//            int toIndex = (int) data.get (i++);
-//
-//            Planet from = mPlanets.get (fromIndex);
-//            Planet to = mPlanets.get (toIndex);
-//            from.linkTo (to);
-//
-//            Road road = new Road (from, to);
-//
-//            mRoads.add (road);
-//        }
-//        for (int j = 0; j < spaceShipNumber; j++) {
-//            int fromIndex = (int) data.get (i++);
-//            int toIndex = (int) data.get (i++);
-//
-//            Planet from = mPlanets.get (fromIndex);
-//            Planet to = mPlanets.get (toIndex);
-//            //Not nice but hopefully works #TODO nicer solution with JSONObjects
-//            double vx, vy;
-//            Object vxObj = data.get (i++);
-//            if (vxObj instanceof Integer) {
-//                vx = ((Integer) vxObj).doubleValue ();
-//            } else {
-//                vx = (Double) vxObj;
-//            }
-//            Object vyObj = data.get (i++);
-//            if (vxObj instanceof Integer) {
-//                vy = ((Integer) vyObj).doubleValue ();
-//            } else {
-//                vy = (Double) vyObj;
-//            }
-//            int ownedBy = (int) data.get (i++);
-//            int unitsNum = (int) data.get (i++);
-//            int curTick = (int) data.get (i++);
-//            int maxTick = (int) data.get (i++);
-//            int tex = (int) data.get (i++);
-//
-//            mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
-//        }
-//    }
+    public func setData (data : JSON) {
+        
+        mBackgroundTextureIndex = data[PK.BG_TEXTURE_INDEX_KEY].int!
+        mMapName = data[PK.MAP_NAME_KEY].string!
+        mMaxUsers = data[PK.MAP_MAX_USER_COUNT_KEY].int!
+        
+        mPlanets = [Planet]()
+        
+        for planetJson in data[PK.PLANETS_KEY].array! {
+            let x = planetJson[PK.POSITION_X_KEY].int!
+            let y = planetJson[PK.POSITION_Y_KEY].int!
+            let r = planetJson[PK.RADIUS_KEY].int!
+            let owner = planetJson[PK.OWNER_KEY].int!
+            let units = planetJson[PK.UNIT_NUMBER_KEY].int!
+            let tex = planetJson[PK.TEXTURE_INDEX_KEY].int!
+            
+            mPlanets.append(Planet(x: x, y: y, radius: r, ownedBy: owner, unitsNumber: units, tex: tex))
+        }
+        
+        mRoads = [Road]()
+        
+        for roadJson in data[PK.ROADS_KEY].array! {
+            let fromIndex = roadJson[PK.FROM_INDEX_KEY].int!
+            let toIndex = roadJson[PK.TO_INDEX_KEY].int!
+            
+            let fromPlanet = mPlanets[fromIndex];
+            let toPlanet = mPlanets[toIndex];
+            
+            fromPlanet.linkTo(other: toPlanet)
+            mRoads.append(Road(from: fromPlanet, to: toPlanet))
+        }
+        mSpaceShips = [SpaceShip]()
+        
+        for spaceShipJson in data[PK.SPACESHIPS_KEY].array! {
+            let fromIndex = spaceShipJson[PK.FROM_INDEX_KEY].int!
+            let toIndex = spaceShipJson[PK.TO_INDEX_KEY].int!
+            
+            let fromPlanet = mPlanets[fromIndex];
+            let toPlanet = mPlanets[toIndex];
+            
+            let vx = spaceShipJson[PK.VELOCITY_X_KEY].double!
+            let vy = spaceShipJson[PK.VELOCITY_Y_KEY].double!
+            
+            let owner = spaceShipJson[PK.OWNER_KEY].int!
+            let units = spaceShipJson[PK.UNIT_NUMBER_KEY].int!
+            
+            let currentTick = spaceShipJson[PK.CURRENT_TICK_NUMBER_KEY].int!
+            let maxTick = spaceShipJson[PK.MAXIMUM_TICK_NUMBER_KEY].int!
+            
+            let tex = spaceShipJson[PK.TEXTURE_INDEX_KEY].int!
+            
+            mSpaceShips.append(SpaceShip(from: fromPlanet, to: toPlanet, vx: vx, vy: vy, ownedBy: owner, numberOfUnits: units, currentTick: currentTick, maxTick: maxTick, textureIndex: tex))
+        }
+        
+    }
 
     //GAME FUNCTION
 
@@ -239,8 +264,8 @@ public class InterstellarWarCore {
         mTickNumber = 1;
         while (mIsRunning) {
 //            try {
-                Thread.sleep (50);
-                mTickNumber++;
+                Thread.sleep (forTimeInterval: 50);
+                mTickNumber += 1;
 
                 moveSpaceShips ();
 
