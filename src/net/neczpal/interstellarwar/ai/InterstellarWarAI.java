@@ -128,6 +128,7 @@ public class InterstellarWarAI extends Thread implements UserInterface {
             }
         }
     }
+
     private Planet getNearNeutralSmallerPlanet(Planet from) {
         for(Planet planet : mGameClient.getCore().getPlanets()) {
             if (planet.getOwnedBy() != mConnection.getConnectionId() &&

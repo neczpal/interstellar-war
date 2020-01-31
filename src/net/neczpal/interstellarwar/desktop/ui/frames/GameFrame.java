@@ -51,17 +51,17 @@ public class GameFrame extends Thread {
 		mGamePanel.initGame ();
 
 		while (!Display.isCloseRequested () && mIsGameFrameRunning) {
-			glClear (GL_COLOR_BUFFER_BIT);
+            glClear (GL_COLOR_BUFFER_BIT);
 
-			if (Mouse.isInsideWindow ()) {
-				mGamePanel.inputEvents ();
-			}
+            if (Mouse.isInsideWindow ()) {
+                mGamePanel.inputEvents ();
+            }
 
-			mGamePanel.draw ();
+            mGamePanel.draw ();
 
-			Display.sync (80);
-			Display.update ();
-		}
+            Display.sync (60);
+            Display.update ();
+        }
 		clean ();
 	}
 
