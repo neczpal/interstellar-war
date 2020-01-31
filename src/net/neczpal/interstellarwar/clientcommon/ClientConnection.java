@@ -129,7 +129,7 @@ public class ClientConnection extends Thread {
 	 * @param roomIndex Die Benutzerindex in dem Zimmer
 	 * @param mapData   Die Mapdata
 	 */
-	private void loadMap (int roomIndex, JSONArray mapData) {
+	private void loadMap (int roomIndex, JSONObject mapData) {
 		mRoomIndex = roomIndex;
 		InterstellarWarCore core = new InterstellarWarCore (mapData);
 		mGameClient = new InterstellarWarClient (core, this);
@@ -179,7 +179,7 @@ public class ClientConnection extends Thread {
 			}
 			case GET_MAP_DATA: {
 				Integer userId = command.getInt (USER_ID_KEY);
-				JSONArray mapData = command.getJSONArray (MAP_DATA_KEY);
+				JSONObject mapData = command.getJSONObject (MAP_DATA_KEY);
 				loadMap (userId, mapData);
 				break;
 			}
