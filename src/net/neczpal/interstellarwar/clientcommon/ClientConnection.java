@@ -218,6 +218,12 @@ public class ClientConnection extends Thread {
 	 */
 	public void exitServer () {
 		send (EXIT_SERVER);
+		mLogger.log (Level.INFO, "<- Exiting server");
+	}
+
+	public void fillRoomWithAi () {
+		send (FILL_ROOM_WITH_AI);
+		mLogger.log (Level.INFO, "<- Filling room with AI");
 	}
 
 	/**

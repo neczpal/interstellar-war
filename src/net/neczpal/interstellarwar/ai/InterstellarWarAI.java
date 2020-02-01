@@ -3,42 +3,31 @@ package net.neczpal.interstellarwar.ai;
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
 import net.neczpal.interstellarwar.clientcommon.NoUserInterface;
+import net.neczpal.interstellarwar.clientcommon.UserInterface;
 import net.neczpal.interstellarwar.common.game.Planet;
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InterstellarWarAI extends Thread {
+public class InterstellarWarAI extends Thread implements UserInterface {
 
     private ClientConnection mConnection;
     private InterstellarWarClient mGameClient;
 
+    private int mRoomId;
     private NoUserInterface mNoUserInterface = new NoUserInterface ();
     private volatile boolean mIsRunning;
 
     public InterstellarWarAI (String host, String userName, int roomId) {
         try {
+            mRoomId = roomId;
             mIsRunning = false;
             mConnection = new ClientConnection (host, userName);
-            mConnection.setUserInterface (mNoUserInterface);
+            mConnection.setUserInterface (this);
 
-
-            sleep (100); // WAIT UNTIL CONNECTION READY
-
-            mConnection.enterRoom (roomId);
-
-            sleep (100);//WAIT FOR COMMAND
-
-            mConnection.startRoom ();
-
-            sleep (200);//WAIT FOR COMMAND
-
-            mGameClient = mConnection.getGameClient ();
-
-            start ();
-
-        } catch (InterruptedException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace ();
         }
     }
@@ -127,18 +116,48 @@ public class InterstellarWarAI extends Thread {
     }
     private Planet getNearAlliedSmallerPlanet(Planet from) {
 //        for(Planet planet : mGameClient.getCore().getPlanets()) {
-            boolean isAllAllied = true;
-            for(Planet neighbor : from.getNeighbors()) {
-                if (neighbor.getOwnedBy() != from.getOwnedBy()) {
-                    isAllAllied = false;
-                }
+        boolean isAllAllied = true;
+        for (Planet neighbor : from.getNeighbors ()) {
+            if (neighbor.getOwnedBy () != from.getOwnedBy ()) {
+                isAllAllied = false;
             }
-            if (isAllAllied) {
-                return from.getNeighbors().get((int) (Math.random() * from.getNeighbors().size()));
-            }
+        }
+        if (isAllAllied) {
+            return from.getNeighbors ().get ((int) (Math.random () * from.getNeighbors ().size ()));
+        }
 //        }
 
         return null;
     }
 
+    @Override
+    public void connectionReady () {
+        mConnection.enterRoom (mRoomId);
+    }
+
+    @Override
+    public void connectionDropped () {
+
+    }
+
+    @Override
+    public void listRooms (JSONArray roomData) {
+
+    }
+
+    @Override
+    public void setIsInRoom (boolean isInRoom) {
+
+    }
+
+    @Override
+    public void startGame (String mapName) {
+        mGameClient = mConnection.getGameClient ();
+        start ();
+    }
+
+    @Override
+    public void stopGame () {
+        mIsRunning = false;
+    }
 }

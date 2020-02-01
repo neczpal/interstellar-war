@@ -1,5 +1,6 @@
 package net.neczpal.interstellarwar.server;
 
+import net.neczpal.interstellarwar.ai.InterstellarWarAI;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -311,6 +312,15 @@ public class ServerConnection extends Thread {
 		}
 	}
 
+	private void fillRoomWithAi (User user) {
+		Room room = getRoom (user.getRoomId ());
+
+		int numberOfAIs = room.getMaxUserCount () - room.getUserCount ();
+		for (int i = 0; i < numberOfAIs; i++) {
+			new InterstellarWarAI ("localhost", "AI[" + i + "]", room.getRoomId ());
+		}
+	}
+
 	/**
 	 * Bekommt ein Spiel-Befehl von dem Benutzer
 	 *
@@ -354,6 +364,11 @@ public class ServerConnection extends Thread {
 				enterRoom (getUser (userId), getRoom (roomId));
 				break;
 			}
+			case FILL_ROOM_WITH_AI: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				fillRoomWithAi (getUser (userId));
+				break;
+			}
 			case START_ROOM: {
 				Integer userId = command.getInt (USER_ID_KEY);
 				startRoom (getUser (userId));
@@ -367,6 +382,7 @@ public class ServerConnection extends Thread {
 			}
 		}
 	}
+
 
 	//SEND
 
