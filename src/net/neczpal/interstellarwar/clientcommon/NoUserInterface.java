@@ -1,8 +1,6 @@
 package net.neczpal.interstellarwar.clientcommon;
 
-import net.neczpal.interstellarwar.common.connection.RoomData;
-
-import java.util.ArrayList;
+import org.json.JSONArray;
 
 public class NoUserInterface implements UserInterface {
 
@@ -17,7 +15,7 @@ public class NoUserInterface implements UserInterface {
     }
 
     @Override
-    public void listRooms (ArrayList<RoomData> roomData) {
+    public void listRooms (JSONArray roomData) {
 
     }
 

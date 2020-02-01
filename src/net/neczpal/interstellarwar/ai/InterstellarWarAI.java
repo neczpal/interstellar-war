@@ -44,7 +44,7 @@ public class InterstellarWarAI extends Thread {
     }
 
     public static void main (String[] args) {
-        new InterstellarWarAI ("localhost", "AI-User", 8);
+        new InterstellarWarAI ("localhost", "AI-User", 1);
     }
 
     @Override
