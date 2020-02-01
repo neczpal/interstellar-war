@@ -69,6 +69,7 @@ public class ServerConnection extends Thread {
 		addRoom ("map06");
 		addRoom ("map07");
 		addRoom ("map08");
+		addRoom ("map09");
 
 		mRoomServer.start ();
 		mIsRunning = true;
