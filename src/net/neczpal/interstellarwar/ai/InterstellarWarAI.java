@@ -2,68 +2,64 @@ package net.neczpal.interstellarwar.ai;
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
-import net.neczpal.interstellarwar.clientcommon.UserInterface;
-import net.neczpal.interstellarwar.common.connection.RoomData;
+import net.neczpal.interstellarwar.clientcommon.NoUserInterface;
 import net.neczpal.interstellarwar.common.game.Planet;
-import net.neczpal.interstellarwar.desktop.ui.frames.GameFrame;
-import net.neczpal.interstellarwar.desktop.ui.frames.LobbyFrame;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InterstellarWarAI extends Thread implements UserInterface {
+public class InterstellarWarAI extends Thread {
 
     private ClientConnection mConnection;
     private InterstellarWarClient mGameClient;
-    private GameFrame mGameFrame;
-    private LobbyFrame lobbyFrame;
 
-    public static void main(String[] args) {
-//        Scanner sc = new Scanner(System.in);
+    private NoUserInterface mNoUserInterface = new NoUserInterface ();
+    private volatile boolean mIsRunning;
 
-        new InterstellarWarAI(1);
-    }
-
-    public InterstellarWarAI(int roomId) {
-//        mUI = new DesktopUI();
+    public InterstellarWarAI (String host, String userName, int roomId) {
         try {
-            mConnection = new ClientConnection("localhost", "AI_USER");
-            mConnection.setUserInterface(this);
+            mIsRunning = false;
+            mConnection = new ClientConnection (host, userName);
+            mConnection.setUserInterface (mNoUserInterface);
 
 
-            sleep (200); // WAIT UNTIL CONNECTION READY
+            sleep (100); // WAIT UNTIL CONNECTION READY
 
             mConnection.enterRoom (roomId);
 
-            sleep (200);//WAIT FOR COMMAND
+            sleep (100);//WAIT FOR COMMAND
 
             mConnection.startRoom ();
 
-            while(mConnection.getGameClient() == null) {}
+            sleep (200);//WAIT FOR COMMAND
 
-            mGameClient = mConnection.getGameClient();
+            mGameClient = mConnection.getGameClient ();
 
             start ();
 
         } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
+            e.printStackTrace ();
         }
     }
 
-
+    public static void main (String[] args) {
+        new InterstellarWarAI ("localhost", "AI-User", 8);
+    }
 
     @Override
-    public void run() {
-        while(true) {
+    public void run () {
+        mIsRunning = true;
+
+        while (mIsRunning) {
             try {
-                sleep (1000);//WAIT FOR COMMAND
+                sleep (1250);//WAIT FOR COMMAND
 
                 //Search OWN nodes that has more POINT then any near NON-OWN nodes
                 //IF FOUND move all to there
-                findOurPlanets();
-                for(Planet planet : ourPlanets) {
-                    Planet target = getNearNeutralSmallerPlanet(planet);
+                findOurPlanets ();
+                for (Planet planet : ourPlanets) {
+                    Planet target = getNearNeutralSmallerPlanet (planet);
                     try {
                         if (target != null) {
                             if (planet.getOwnedBy() == mConnection.getConnectionId()) {
@@ -98,24 +94,12 @@ public class InterstellarWarAI extends Thread implements UserInterface {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
-//                    sleep(100);//WAIT FOR COMMAND
 
                 }
-//                    sleep(100);//WAIT FOR COMMAND
 
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
-
-                //Search OWN nodes that has only allied node
-                    //Find the one allied node that has the most non-allied neutral node neighbour
-                        //Send units there
-
-
-
-
-
-
         }
     }
     private List<Planet> ourPlanets = new ArrayList<>();
@@ -157,41 +141,4 @@ public class InterstellarWarAI extends Thread implements UserInterface {
         return null;
     }
 
-
-
-
-    @Override
-    public void connectionReady() {
-//        mUI.connectionReady();
-    }
-
-    @Override
-    public void connectionDropped() {
-//        mUI.connectionDropped();
-    }
-
-    @Override
-    public void listRooms(ArrayList<RoomData> roomData) {
-//        mUI.listRooms(roomData);
-    }
-
-    @Override
-    public void setIsInRoom(boolean isInRoom) {
-//        mUI.setIsInRoom(isInRoom);
-    }
-
-    @Override
-    public void startGame(String mapName) {
-//        mGameFrame = new GameFrame("Interstellar War : " + mapName, false, 4, mConnection.getGameClient ());
-//        mGameFrame.start ();
-//        start();
-    }
-
-    @Override
-    public void stopGame() {
-//        if (mGameFrame != null) {
-//            mGameFrame.stopGameFrame ();
-//            mGameFrame = null;
-//        }
-    }
 }

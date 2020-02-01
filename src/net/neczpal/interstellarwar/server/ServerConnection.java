@@ -65,6 +65,7 @@ public class ServerConnection extends Thread {
 		addRoom ("map05");
 		addRoom ("map06");
 		addRoom ("map07");
+		addRoom ("map08");
 
 		mRoomServer.start ();
 		mIsRunning = true;
@@ -240,15 +241,24 @@ public class ServerConnection extends Thread {
 	 */
 	private void startRoom (User user) {
 		Room room = getRoom (user.getRoomId ());
-		if (room != null && room.isFull () && !room.isMapRunning ()) {
-			room.send (Command.Type.READY_TO_PLAY, room.getMapFantasyName ());
-			room.startGame ();
-			addRoom (room.getMapName ());
+		if (room != null) {
+			if (!room.isMapRunning ()) {
+				if (room.isFull ()) {
+					room.send (Command.Type.READY_TO_PLAY, room.getMapFantasyName ());
+					room.startGame ();
+					addRoom (room.getMapName ());
 
-			listRoom ();
-			mLogger.log (Level.INFO, "-> User (" + user + ") started the game in the Room (" + room + ")");
+					listRoom ();
+					mLogger.log (Level.INFO, "-> User (" + user + ") started the game in the Room (" + room + ")");
+
+				} else {
+					mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not full");
+				}
+			} else {
+				mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not running");
+			}
 		} else {
-			mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not yet full/running/not existing");
+			mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not existing");
 		}
 	}
 

@@ -27,7 +27,7 @@ public class InterstellarWarPanel {
     private InterstellarWarClient mInterstellarWarClient;
     private InterstellarWarCore mCore;
     private Rect mBackground;
-    private Point mViewPort;
+	private Point mViewPort = new Point (0, 0);
 
     private boolean mWasMouseDown = false;
 

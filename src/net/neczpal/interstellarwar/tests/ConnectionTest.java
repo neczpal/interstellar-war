@@ -2,15 +2,12 @@ package net.neczpal.interstellarwar.tests;
 
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
-import net.neczpal.interstellarwar.clientcommon.UserInterface;
-import net.neczpal.interstellarwar.common.connection.RoomData;
+import net.neczpal.interstellarwar.clientcommon.NoUserInterface;
 import net.neczpal.interstellarwar.server.ServerConnection;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
 
@@ -87,38 +84,5 @@ public class ConnectionTest {
 		mClientConnection.leaveRoom ();
 		sleep (100);//WAIT UNTIL COMMAND RECEIVED
 		Assert.assertEquals ("User left Room, got roomId 0.", 0, mServerConnection.getUser (1).getRoomId ());
-	}
-
-	private class NoUserInterface implements UserInterface {
-
-		@Override
-		public void connectionReady () {
-
-		}
-
-		@Override
-		public void connectionDropped () {
-
-		}
-
-		@Override
-		public void listRooms (ArrayList <RoomData> roomData) {
-
-		}
-
-		@Override
-		public void setIsInRoom (boolean isInRoom) {
-
-		}
-
-		@Override
-		public void startGame (String mapName) {
-
-		}
-
-		@Override
-		public void stopGame () {
-
-		}
 	}
 }
