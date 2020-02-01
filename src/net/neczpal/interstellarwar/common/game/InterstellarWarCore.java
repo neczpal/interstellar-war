@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandParamKey.*;
 
@@ -140,6 +141,8 @@ public class InterstellarWarCore extends Thread {
 			jsonSpaceship.put (OWNER_KEY, spaceShip.getOwnedBy ());
 			jsonSpaceship.put (UNIT_NUMBER_KEY, spaceShip.getUnitsNumber ());
 
+			jsonSpaceship.put (ROAD_INDEX_KEY, mRoads.indexOf (spaceShip.getRoad ()));
+
 			jsonSpaceship.put (CURRENT_TICK_NUMBER_KEY, spaceShip.getCurrentTick ());
 			jsonSpaceship.put (MAXIMUM_TICK_NUMBER_KEY, spaceShip.getMaxTick ());
 
@@ -213,13 +216,19 @@ public class InterstellarWarCore extends Thread {
 			double vx = jsonSpaceship.getDouble (VELOCITY_X_KEY);
 			double vy = jsonSpaceship.getDouble (VELOCITY_Y_KEY);
 
+			int roadIndex = jsonSpaceship.getInt (ROAD_INDEX_KEY);
+
 			int ownedBy = jsonSpaceship.getInt (OWNER_KEY);
 			int unitsNum = jsonSpaceship.getInt (UNIT_NUMBER_KEY);
 			int curTick = jsonSpaceship.getInt (CURRENT_TICK_NUMBER_KEY);
 			int maxTick = jsonSpaceship.getInt (MAXIMUM_TICK_NUMBER_KEY);
 			int tex = jsonSpaceship.getInt (TEXTURE_INDEX_KEY);
 
-			mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
+			Road road = mRoads.get (roadIndex);
+			SpaceShip spaceShip = new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex, road);
+			road.addSpaceship (spaceShip);
+
+			mSpaceShips.add (spaceShip);
 		}
 	}
 
@@ -233,9 +242,17 @@ public class InterstellarWarCore extends Thread {
 		Planet fromPlanet = mPlanets.get (from);
 		Planet toPlanet = mPlanets.get (to);
 		int unitNumber = fromPlanet.getUnitsNumber ();
+
 		if (unitNumber > 0) {
+			Road r = new Road (fromPlanet, toPlanet);
+			Road road = mRoads.get (mRoads.indexOf (r));
+
+			SpaceShip spaceShip = new SpaceShip (fromPlanet, toPlanet, unitNumber);
+			spaceShip.setRoad (road);
+
 			fromPlanet.setUnitsNumber (0);
-			mSpaceShips.add (new SpaceShip (fromPlanet, toPlanet, unitNumber));
+			road.addSpaceship (spaceShip);
+			mSpaceShips.add (spaceShip);
 		}
 	}
 
@@ -247,14 +264,51 @@ public class InterstellarWarCore extends Thread {
 			spaceShip.tick ();
 		}
 
-		Iterator <SpaceShip> iterator = mSpaceShips.iterator ();
+		Iterator<SpaceShip> iterator = mSpaceShips.iterator ();
 		while (iterator.hasNext ()) {
 			SpaceShip spaceShip = iterator.next ();
 			if (spaceShip.isArrived ()) {
+				spaceShip.getRoad ().removeSpaceships (spaceShip);
 				spaceShip.getToPlanet ().spaceShipArrived (spaceShip);
 				iterator.remove ();
 			}
 		}
+
+		List<SpaceShip> deleteCoreSpaceShips = new ArrayList<> ();
+//
+		for (Road road : mRoads) {
+			List<SpaceShip> spaceShips = road.getSpaceShips ();
+			List<SpaceShip> deleteRoadSpaceShips = new ArrayList<> ();
+			if (spaceShips.size () > 1) {
+				for (int i = 0; i < spaceShips.size (); i++) {
+					SpaceShip spaceShip1 = spaceShips.get (i);
+					for (int j = i + 1; j < spaceShips.size (); j++) {
+						SpaceShip spaceShip2 = spaceShips.get (j);
+						if (spaceShip1.isCollided (spaceShip2) && spaceShip1.getOwnedBy () != spaceShip2.getOwnedBy ()) {
+							if (spaceShip1.getUnitsNumber () > spaceShip2.getUnitsNumber ()) {
+								spaceShip1.setUnitsNumber (spaceShip1.getUnitsNumber () - spaceShip2.getUnitsNumber ());
+								deleteCoreSpaceShips.add (spaceShip2);
+								deleteRoadSpaceShips.add (spaceShip2);
+							} else if (spaceShip2.getUnitsNumber () > spaceShip1.getUnitsNumber ()) {
+								spaceShip2.setUnitsNumber (spaceShip2.getUnitsNumber () - spaceShip1.getUnitsNumber ());
+								deleteCoreSpaceShips.add (spaceShip1);
+								deleteRoadSpaceShips.add (spaceShip1);
+							} else {
+								spaceShip2.setUnitsNumber (0);
+								spaceShip1.setUnitsNumber (0);
+								deleteCoreSpaceShips.add (spaceShip1);
+								deleteCoreSpaceShips.add (spaceShip2);
+								deleteRoadSpaceShips.add (spaceShip1);
+								deleteRoadSpaceShips.add (spaceShip2);
+							}
+						}
+
+					}
+					road.removeSpaceships (deleteRoadSpaceShips);
+				}
+			}
+		}
+		mSpaceShips.removeAll (deleteCoreSpaceShips);
 	}
 
 	/**
@@ -308,16 +362,16 @@ public class InterstellarWarCore extends Thread {
 		return mMaxUsers;
 	}
 
-	public ArrayList <Planet> getPlanets () {
-		return new ArrayList<>(mPlanets);
+	public List<Planet> getPlanets () {
+		return new ArrayList<> (mPlanets);
 	}
 
-	public ArrayList <Road> getRoads () {
-		return new ArrayList<>(mRoads);
+	public List<Road> getRoads () {
+		return new ArrayList<> (mRoads);
 	}
 
-	public ArrayList <SpaceShip> getSpaceShips () {
-		return new ArrayList<>(mSpaceShips);
+	public List<SpaceShip> getSpaceShips () {
+		return new ArrayList<> (mSpaceShips);
 	}
 
 	public int getBackgroundTextureIndex () {

@@ -17,7 +17,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
@@ -179,20 +178,20 @@ public class InterstellarWarPanel {
 	 * Malt das Spiel aus
 	 */
 	public void draw () {
-        mBackground.draw ();
-        ArrayList<Road> roads = mCore.getRoads ();
-        ArrayList<Planet> planets = mCore.getPlanets ();
-        ArrayList<SpaceShip> spaceShips = mCore.getSpaceShips ();
+		mBackground.draw ();
+		List<Road> roads = mCore.getRoads ();
+		List<Planet> planets = mCore.getPlanets ();
+		List<SpaceShip> spaceShips = mCore.getSpaceShips ();
 
-        GL11.glPushMatrix ();
-        GL11.glTranslated (mViewPort.getX (), mViewPort.getY (), 0);
+		GL11.glPushMatrix ();
+		GL11.glTranslated (mViewPort.getX (), mViewPort.getY (), 0);
 
-        if (mSelectedPlanetFromIndex != -1) {
-            Planet selectedPlanet = planets.get (mSelectedPlanetFromIndex);
-            GLUtil.drawCircle (selectedPlanet.getX (), selectedPlanet.getY (), selectedPlanet.getRadius (), Color.values ()[selectedPlanet.getOwnedBy ()]);
-        }
-        if (mSelectedPlanetToIndex != -1) {
-            Planet selectedPlanet = planets.get (mSelectedPlanetToIndex);
+		if (mSelectedPlanetFromIndex != -1) {
+			Planet selectedPlanet = planets.get (mSelectedPlanetFromIndex);
+			GLUtil.drawCircle (selectedPlanet.getX (), selectedPlanet.getY (), selectedPlanet.getRadius (), Color.values ()[selectedPlanet.getOwnedBy ()]);
+		}
+		if (mSelectedPlanetToIndex != -1) {
+			Planet selectedPlanet = planets.get (mSelectedPlanetToIndex);
             GLUtil.drawCircle (selectedPlanet.getX (), selectedPlanet.getY (), selectedPlanet.getRadius (), Color.values ()[selectedPlanet.getOwnedBy ()]);
         }
 
@@ -258,9 +257,9 @@ public class InterstellarWarPanel {
 		Planet from = spaceShip.getFromPlanet ();
 		Planet to = spaceShip.getToPlanet ();
 
-		float lx = to.getX () - from.getX ();
-		float ly = to.getY () - from.getY ();
-		float angle = (float) Math.atan (ly / lx);
+		double lx = to.getX () - from.getX ();
+		double ly = to.getY () - from.getY ();
+		double angle = Math.atan (ly / lx);
 
 		Point a = new Point (from.getX () - w / 2, from.getY () + h / 2);
 		Point b = new Point (from.getX () + w / 2, from.getY () + h / 2);

@@ -17,7 +17,7 @@ public class InterstellarWarCommandParamKey {
     public static final String VELOCITY_X_KEY = "velocity-x";
     public static final String VELOCITY_Y_KEY = "velocity-y";
 
-
+    public static final String ROAD_INDEX_KEY = "road-index-key";
     public static final String OWNER_KEY = "owner";
 
     public static final String POSITION_X_KEY = "position-x";
@@ -30,5 +30,6 @@ public class InterstellarWarCommandParamKey {
 
     public static final String MAP_NAME_KEY = "map-name";
     public static final String MAP_MAX_USER_COUNT_KEY = "map-max-user-count";
+
 
 }

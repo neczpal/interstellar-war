@@ -1,6 +1,9 @@
 package net.neczpal.interstellarwar.common.game;
 
+import net.neczpal.interstellarwar.desktop.geom.Point;
+
 import java.io.Serializable;
+import java.util.Objects;
 
 public class SpaceShip implements Serializable {
 	public static final int SPACESHIP_TYPES = 11;
@@ -14,6 +17,7 @@ public class SpaceShip implements Serializable {
 
     private Planet mFromPlanet;
     private Planet mToPlanet;
+    private Road mRoad;
 
     private double mVx, mVy;
 
@@ -26,40 +30,64 @@ public class SpaceShip implements Serializable {
      * @param toPlanet    Der Planet wohin das Raumschiff einfahrt
      * @param unitsNumber Die Anzahl der Einheits, die transportiert wird
      */
-	SpaceShip (Planet fromPlanet, Planet toPlanet, int unitsNumber) {
-		mTextureIndex = (int) (Math.random () * SPACESHIP_TYPES);
+    SpaceShip (Planet fromPlanet, Planet toPlanet,
+               int unitsNumber) {
+        mTextureIndex = (int) (Math.random () * SPACESHIP_TYPES);
 
-		mUnitsNumber = unitsNumber;
-		mCurrentTick = 0;
-		mFromPlanet = fromPlanet;
-		mToPlanet = toPlanet;
+        mUnitsNumber = unitsNumber;
+        mCurrentTick = 0;
+        mFromPlanet = fromPlanet;
+        mToPlanet = toPlanet;
 
-		mOwnedBy = mFromPlanet.getOwnedBy ();
+        mOwnedBy = mFromPlanet.getOwnedBy ();
 
-		float lx = toPlanet.getX () - fromPlanet.getX ();
-		float ly = toPlanet.getY () - fromPlanet.getY ();
-		float length = fromPlanet.distance (toPlanet);
+        double lx = toPlanet.getX () - fromPlanet.getX ();
+        double ly = toPlanet.getY () - fromPlanet.getY ();
+        double length = fromPlanet.distance (toPlanet);
 
-		mMaxTick = (int) (length / SPACE_SHIP_SPEED);
+        mMaxTick = (int) (length / SPACE_SHIP_SPEED);
 
-		mVx = lx / length * SPACE_SHIP_SPEED;
-		mVy = ly / length * SPACE_SHIP_SPEED;
-	}
+        mVx = lx / length * SPACE_SHIP_SPEED;
+        mVy = ly / length * SPACE_SHIP_SPEED;
+    }
 
-	/**
-	 * Erstellt ein Raumschiff
-     *
-     * @param fromPlanet   Der Planet woher das Raumschiff beginnt
-     * @param toPlanet     Der Planet wohin das Raumschiff einfahrt
-     * @param vx           Die Geschwindigkeit von dem Raumshiff auf dem X-Achse
-     * @param vy           Die Geschwindigkeit von dem Raumshiff auf dem Y-Achse
-     * @param ownedBy      Die Nummer von Spieler, die diesem Raumschiff dominiert
-     * @param unitsNumber  Die Anzahl der Einheits, die transportiert wird
-     * @param currentTick  Die akutelle Zeitvariable
-     * @param maxTick      Die maximalle Zeitvariable
-     * @param textureIndex Das Index der Texture
-     */
-    SpaceShip (Planet fromPlanet, Planet toPlanet, double vx, double vy, int ownedBy, int unitsNumber, int currentTick, int maxTick, int textureIndex) {
+//	/**
+//	 * Erstellt ein Raumschiff
+//     *
+//     * @param fromPlanet   Der Planet woher das Raumschiff beginnt
+//     * @param toPlanet     Der Planet wohin das Raumschiff einfahrt
+//     * @param vx           Die Geschwindigkeit von dem Raumshiff auf dem X-Achse
+//     * @param vy           Die Geschwindigkeit von dem Raumshiff auf dem Y-Achse
+//     * @param ownedBy      Die Nummer von Spieler, die diesem Raumschiff dominiert
+//     * @param unitsNumber  Die Anzahl der Einheits, die transportiert wird
+//     * @param currentTick  Die akutelle Zeitvariable
+//     * @param maxTick      Die maximalle Zeitvariable
+//     * @param textureIndex Das Index der Texture
+//     */
+//    SpaceShip (Planet fromPlanet, Planet toPlanet,
+//               double vx, double vy,
+//               int ownedBy, int unitsNumber,
+//               int currentTick, int maxTick,
+//               int textureIndex) {
+//
+//        mTextureIndex = textureIndex;
+//        mUnitsNumber = unitsNumber;
+//        mCurrentTick = currentTick;
+//        mMaxTick = maxTick;
+//        mFromPlanet = fromPlanet;
+//        mToPlanet = toPlanet;
+//        mVx = vx;
+//        mVy = vy;
+//        mOwnedBy = ownedBy;
+//	}
+
+    SpaceShip (Planet fromPlanet, Planet toPlanet,
+               double vx, double vy,
+               int ownedBy, int unitsNumber,
+               int currentTick, int maxTick,
+               int textureIndex,
+               Road road) {
+
         mTextureIndex = textureIndex;
         mUnitsNumber = unitsNumber;
         mCurrentTick = currentTick;
@@ -69,7 +97,8 @@ public class SpaceShip implements Serializable {
         mVx = vx;
         mVy = vy;
         mOwnedBy = ownedBy;
-	}
+        mRoad = road;
+    }
 
 	/**
 	 * Incrementiert die Zeitvariable
@@ -121,6 +150,50 @@ public class SpaceShip implements Serializable {
 
     public int getTextureIndex () {
         return mTextureIndex;
-	}
+    }
+
+    public Road getRoad () {
+        return mRoad;
+    }
+
+    public void setRoad (Road road) {
+        mRoad = road;
+    }
+
+    public double getPreciseX () {
+        return (mToPlanet.getX () - mFromPlanet.getX ()) + getCurrentTick () * getVx ();
+    }
+
+    public double getPreciseY () {
+        return (mToPlanet.getY () - mFromPlanet.getY ()) + getCurrentTick () * getVy ();
+    }
+
+    public Point getPosition () {
+        return new Point (getPreciseX (), getPreciseY ());
+    }
+
+    public boolean isCollided (SpaceShip other) {
+        return mCurrentTick + other.mCurrentTick >= mMaxTick &&
+                this.getToPlanet ().equals (other.getFromPlanet ()) &&
+                this.getFromPlanet ().equals (other.getToPlanet ());
+    }
+
+    public void setUnitsNumber (int unitsNumber) {
+        this.mUnitsNumber = unitsNumber;
+    }
+
+    @Override
+    public boolean equals (Object o) {
+        if (this == o) return true;
+        if (o == null || getClass () != o.getClass ()) return false;
+        SpaceShip spaceShip = (SpaceShip) o;
+        return mUnitsNumber == spaceShip.mUnitsNumber &&
+                mOwnedBy == spaceShip.mOwnedBy &&
+                mMaxTick == spaceShip.mMaxTick &&
+                mCurrentTick == spaceShip.mCurrentTick &&
+                mTextureIndex == spaceShip.mTextureIndex &&
+                Objects.equals (mFromPlanet, spaceShip.mFromPlanet) &&
+                Objects.equals (mToPlanet, spaceShip.mToPlanet);
+    }
 
 }
