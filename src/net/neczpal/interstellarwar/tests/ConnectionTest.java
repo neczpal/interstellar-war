@@ -2,12 +2,15 @@ package net.neczpal.interstellarwar.tests;
 
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
-import net.neczpal.interstellarwar.clientcommon.NoUserInterface;
+import net.neczpal.interstellarwar.clientcommon.UserInterface;
+import net.neczpal.interstellarwar.common.connection.RoomData;
 import net.neczpal.interstellarwar.server.ServerConnection;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
 
@@ -40,7 +43,7 @@ public class ConnectionTest {
 	@Test
 	public void testEnterRoom () {
 		mClientConnection.enterRoom (3);
-
+		sleep (100);
 		Assert.assertEquals ("User enters a Room", 3, mServerConnection.getUser (1).getRoomId ());
 	}
 

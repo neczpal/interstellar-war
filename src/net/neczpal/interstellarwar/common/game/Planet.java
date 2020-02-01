@@ -17,10 +17,6 @@ public class Planet implements Serializable {
 	private int mOwnedBy;
 	private int mUnitsNumber;
 
-	public List<Planet> getNeighbors() {
-		return mNeighbors;
-	}
-
 	private List<Planet> mNeighbors;
 
 
@@ -146,6 +142,10 @@ public class Planet implements Serializable {
 
 	public int getTextureIndex () {
 		return mTextureIndex;
+	}
+
+	public List<Planet> getNeighbors() {
+		return mNeighbors;
 	}
 
 }

@@ -1,8 +1,6 @@
 package net.neczpal.interstellarwar.clientcommon;
 
-import net.neczpal.interstellarwar.common.connection.RoomData;
-
-import java.util.ArrayList;
+import org.json.JSONArray;
 
 public interface UserInterface {
 	/**
@@ -15,12 +13,12 @@ public interface UserInterface {
 	 */
 	void connectionDropped ();
 
-	/**
-	 * Listet die Zimmer
-	 *
-	 * @param roomData Die Zimmerdata
-	 */
-	void listRooms (ArrayList <RoomData> roomData);
+    /**
+     * Listet die Zimmer
+     *
+     * @param roomData Die Zimmerdata
+     */
+    void listRooms (JSONArray roomData);
 
 	/**
 	 * Einstellt ob es in einen Zimmer ist

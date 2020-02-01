@@ -1,10 +1,8 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.connection.Command;
-import net.neczpal.interstellarwar.common.connection.RoomData;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static net.neczpal.interstellarwar.common.connection.CommandParamKey.*;
+import static net.neczpal.interstellarwar.common.connection.CommandType.*;
+
 
 public class ServerConnection extends Thread {
 
@@ -154,13 +156,13 @@ public class ServerConnection extends Thread {
 	/**
 	 * @return Ein Liste von dem alle Zimmer-Data auf dem Server
 	 */
-	public ArrayList <RoomData> getRoomData () {
-		ArrayList <RoomData> roomDatas = new ArrayList <> ();
+	public List<JSONObject> getAllRoomData () {
+		List<JSONObject> allRoomData = new ArrayList<> ();
 		for (Room room : mRooms.values ()) {
-			roomDatas.add (room.getData ());
+			allRoomData.add (room.getData ());
 		}
 
-		return roomDatas;
+		return allRoomData;
 	}
 
 	/**
@@ -198,8 +200,21 @@ public class ServerConnection extends Thread {
 		User newUser = new User (name, id);
 		mUsers.put (id, newUser);
 
-		sendToId (id, new Command (Command.Type.CONNECTION_READY, id));
-		sendToId (id, Command.Type.LIST_ROOMS, getRoomData ());
+		{
+			JSONObject command = new JSONObject ();
+			command.put (COMMAND_TYPE_KEY, CONNECTION_READY);
+			command.put (USER_ID_KEY, id);
+
+			sendToId (id, command);
+		}
+		{
+			JSONObject command = new JSONObject ();
+			command.put (COMMAND_TYPE_KEY, LIST_ROOMS);
+			command.put (USER_ID_KEY, id);
+			command.put (ALL_ROOM_DATA_KEY, getAllRoomData ());
+
+			sendToId (id, command);
+		}
 
 		mLogger.log (Level.INFO, "-> User (" + newUser + ") entered the server");
 	}
@@ -225,8 +240,15 @@ public class ServerConnection extends Thread {
 		if (room != null && !room.isFull () && !room.isMapRunning ()) {
 			user.setRoomId (room.getRoomId ());
 			room.addUser (user);
-			sendToId (user.getId (), new Command (Command.Type.MAP_DATA, user.getRoomIndex (), room.getGameServer ().getCore ().getData ()));
+			{
+				JSONObject command = new JSONObject ();
+				command.put (COMMAND_TYPE_KEY, GET_MAP_DATA);
+				command.put (ROOM_INDEX_KEY, user.getRoomIndex ());
+				command.put (MAP_DATA_KEY, room.getGameServer ().getCore ().getData ());
+				command.put (USER_ID_KEY, user.getId ());
 
+				sendToId (user.getId (), command);
+			}
 			listRoom ();
 			mLogger.log (Level.INFO, "-> User (" + user + ") connected to the Room (" + room + ")");
 		} else {
@@ -244,7 +266,13 @@ public class ServerConnection extends Thread {
 		if (room != null) {
 			if (!room.isMapRunning ()) {
 				if (room.isFull ()) {
-					room.send (Command.Type.READY_TO_PLAY, room.getMapFantasyName ());
+					{
+						JSONObject command = new JSONObject ();
+						command.put (COMMAND_TYPE_KEY, READY_TO_PLAY);
+						command.put (MAP_NAME_KEY, room.getMapFantasyName ());
+
+						room.send (command);
+					}
 					room.startGame ();
 					addRoom (room.getMapName ());
 
@@ -258,7 +286,7 @@ public class ServerConnection extends Thread {
 				mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not running");
 			}
 		} else {
-			mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not existing");
+			mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not yet full/running/not existing");
 		}
 	}
 
@@ -289,7 +317,7 @@ public class ServerConnection extends Thread {
 	 * @param user    Der Benutzer
 	 * @param command Der Spiel-Befehl
 	 */
-	private void gameCommand (User user, Command command) {
+	private void gameCommand (User user, JSONObject command) {
 		Room room = getRoom (user.getRoomId ());
 		mLogger.log (Level.INFO, "-> Received GameCommand (" + command + ")from User (" + user + ") in the Room (" + room + ")");
 		room.receive (command);
@@ -301,26 +329,42 @@ public class ServerConnection extends Thread {
 	 * @param command     Der Befehl
 	 * @param currentPort Das Port der Benutzer
 	 */
-	public void receive (Command command, int currentPort) {
-		switch (command.type) {
-			case ENTER_SERVER:
-				enterServer ((String) command.data[1], currentPort);
+	public void receive (JSONObject command, int currentPort) {
+		String type = command.getString (COMMAND_TYPE_KEY);
+
+		switch (type) {
+			case ENTER_SERVER: {
+				String name = command.getString (USER_NAME_KEY);
+				enterServer (name, currentPort);
 				break;
-			case EXIT_SERVER:
-				exitServer (getUser (command.data[0]));
+			}
+			case EXIT_SERVER: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				exitServer (getUser (userId));
 				break;
-			case LEAVE_ROOM:
-				leaveRoom (getUser (command.data[0]));
+			}
+			case LEAVE_ROOM: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				leaveRoom (getUser (userId));
 				break;
-			case ENTER_ROOM:
-				enterRoom (getUser (command.data[0]), getRoom (command.data[1]));
+			}
+			case ENTER_ROOM: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				Integer roomId = command.getInt (ROOM_ID_KEY);
+				enterRoom (getUser (userId), getRoom (roomId));
 				break;
-			case START_ROOM:
-				startRoom (getUser (command.data[0]));
+			}
+			case START_ROOM: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				startRoom (getUser (userId));
 				break;
-			case GAME_COMMAND:
-				gameCommand (getUser (command.data[0]), command);
+			}
+			case GAME_COMMAND: {
+				Integer userId = command.getInt (USER_ID_KEY);
+//				JSONObject gameCommand = command.getJSONObject(InterstellarWarCommandParamKey.GAME_COMMAND_KEY);
+				gameCommand (getUser (userId), command);
 				break;
+			}
 		}
 	}
 
@@ -330,30 +374,15 @@ public class ServerConnection extends Thread {
 	 * Sendet die Zimmer-Data zu den Benutzern
 	 */
 	public void listRoom () {
-		ArrayList <RoomData> roomDatas = getRoomData ();
-		send (Command.Type.LIST_ROOMS, getRoomData ());
-		mLogger.log (Level.INFO, "<- Sending RoomDatas Size(" + roomDatas.size () + ")");
-	}
+		List<JSONObject> allRoomData = getAllRoomData ();
+		{
+			JSONObject command = new JSONObject ();
+			command.put (COMMAND_TYPE_KEY, LIST_ROOMS);
+			command.put (ALL_ROOM_DATA_KEY, allRoomData);
 
-	/**
-	 * Sendet ein Befehl zu dem Benutzer
-	 *
-	 * @param id   Das ID der Benutzer
-	 * @param type Das Typ der Befehl
-	 */
-	public void sendToId (int id, Command.Type type) {
-		sendToId (id, new Command (type));
-	}
-
-	/**
-	 * Sendet ein Befehl zu dem Benutzer
-	 *
-	 * @param id   Das ID der Benutzer
-	 * @param type Das Typ der Befehl
-	 * @param data Das Data der Befehl
-	 */
-	public void sendToId (int id, Command.Type type, Serializable... data) {
-		sendToId (id, new Command (type, data));
+			send (command);
+		}
+		mLogger.log (Level.INFO, "<- Sending RoomDatas Size(" + allRoomData.size () + ")");
 	}
 
 	/**
@@ -362,41 +391,23 @@ public class ServerConnection extends Thread {
 	 * @param id      Das ID der Benutzer
 	 * @param command Der Befehl
 	 */
-	public void sendToId (int id, Command command) {
+	public void sendToId (int id, JSONObject command) {
 		Client client = mClients.get (id);
 		if (client != null && !client.send (command)) {
 			removeClient (id);
 		}
 	}
 
-	/**
-	 * Sender ein Befehl zu den allen Benutzern
-	 *
-	 * @param type Das Typ der Befehl
-	 */
-	public void send (Command.Type type) {
-		send (new Command (type));
-	}
-
-	/**
-	 * Sender ein Befehl zu den allen Benutzern
-	 *
-	 * @param type Das Typ der Befehl
-	 * @param data Das Data der Befehl
-	 */
-	public void send (Command.Type type, Serializable... data) {
-		send (new Command (type, data));
-	}
 
 	/**
 	 * Sender ein Befehl zu den allen Benutzern
 	 *
 	 * @param command Der Befehl
 	 */
-	public synchronized void send (Command command) {
-		Iterator <HashMap.Entry <Integer, Client>> iterator = mClients.entrySet ().iterator ();
+	public synchronized void send (JSONObject command) {
+		Iterator<HashMap.Entry<Integer, Client>> iterator = mClients.entrySet ().iterator ();
 		while (iterator.hasNext () && mIsRunning) {
-			HashMap.Entry <Integer, Client> entry = iterator.next ();
+			HashMap.Entry<Integer, Client> entry = iterator.next ();
 			if (!entry.getValue ().send (command)) {
 				iterator.remove ();
 				removeClient (entry.getKey ());

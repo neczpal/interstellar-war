@@ -1,11 +1,13 @@
 package net.neczpal.interstellarwar.clientcommon;
 
-import net.neczpal.interstellarwar.common.connection.Command;
-import net.neczpal.interstellarwar.common.game.InterstellarWarCommand;
+import net.neczpal.interstellarwar.common.connection.CommandParamKey;
+import net.neczpal.interstellarwar.common.connection.CommandType;
 import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
+import org.json.JSONObject;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandParamKey.*;
+import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandType.REFRESH_WHOLE_MAP;
+import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandType.START_MOVE_SPACESHIP;
 
 public class InterstellarWarClient {
 	private InterstellarWarCore mInterstellarWarCore;
@@ -24,18 +26,22 @@ public class InterstellarWarClient {
 
 	// RECEIVE
 
-	/**
-	 * Bekommt ein Befehl
-	 *
-	 * @param command Der Befehl
-	 */
-	public void receive (Command command) {
-		switch ((InterstellarWarCommand) command.data[0]) {
-			case REFRESH_WHOLE_MAP:
-				mInterstellarWarCore.setData ((ArrayList <Serializable>) command.data[1]);
-				break;
-		}
-	}
+    /**
+     * Bekommt ein Befehl
+     *
+     * @param command Der Befehl
+     */
+    public void receive (JSONObject command) {
+        String type = command.getString (GAME_COMMAND_TYPE_KEY);
+
+        switch (type) {
+            case REFRESH_WHOLE_MAP: {
+	            JSONObject mapData = command.getJSONObject (CommandParamKey.MAP_DATA_KEY);
+	            mInterstellarWarCore.setData (mapData);
+	            break;
+            }
+        }
+    }
 
 	// SEND
 
@@ -48,7 +54,15 @@ public class InterstellarWarClient {
 	 * @param unitNumber die Anzahl der Einheiten des Raumschiffes
 	 */
 	public void startMoveSpaceShip (int fromIndex, int toIndex, int tickNumber, int unitNumber) {
-		mClientConnection.send (Command.Type.GAME_COMMAND, InterstellarWarCommand.START_MOVE_SPACESHIP, fromIndex, toIndex, tickNumber, unitNumber);
+        JSONObject command = new JSONObject ();
+        command.put (CommandParamKey.COMMAND_TYPE_KEY, CommandType.GAME_COMMAND);
+        command.put (GAME_COMMAND_TYPE_KEY, START_MOVE_SPACESHIP);
+        command.put (FROM_INDEX_KEY, fromIndex);
+        command.put (TO_INDEX_KEY, toIndex);
+        command.put (TICK_NUMBER_KEY, tickNumber);
+        command.put (UNIT_NUMBER_KEY, unitNumber);
+
+        mClientConnection.send (command);
 	}
 
 	/**

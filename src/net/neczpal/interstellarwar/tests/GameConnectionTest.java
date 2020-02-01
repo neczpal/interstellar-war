@@ -2,13 +2,16 @@ package net.neczpal.interstellarwar.tests;
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
-import net.neczpal.interstellarwar.clientcommon.NoUserInterface;
+import net.neczpal.interstellarwar.clientcommon.UserInterface;
+import net.neczpal.interstellarwar.common.connection.RoomData;
 import net.neczpal.interstellarwar.server.InterstellarWarServer;
 import net.neczpal.interstellarwar.server.ServerConnection;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
 
@@ -56,7 +59,7 @@ public class GameConnectionTest {
 	@After
 	public void tearDown () throws Exception {
 		mInterstellarWarClient1.getCore ().stopGame ();
-		mInterstellarWarClient2.getCore ().stopGame ();
+		mInterstellarWarClient1.getCore ().stopGame ();
 
 		mClientConnection1.stopClientConnection ();
 		mClientConnection2.stopClientConnection ();
