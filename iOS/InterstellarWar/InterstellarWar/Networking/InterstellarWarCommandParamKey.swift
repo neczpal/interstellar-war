@@ -7,7 +7,7 @@
 //
 
 import Foundation
-class InterstellarWarCommandParamKey {
+public class InterstellarWarCommandParamKey {
     public static let GAME_COMMAND_TYPE_KEY = "game-command-type";
 
     public static let FROM_INDEX_KEY = "from-index";

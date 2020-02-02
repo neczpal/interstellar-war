@@ -8,34 +8,11 @@
 
 import Foundation
 
-extension String {
-    func toJSON() -> Any? {
-        guard let data = self.data(using: .utf8, allowLossyConversion: false) else { return nil }
-        return try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)
-    }
-}
 
-func stringify(json: Any, prettyPrinted: Bool = false) -> String {
-    var options: JSONSerialization.WritingOptions = []
-    if prettyPrinted {
-      options = JSONSerialization.WritingOptions.prettyPrinted
-    }
-
-    do {
-      let data = try JSONSerialization.data(withJSONObject: json, options: options)
-      if let string = String(data: data, encoding: String.Encoding.utf8) {
-        return string
-      }
-    } catch {
-      print(error)
-    }
-
-    return ""
-}
 
 public class ClientConnection {
 
-//    private UserInterface mUserInterface;
+    private var mUserInterface : UserInterface;
 //    private InterstellarWarClient mGameClient; #TODO
 
     private var mConnectionId : Int = -1;
@@ -48,6 +25,9 @@ public class ClientConnection {
     var mIn : InputStream?
     var mOut : OutputStream?
     
+    enum ConnectionError : Error {
+        case wrongAddress
+    }
 
     /**
      * Erstellt eine Verbindung mit dem Server
@@ -56,14 +36,19 @@ public class ClientConnection {
      * @param userName Benutzername der Klient
      * @throws IOException falls die Verbindung kann nicht aufbauen
      */
-    init (adresse : String, userName : String) {
+    init (adresse : String, userName : String, ui : UserInterface) throws {
         mUserName = userName;
         mIsRunning = false;
+        mUserInterface = ui
         let hostAndPort = adresse.split (separator: ":");
         let host = String(hostAndPort[0])
         let port = hostAndPort.count > 1 ? Int(String(hostAndPort[1]))! : 23233
         
         Stream.getStreamsToHost(withName: host, port: port, inputStream: &mIn, outputStream: &mOut)
+        
+        if (mIn == nil || mOut == nil) {
+            throw ConnectionError.wrongAddress
+        }
         
         
         mIn!.open()
@@ -110,7 +95,7 @@ public class ClientConnection {
                 for linesub in lines {
                     let line = String(linesub)
                     if(!line.isEmpty) {
-                        print("Read line: \(line)")
+//                        print("Read line: \(line)")
                         let jsonObject = JSON(parseJSON: line);
                         
                         receive (jsonObject);
@@ -157,7 +142,7 @@ public class ClientConnection {
      */
     private func connectionReady (_ newConnectionId : Int) {
         mConnectionId = newConnectionId;
-//        mUserInterface.connectionReady ();
+        mUserInterface.connectionReady ();
         print("-> Connected to the server. ID (" + String(mConnectionId) + ")");
     }
 
@@ -167,7 +152,7 @@ public class ClientConnection {
      * @param allRoomData Die Zimmerdata
      */
     private func listRooms (_ allRoomData : [JSON]) {
-//        mUserInterface.listRooms (allRoomData);
+        mUserInterface.listRooms (allRoomData);
         print("-> RoomDatas loaded. Size (" + String(allRoomData.count) + ")");
     }
 
@@ -181,7 +166,7 @@ public class ClientConnection {
 //        mRoomIndex = roomIndex;
 //        InterstellarWarCore core = new InterstellarWarCore (mapData);
 //        mGameClient = new InterstellarWarClient (core, this);
-//        mUserInterface.setIsInRoom (true);
+        mUserInterface.setIsInRoom (true);
         print("-> MapData loaded. RoomIndex (" + String(mRoomIndex) + ")");
     }
 
@@ -191,7 +176,7 @@ public class ClientConnection {
      * @param mapName Der Name der Mappe
      */
     private func startGame (_ mapName: String) {
-//        mUserInterface.startGame (mapName);
+        mUserInterface.startGame (mapName);
 //        mGameClient.getCore ().start (); ### TODO TODO TODO
         print("-> Started the game with Map (" + mapName + ")");
     }
@@ -266,6 +251,8 @@ public class ClientConnection {
      */
     public func exitServer () {
         send (CommandType.EXIT_SERVER);
+        //#TODO mb check if rly succesfull
+        mUserInterface.connectionDropped()
     }
 
     /**
@@ -295,11 +282,11 @@ public class ClientConnection {
      * Verlasst das Zimmer
      */
     public func leaveRoom () {
-//        mUserInterface.stopGame ();
+        mUserInterface.stopGame ();
 
         send (CommandType.LEAVE_ROOM);
 
-//        mUserInterface.setIsInRoom (false);
+        mUserInterface.setIsInRoom (false);
         print ("<- Leaving the Room");
     }
 
@@ -326,6 +313,8 @@ public class ClientConnection {
         command[CommandParamKey.USER_ID_KEY].int = mConnectionId
         let string = command.rawString()!
         let onLineString = string.replacingOccurrences(of: "\n", with: "");
+        
+        print(onLineString)
         
 //        do {
         let encodedDataArray = [UInt8]((onLineString + "\n").utf8)
@@ -362,7 +351,7 @@ public class ClientConnection {
 //        return mGameClient;
 //    }
 //
-//    public void setUserInterface (UserInterface userInterface) {
-//        mUserInterface = userInterface;
-//    }
+    func setUserInterface (_ userInterface : UserInterface) {
+        mUserInterface = userInterface;
+    }
 }

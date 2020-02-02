@@ -3,4 +3,86 @@
    uuid = "124A0737-5356-4518-8F29-8DDF4A2CAB96"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FC3D8C69-2C52-4E67-887F-2ECF0EFF70AB"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "InterstellarWar/Networking/ClientConnection.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "145"
+            endingLineNumber = "145"
+            landmarkName = "connectionReady(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F94BEA44-F818-45E8-B142-E56819112285"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "InterstellarWar/View/Controllers/LoginViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "239"
+            endingLineNumber = "239"
+            landmarkName = "connectionReady()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4D6A4663-F83B-4D81-BD75-CF809AFB2171"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "InterstellarWar/View/Controllers/LoginViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "245"
+            endingLineNumber = "245"
+            landmarkName = "connectionDropped()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "4D6A4663-F83B-4D81-BD75-CF809AFB2171 - 525a6011851495cc"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "InterstellarWar.LoginViewController.connectionDropped() -&gt; ()"
+                  moduleName = "InterstellarWar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/neczpalabel/IdeaProjects/interstellar-war/iOS/InterstellarWar/InterstellarWar/View/Controllers/LoginViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "214"
+                  endingLineNumber = "214"
+                  offsetFromSymbolStart = "150">
+               </Location>
+               <Location
+                  uuid = "4D6A4663-F83B-4D81-BD75-CF809AFB2171 - 2d2bc7246538d1b8"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in InterstellarWar.LoginViewController.connectionDropped() -&gt; ()"
+                  moduleName = "InterstellarWar"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/neczpalabel/IdeaProjects/interstellar-war/iOS/InterstellarWar/InterstellarWar/View/Controllers/LoginViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "215"
+                  endingLineNumber = "215"
+                  offsetFromSymbolStart = "56">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

@@ -8,7 +8,7 @@
 
 import Foundation
 
-class InterstellarWarCommandType {
+public class InterstellarWarCommandType {
     public static let START_MOVE_SPACESHIP = "START_MOVE_SPACESHIP";
     public static let REFRESH_WHOLE_MAP = "REFRESH_WHOLE_MAP";
 }

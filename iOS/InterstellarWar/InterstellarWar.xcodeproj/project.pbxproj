@@ -21,13 +21,14 @@
 		967CB80423E22DA800115E98 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 967CB80223E22DA800115E98 /* Main.storyboard */; };
 		967CB80623E22DAD00115E98 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 967CB80523E22DAD00115E98 /* Assets.xcassets */; };
 		967CB80923E22DAD00115E98 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 967CB80723E22DAD00115E98 /* LaunchScreen.storyboard */; };
+		9696F61623E73CE30035B1F8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9696F61523E73CE30035B1F8 /* LoginViewController.swift */; };
+		9696F61823E73D5E0035B1F8 /* RoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9696F61723E73D5E0035B1F8 /* RoomViewController.swift */; };
+		9696F61A23E7492F0035B1F8 /* UserInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9696F61923E7492F0035B1F8 /* UserInterface.swift */; };
 		96D081A223E4107F00D2D251 /* InterstellarWarCommandParamKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D081A123E4107F00D2D251 /* InterstellarWarCommandParamKey.swift */; };
 		96D081A423E4109D00D2D251 /* InterstellarWarCommandType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D081A323E4109D00D2D251 /* InterstellarWarCommandType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		964F334923E30293004C2AC7 /* common */ = {isa = PBXFileReference; lastKnownFileType = folder; path = common; sourceTree = "<group>"; };
-		964F334A23E302A0004C2AC7 /* clientcommon */ = {isa = PBXFileReference; lastKnownFileType = folder; path = clientcommon; sourceTree = "<group>"; };
 		964F334E23E30334004C2AC7 /* Spaceship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spaceship.swift; sourceTree = "<group>"; };
 		964F335023E3086C004C2AC7 /* Planet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planet.swift; sourceTree = "<group>"; };
 		964F335223E30E8B004C2AC7 /* Road.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Road.swift; sourceTree = "<group>"; };
@@ -44,6 +45,9 @@
 		967CB80523E22DAD00115E98 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		967CB80823E22DAD00115E98 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		967CB80A23E22DAD00115E98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9696F61523E73CE30035B1F8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		9696F61723E73D5E0035B1F8 /* RoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomViewController.swift; sourceTree = "<group>"; };
+		9696F61923E7492F0035B1F8 /* UserInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInterface.swift; sourceTree = "<group>"; };
 		96D081A123E4107F00D2D251 /* InterstellarWarCommandParamKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterstellarWarCommandParamKey.swift; sourceTree = "<group>"; };
 		96D081A323E4109D00D2D251 /* InterstellarWarCommandType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterstellarWarCommandType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -70,20 +74,8 @@
 		964F334B23E302CB004C2AC7 /* clientcommon */ = {
 			isa = PBXGroup;
 			children = (
-				964F335623E31310004C2AC7 /* ClientConnection.swift */,
-				964F335A23E31D9C004C2AC7 /* CommandParamKey.swift */,
-				964F335C23E31DE7004C2AC7 /* CommandType.swift */,
 			);
 			path = clientcommon;
-			sourceTree = "<group>";
-		};
-		964F334C23E302DE004C2AC7 /* JAVA */ = {
-			isa = PBXGroup;
-			children = (
-				964F334A23E302A0004C2AC7 /* clientcommon */,
-				964F334923E30293004C2AC7 /* common */,
-			);
-			path = JAVA;
 			sourceTree = "<group>";
 		};
 		964F334D23E30318004C2AC7 /* game */ = {
@@ -93,8 +85,6 @@
 				964F335023E3086C004C2AC7 /* Planet.swift */,
 				964F335223E30E8B004C2AC7 /* Road.swift */,
 				964F335423E30F21004C2AC7 /* InterstellarWarCore.swift */,
-				96D081A123E4107F00D2D251 /* InterstellarWarCommandParamKey.swift */,
-				96D081A323E4109D00D2D251 /* InterstellarWarCommandType.swift */,
 			);
 			path = game;
 			sourceTree = "<group>";
@@ -119,13 +109,13 @@
 		967CB7FB23E22DA800115E98 /* InterstellarWar */ = {
 			isa = PBXGroup;
 			children = (
-				964F334C23E302DE004C2AC7 /* JAVA */,
-				964F334B23E302CB004C2AC7 /* clientcommon */,
-				964F334323E301B6004C2AC7 /* common */,
+				9696F61323E735CC0035B1F8 /* Networking */,
+				9696F61023E711380035B1F8 /* Model */,
+				9696F60F23E710C50035B1F8 /* View */,
+				9696F61123E711420035B1F8 /* Controller */,
 				967CB7FC23E22DA800115E98 /* AppDelegate.swift */,
 				964F335823E31AEE004C2AC7 /* SwiftyJSON.swift */,
 				967CB7FE23E22DA800115E98 /* SceneDelegate.swift */,
-				967CB80023E22DA800115E98 /* ViewController.swift */,
 				967CB80223E22DA800115E98 /* Main.storyboard */,
 				967CB80523E22DAD00115E98 /* Assets.xcassets */,
 				967CB80723E22DAD00115E98 /* LaunchScreen.storyboard */,
@@ -139,6 +129,53 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9696F60F23E710C50035B1F8 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				9696F61423E73C710035B1F8 /* Controllers */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		9696F61023E711380035B1F8 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				964F334B23E302CB004C2AC7 /* clientcommon */,
+				964F334323E301B6004C2AC7 /* common */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9696F61123E711420035B1F8 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		9696F61323E735CC0035B1F8 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				964F335623E31310004C2AC7 /* ClientConnection.swift */,
+				964F335A23E31D9C004C2AC7 /* CommandParamKey.swift */,
+				964F335C23E31DE7004C2AC7 /* CommandType.swift */,
+				96D081A123E4107F00D2D251 /* InterstellarWarCommandParamKey.swift */,
+				96D081A323E4109D00D2D251 /* InterstellarWarCommandType.swift */,
+				9696F61923E7492F0035B1F8 /* UserInterface.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		9696F61423E73C710035B1F8 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				967CB80023E22DA800115E98 /* ViewController.swift */,
+				9696F61523E73CE30035B1F8 /* LoginViewController.swift */,
+				9696F61723E73D5E0035B1F8 /* RoomViewController.swift */,
+			);
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,8 +249,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9696F61623E73CE30035B1F8 /* LoginViewController.swift in Sources */,
 				964F335723E31310004C2AC7 /* ClientConnection.swift in Sources */,
 				964F335B23E31D9C004C2AC7 /* CommandParamKey.swift in Sources */,
+				9696F61823E73D5E0035B1F8 /* RoomViewController.swift in Sources */,
 				967CB80123E22DA800115E98 /* ViewController.swift in Sources */,
 				967CB7FD23E22DA800115E98 /* AppDelegate.swift in Sources */,
 				964F334F23E30334004C2AC7 /* Spaceship.swift in Sources */,
@@ -224,6 +263,7 @@
 				964F335523E30F21004C2AC7 /* InterstellarWarCore.swift in Sources */,
 				964F335D23E31DE7004C2AC7 /* CommandType.swift in Sources */,
 				964F335123E3086C004C2AC7 /* Planet.swift in Sources */,
+				9696F61A23E7492F0035B1F8 /* UserInterface.swift in Sources */,
 				96D081A423E4109D00D2D251 /* InterstellarWarCommandType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
