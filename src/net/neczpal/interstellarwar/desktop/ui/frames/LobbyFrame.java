@@ -79,12 +79,17 @@ public class LobbyFrame extends JFrame {
 			    int selectedRow = mRoomsTable.getSelectedRow ();
 				if (selectedRow != -1) {
 					mSelectedRoomId = mRoomsDataTableModel.getId (selectedRow);
-					mUserListModel.setUserNames (mAllRoomUsers.get (mSelectedRoomId));
-					String[] userCount = mRoomsDataTableModel.getValueAt (selectedRow, 1).toString ().split ("/");
-					if ((userCount[0].equals (userCount[1]) || (boolean) mRoomsDataTableModel.getValueAt (selectedRow, 2)) && !mIsInRoom) {
-						mJoinOrLeaveButton.setEnabled (false);
+					List<String> userNames = mAllRoomUsers.get (mSelectedRoomId);
+					if (userNames != null) {
+						mUserListModel.setUserNames (userNames);
+						String[] userCount = mRoomsDataTableModel.getValueAt (selectedRow, 1).toString ().split ("/");
+						if ((userCount[0].equals (userCount[1]) || (boolean) mRoomsDataTableModel.getValueAt (selectedRow, 2)) && !mIsInRoom) {
+							mJoinOrLeaveButton.setEnabled (false);
+						} else {
+							mJoinOrLeaveButton.setEnabled (true);
+						}
 					} else {
-						mJoinOrLeaveButton.setEnabled (true);
+						mSelectedRoomId = -1;
 					}
 				}
 			}

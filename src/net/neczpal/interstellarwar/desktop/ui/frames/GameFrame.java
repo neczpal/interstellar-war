@@ -53,15 +53,21 @@ public class GameFrame extends Thread {
 		while (!Display.isCloseRequested () && mIsGameFrameRunning) {
             glClear (GL_COLOR_BUFFER_BIT);
 
-            if (Mouse.isInsideWindow ()) {
-                mGamePanel.inputEvents ();
-            }
+			if (Mouse.isInsideWindow ()) {
+				mGamePanel.inputEvents ();
+			}
 
-            mGamePanel.draw ();
+			mGamePanel.draw ();
 
-            Display.sync (60);
-            Display.update ();
-        }
+			Display.sync (60);
+			Display.update ();
+		}
+		InterstellarWarClient gameClient = mGamePanel.getInterstellarWarClient ();
+
+		if (gameClient != null) {
+			gameClient.leaveRoom ();
+		}
+
 		clean ();
 	}
 

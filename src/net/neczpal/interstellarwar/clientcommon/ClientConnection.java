@@ -21,7 +21,6 @@ public class ClientConnection extends Thread {
 	private InterstellarWarClient mGameClient;
 
 
-
 	private int mConnectionId;
 	private int mRoomIndex;
 
@@ -181,9 +180,9 @@ public class ClientConnection extends Thread {
 				break;
 			}
 			case GET_MAP_DATA: {
-				int userId = command.getInt (USER_ID_KEY);
+				int roomIndex = command.getInt (ROOM_INDEX_KEY);
 				JSONObject mapData = command.getJSONObject (MAP_DATA_KEY);
-				loadMap (userId, mapData);
+				loadMap (roomIndex, mapData);
 				break;
 			}
 			case READY_TO_PLAY: {

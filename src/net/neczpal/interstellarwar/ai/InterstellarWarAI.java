@@ -11,17 +11,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+//#TODO why AI's stuck in rooms
 public class InterstellarWarAI extends Thread implements UserInterface {
 
     private ClientConnection mConnection;
     private InterstellarWarClient mGameClient;
 
     private int mRoomId;
+    private int mUserId;
     private NoUserInterface mNoUserInterface = new NoUserInterface ();
     private volatile boolean mIsRunning;
 
     public InterstellarWarAI (String host, String userName, int roomId) {
         try {
+            mUserId = 0;
             mRoomId = roomId;
             mIsRunning = false;
             mConnection = new ClientConnection (host, userName);
@@ -51,11 +54,11 @@ public class InterstellarWarAI extends Thread implements UserInterface {
                     Planet target = getNearNeutralSmallerPlanet (planet);
                     try {
                         if (target != null) {
-                            if (planet.getOwnedBy() == mConnection.getConnectionId()) {
-                                mGameClient.startMoveSpaceShip(mGameClient.getCore().getPlanets().indexOf(planet),
-                                        mGameClient.getCore().getPlanets().indexOf(target),
-                                        mGameClient.getCore().getTickNumber(),
-                                        planet.getUnitsNumber());
+                            if (planet.getOwnedBy () == mConnection.getRoomIndex ()) {
+                                mGameClient.startMoveSpaceShip (mGameClient.getCore ().getPlanets ().indexOf (planet),
+                                        mGameClient.getCore ().getPlanets ().indexOf (target),
+                                        mGameClient.getCore ().getTickNumber (),
+                                        planet.getUnitsNumber ());
                                 break;
                             }
                         }
@@ -68,7 +71,7 @@ public class InterstellarWarAI extends Thread implements UserInterface {
                     Planet target = getNearAlliedSmallerPlanet(planet);
                     try {
                         if (target != null) {
-                            if(planet.getOwnedBy() == mConnection.getConnectionId()) {
+                            if (planet.getOwnedBy () == mConnection.getRoomIndex ()) {
                                 int fromIndex = mGameClient.getCore ().getPlanets ().indexOf (planet);
                                 int toIndex = mGameClient.getCore ().getPlanets ().indexOf (target);
                                 if (fromIndex != -1 && toIndex != -1) {
@@ -91,22 +94,23 @@ public class InterstellarWarAI extends Thread implements UserInterface {
             }
         }
     }
+
     private List<Planet> ourPlanets = new ArrayList<>();
 
     private void findOurPlanets () {
         ourPlanets.clear();
         for(Planet planet : mGameClient.getCore().getPlanets()) {
-            if (planet.getOwnedBy() == mConnection.getConnectionId()) {
-                ourPlanets.add(planet);
+            if (planet.getOwnedBy () == mConnection.getRoomIndex ()) {
+                ourPlanets.add (planet);
             }
         }
     }
 
     private Planet getNearNeutralSmallerPlanet(Planet from) {
         for(Planet planet : mGameClient.getCore().getPlanets()) {
-            if (planet.getOwnedBy() != mConnection.getConnectionId() &&
-                planet.isNeighbor(from) &&
-                planet.getUnitsNumber() < from.getUnitsNumber()) {
+            if (planet.getOwnedBy () != mConnection.getRoomIndex () &&
+                    planet.isNeighbor (from) &&
+                    planet.getUnitsNumber () < from.getUnitsNumber ()) {
 
                 return planet;
             }
@@ -114,6 +118,7 @@ public class InterstellarWarAI extends Thread implements UserInterface {
 
         return null;
     }
+
     private Planet getNearAlliedSmallerPlanet(Planet from) {
 //        for(Planet planet : mGameClient.getCore().getPlanets()) {
         boolean isAllAllied = true;
@@ -133,11 +138,12 @@ public class InterstellarWarAI extends Thread implements UserInterface {
     @Override
     public void connectionReady () {
         mConnection.enterRoom (mRoomId);
+        mUserId = mConnection.getConnectionId ();
     }
 
     @Override
     public void connectionDropped () {
-
+        stopAI ();
     }
 
     @Override
@@ -160,4 +166,19 @@ public class InterstellarWarAI extends Thread implements UserInterface {
     public void stopGame () {
         mIsRunning = false;
     }
+
+    public void stopAI () {
+        stopGame ();
+
+        if (mGameClient != null)
+            mGameClient.leaveRoom ();
+        if (mConnection != null)
+            mConnection.exitServer ();
+    }
+
+    public int getUserId () {
+        return mUserId;
+    }
+
+
 }
