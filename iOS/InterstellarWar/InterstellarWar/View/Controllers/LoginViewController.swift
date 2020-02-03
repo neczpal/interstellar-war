@@ -8,6 +8,9 @@
 
 import UIKit
 
+
+var sharedConnection : ClientConnection?;
+
 class LoginViewController: UITableViewController, UserInterface{
 
     @IBOutlet weak var nameField: UITextField!
@@ -20,7 +23,7 @@ class LoginViewController: UITableViewController, UserInterface{
     
     var mRooms : [RoomData] = [RoomData]();
     
-    var connection : ClientConnection?;
+    
     
     enum MainSection {
         case login
@@ -129,7 +132,7 @@ class LoginViewController: UITableViewController, UserInterface{
             if !mRooms.isEmpty {
                 // Handle the user tapping on a discovered game
                 let data = mRooms[indexPath.row]
-                performSegue(withIdentifier: "ShowRoom", sender: data)
+                performSegue (withIdentifier: "ShowRoom", sender: data)
             }
         case .disconnect:
             if indexPath.row == 0 {
@@ -151,7 +154,7 @@ class LoginViewController: UITableViewController, UserInterface{
             showToast(controller: self, message: "Server is empty!", seconds: 1.5)
         } else {
             do {
-                connection = try ClientConnection(adresse: serverField.text!, userName: nameField.text!, ui: self)
+                sharedConnection = try ClientConnection(adresse: serverField.text!, userName: nameField.text!, ui: self)
             } catch let error {
                 showToast(controller: self, message: "Cannot connect : \(error)", seconds: 1.5)
             }
@@ -159,7 +162,7 @@ class LoginViewController: UITableViewController, UserInterface{
     }
     
     func disconnectServerButton() {
-        if let con = self.connection {
+        if let con = sharedConnection {
             con.exitServer()
         }
     }
@@ -223,19 +226,28 @@ class LoginViewController: UITableViewController, UserInterface{
     }
     */
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        if (segue.identifier == "ShowRoom") {
+            let roomViewController = segue.destination as! RoomViewController
+            let data = sender as! RoomData
+            
+            roomViewController.data = data
+            
+            if let con = sharedConnection {
+                con.setUserInterface(roomViewController)
+                con.enterRoom(data.mRoomId)
+            }
+        }
     }
-    */
+    
 
     func connectionReady () {
         DispatchQueue.main.async {
             self.shouldHide = [true, false, false]
+            self.navigationItem.title = "Lobby"
             self.tableView.reloadData()
         }
     }
@@ -243,6 +255,7 @@ class LoginViewController: UITableViewController, UserInterface{
     func connectionDropped () {
         DispatchQueue.main.async {
             self.shouldHide = [false, true, true]
+            self.navigationItem.title = "Connect"
             self.tableView.reloadData()
         }
     }

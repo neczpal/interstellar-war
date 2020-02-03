@@ -8,28 +8,99 @@
 
 import UIKit
 
-class RoomViewController: UITableViewController {
+class RoomViewController: UITableViewController, UserInterface {
+    
+    
+    var data : RoomData = RoomData (mRoomId: -1, mMapName: "", mUsers: [], mMaxUserCount: 0, mIsRunning: false)
+    
+    enum RoomSection {
+        case users, buttons
+    }
+    var sections : [RoomSection] = [.users, .buttons]
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "userCell")
+        
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
-
+    
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return sections.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        switch sections[section] {
+        case .users:
+            return max(1, data.mMaxUserCount)
+        case .buttons:
+            return 3
+        }
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let currentSection = sections[indexPath.section]
+        if currentSection == .users {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "userCell") ?? UITableViewCell(style: .default, reuseIdentifier: "userCell")
+//             Display the results that we've found, if any. Otherwise, show "searching..."
+            
+            
+            if data.mUsers.isEmpty {
+                cell.textLabel?.text = "Loading..."
+            } else {
+                let row = indexPath.row
+                
+                if(row >= data.mUsers.count) {
+                    cell.textLabel?.textColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
+                    cell.textLabel?.text = "Empty"
+                } else {
+                    cell.textLabel?.textColor = nil
+                    let name = data.mUsers[row];
+                    cell.textLabel?.text = name
+                }
+                
+//                let peerEndpoint = results[indexPath.row].endpoint
+//                if case let NWEndpoint.service(name: name, type: _, domain: _, interface: _) = peerEndpoint {
+//                    cell.textLabel?.text = name
+//                } else {
+//                    cell.textLabel?.text = "Unknown Endpoint"
+//                }
+            }
+            return cell
+        }
+        return super.tableView(tableView, cellForRowAt: indexPath)
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let currentSection = sections[indexPath.section]
+        switch currentSection {
+        case .users:
+            break;
+        case .buttons:
+            switch indexPath.row {
+                case 0:
+                    startGameButton()
+                case 1:
+                    fillWithAIButton()
+                case 2:
+                    exitRoomButton()
+                default:
+                    break
+            }
+        }
+
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 
     /*
@@ -77,14 +148,89 @@ class RoomViewController: UITableViewController {
     }
     */
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+    func startGameButton () {
+        if let con = sharedConnection {
+            con.startRoom()
+//            con.setUserInterface(roomViewController)
+        }
     }
-    */
+    
+    func fillWithAIButton () {
+        if let con = sharedConnection {
+//            con.fillRoomWithAI() #TODO
+//            con.setUserInterface(roomViewController)
+        }
+    }
+    
+    func exitRoomButton () {
+        self.navigationController?.popViewController(animated: true)
+        
+        if let con = sharedConnection {
+            con.leaveRoom()
+//            con.setUserInterface(roomViewController)
+        }
+    }
+    
+    // MARK: - Navigation
+//
+//    // In a storyboard-based application, you will often want to do a little preparation before navigation
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        
+//    }
+
+    
+    func connectionReady() {
+        //unused in this scope
+    }
+    
+    func connectionDropped() {
+        //#TODO
+    }
+    
+    func listRooms(_ roomData: [JSON]) {
+        for room in roomData {
+            if (room[CommandParamKey.ROOM_ID_KEY].int! == data.mRoomId) {
+                data = RoomData(json: room)
+                DispatchQueue.main.async {
+                    self.navigationItem.title = self.data.mMapName
+                    self.tableView.reloadData()
+                }
+                
+                break
+            }
+        }
+        
+        //unused in this scope
+    }
+    
+    func setIsInRoom(_ isInRoom: Bool) {
+        //
+    }
+    
+    func startGame(_ mapName: String) {
+        //
+    }
+    
+    func stopGame() {
+        //
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if isMovingFromParent {
+            if let viewControllers = self.navigationController?.viewControllers {
+                if (viewControllers.count >= 1) {
+                    let previousViewController = viewControllers[viewControllers.count-1] as! LoginViewController
+                    // whatever you want to do
+                    if let con = sharedConnection {
+                        con.leaveRoom()
+                        con.setUserInterface(previousViewController)
+                    }
+//                    previousViewController.callOrModifySomething()
+                }
+            }
+        }
+    }
 
 }

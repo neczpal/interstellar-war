@@ -342,7 +342,11 @@ public class ClientConnection {
     }
 
     //GETTERS, SETTERS
-
+    
+    public func getConnectionId () -> Int{
+        return mConnectionId;
+    }
+    
     public func getRoomIndex () -> Int{
         return mRoomIndex;
     }
