@@ -1,6 +1,7 @@
 package net.neczpal.interstellarwar.common.game;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandParamKey.*;
 
 public class InterstellarWarCore extends Thread {
 	public static final int BACKGROUND_TYPES = 5;
@@ -36,20 +39,15 @@ public class InterstellarWarCore extends Thread {
         loadMap (fileName);
     }
 
-
-    public InterstellarWarCore (JSONArray jsonArray) {
-        setData (jsonArray.toList ());
-    }
-
-    /**
-     * Erstellt ein Spiel-Core durch einen List
-     *
-     * @param data der List
-     * @see InterstellarWarCore#setData(List)
-     */
-    public InterstellarWarCore (List<Object> data) {
-        setData (data);
-    }
+	/**
+	 * Erstellt ein Spiel-Core durch einen List
+	 *
+	 * @param data der List
+	 * @see InterstellarWarCore#setData(JSONObject)
+	 */
+	public InterstellarWarCore (JSONObject data) {
+		setData (data);
+	}
 
 	/**
 	 * Einladet ein Spiel von einem File
@@ -93,83 +91,110 @@ public class InterstellarWarCore extends Thread {
         }
     }
 
-    /**
-     * @return Der List die enthält die Spieldata
-     */
-    public List<Object> getData () {
-        List<Object> list = new ArrayList<> ();
+	/**
+	 * @return Der List die enthält die Spieldata
+	 */
+	public JSONObject getData () {
+		JSONObject data = new JSONObject ();
 
-        list.add (mBackgroundTextureIndex);
+		data.put (BG_TEXTURE_INDEX_KEY, mBackgroundTextureIndex);
+		data.put (MAP_NAME_KEY, mMapName);
+		data.put (MAP_MAX_USER_COUNT_KEY, mMaxUsers);
 
-        list.add (mMapName);
-        list.add (mMaxUsers);
+		JSONArray jsonPlanets = new JSONArray ();
+		for (Planet planet : mPlanets) {
+			JSONObject jsonPlanet = new JSONObject ();
 
-        list.add (mPlanets.size ());
-        list.add (mRoads.size ());
-        list.add (mSpaceShips.size ());
+			jsonPlanet.put (POSITION_X_KEY, planet.getX ());
+			jsonPlanet.put (POSITION_Y_KEY, planet.getY ());
+			jsonPlanet.put (RADIUS_KEY, planet.getRadius ());
+			jsonPlanet.put (OWNER_KEY, planet.getOwnedBy ());
+			jsonPlanet.put (UNIT_NUMBER_KEY, planet.getUnitsNumber ());
+			jsonPlanet.put (TEXTURE_INDEX_KEY, planet.getTextureIndex ());
 
-        for (Planet planet : mPlanets) {
-            list.add (planet.getX ());
-            list.add (planet.getY ());
-            list.add (planet.getRadius ());
-            list.add (planet.getOwnedBy ());
-            list.add (planet.getUnitsNumber ());
-            list.add (planet.getTextureIndex ());
+			jsonPlanets.put (jsonPlanet);
 		}
+		data.put (PLANETS_KEY, jsonPlanets);
+
+		JSONArray jsonRoads = new JSONArray ();
 		for (Road road : mRoads) {
-			list.add (mPlanets.indexOf (road.getFrom ()));
-			list.add (mPlanets.indexOf (road.getTo ()));
+			JSONObject jsonRoad = new JSONObject ();
+
+			jsonRoad.put (FROM_INDEX_KEY, mPlanets.indexOf (road.getFrom ()));
+			jsonRoad.put (TO_INDEX_KEY, mPlanets.indexOf (road.getTo ()));
+
+			jsonRoads.put (jsonRoad);
 		}
+		data.put (ROADS_KEY, jsonRoads);
+
+		JSONArray jsonSpaceships = new JSONArray ();
 		for (SpaceShip spaceShip : mSpaceShips) {
-			list.add (mPlanets.indexOf (spaceShip.getFromPlanet ()));
-			list.add (mPlanets.indexOf (spaceShip.getToPlanet ()));
-			list.add ((Double) spaceShip.getVx ());
-			list.add ((Double) spaceShip.getVy ());
-			list.add (spaceShip.getOwnedBy ());
-			list.add (spaceShip.getUnitsNumber ());
-			list.add (spaceShip.getCurrentTick ());
-			list.add (spaceShip.getMaxTick ());
-			list.add (spaceShip.getTextureIndex ());
+			JSONObject jsonSpaceship = new JSONObject ();
+
+			jsonSpaceship.put (FROM_INDEX_KEY, mPlanets.indexOf (spaceShip.getFromPlanet ()));
+			jsonSpaceship.put (TO_INDEX_KEY, mPlanets.indexOf (spaceShip.getToPlanet ()));
+
+
+			jsonSpaceship.put (VELOCITY_X_KEY, spaceShip.getVx ());
+			jsonSpaceship.put (VELOCITY_Y_KEY, spaceShip.getVy ());
+
+			jsonSpaceship.put (OWNER_KEY, spaceShip.getOwnedBy ());
+			jsonSpaceship.put (UNIT_NUMBER_KEY, spaceShip.getUnitsNumber ());
+
+			jsonSpaceship.put (ROAD_INDEX_KEY, mRoads.indexOf (spaceShip.getRoad ()));
+
+			jsonSpaceship.put (CURRENT_TICK_NUMBER_KEY, spaceShip.getCurrentTick ());
+			jsonSpaceship.put (MAXIMUM_TICK_NUMBER_KEY, spaceShip.getMaxTick ());
+
+			jsonSpaceship.put (TEXTURE_INDEX_KEY, spaceShip.getTextureIndex ());
+
+			jsonSpaceships.put (jsonSpaceship);
 		}
-        return list;
-    }
+		data.put (SPACESHIPS_KEY, jsonSpaceships);
 
-    /**
-     * Einstellt die Spieldata durch der List
-     *
-     * @param data Der List die enthält die Spieldata
-     */
-    public void setData (List<Object> data) {
-        int i = 0;
+		return data;
+	}
 
-        mBackgroundTextureIndex = (int) data.get (i++);
+	/**
+	 * Einstellt die Spieldata durch der List
+	 *
+	 * @param data Der List die enthält die Spieldata
+	 */
+	public void setData (JSONObject data) {
+		mBackgroundTextureIndex = data.getInt (BG_TEXTURE_INDEX_KEY);
+		mMapName = data.getString (MAP_NAME_KEY);
+		mMaxUsers = data.getInt (MAP_MAX_USER_COUNT_KEY);
 
-        mPlanets = new ArrayList<> ();
-        mRoads = new ArrayList<> ();
-        mSpaceShips = new ArrayList<> ();
+		mPlanets = new ArrayList<> ();
+		mRoads = new ArrayList<> ();
+		mSpaceShips = new ArrayList<> ();
 
+		JSONArray jsonPlanets = data.getJSONArray (PLANETS_KEY);
+		JSONArray jsonRoads = data.getJSONArray (ROADS_KEY);
+		JSONArray jsonSpaceships = data.getJSONArray (SPACESHIPS_KEY);
 
-        mMapName = (String) data.get (i++);
-        mMaxUsers = (int) data.get (i++);
+		int planetsCount = jsonPlanets.length ();
+		int roadsCount = jsonRoads.length ();
+		int spaceShipsCount = jsonSpaceships.length ();
 
-        int planetNumber = (int) data.get (i++);
-        int connectionNumber = (int) data.get (i++);
-        int spaceShipNumber = (int) data.get (i++);
+		for (int j = 0; j < planetsCount; j++) {
+			JSONObject jsonPlanet = jsonPlanets.getJSONObject (j);
 
-        for (int j = 0; j < planetNumber; j++) {
-            int x = (int) data.get (i++);
-            int y = (int) data.get (i++);
-            int r = (int) data.get (i++);
-            int ownedBy = (int) data.get (i++);
-            int unitNum = (int) data.get (i++);
-            int tex = (int) data.get (i++);
+			int x = jsonPlanet.getInt (POSITION_X_KEY);
+			int y = jsonPlanet.getInt (POSITION_Y_KEY);
+			int r = jsonPlanet.getInt (RADIUS_KEY);
+			int ownedBy = jsonPlanet.getInt (OWNER_KEY);
+			int unitNum = jsonPlanet.getInt (UNIT_NUMBER_KEY);
+			int tex = jsonPlanet.getInt (TEXTURE_INDEX_KEY);
 
-            mPlanets.add (new Planet(x, y, r, ownedBy, unitNum, tex));
+			mPlanets.add (new Planet (x, y, r, ownedBy, unitNum, tex));
 		}
 
-		for (int j = 0; j < connectionNumber; j++) {
-			int fromIndex = (int) data.get (i++);
-			int toIndex = (int) data.get (i++);
+		for (int j = 0; j < roadsCount; j++) {
+			JSONObject jsonRoad = jsonRoads.getJSONObject (j);
+
+			int fromIndex = jsonRoad.getInt (FROM_INDEX_KEY);
+			int toIndex = jsonRoad.getInt (TO_INDEX_KEY);
 
 			Planet from = mPlanets.get (fromIndex);
 			Planet to = mPlanets.get (toIndex);
@@ -178,35 +203,33 @@ public class InterstellarWarCore extends Thread {
 			Road road = new Road (from, to);
 
 			mRoads.add (road);
-        }
-        for (int j = 0; j < spaceShipNumber; j++) {
-	        int fromIndex = (int) data.get (i++);
-	        int toIndex = (int) data.get (i++);
+		}
+		for (int j = 0; j < spaceShipsCount; j++) {
+			JSONObject jsonSpaceship = jsonSpaceships.getJSONObject (j);
 
-	        Planet from = mPlanets.get (fromIndex);
-	        Planet to = mPlanets.get (toIndex);
-	        //Not nice but hopefully works #TODO nicer solution with JSONObjects
-	        double vx, vy;
-	        Object vxObj = data.get (i++);
-	        if (vxObj instanceof Integer) {
-		        vx = ((Integer) vxObj).doubleValue ();
-	        } else {
-		        vx = (Double) vxObj;
-	        }
-	        Object vyObj = data.get (i++);
-	        if (vxObj instanceof Integer) {
-		        vy = ((Integer) vyObj).doubleValue ();
-	        } else {
-		        vy = (Double) vyObj;
-	        }
-	        int ownedBy = (int) data.get (i++);
-	        int unitsNum = (int) data.get (i++);
-	        int curTick = (int) data.get (i++);
-	        int maxTick = (int) data.get (i++);
-	        int tex = (int) data.get (i++);
+			int fromIndex = jsonSpaceship.getInt (FROM_INDEX_KEY);
+			int toIndex = jsonSpaceship.getInt (TO_INDEX_KEY);
 
-	        mSpaceShips.add (new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex));
-        }
+			Planet from = mPlanets.get (fromIndex);
+			Planet to = mPlanets.get (toIndex);
+
+			double vx = jsonSpaceship.getDouble (VELOCITY_X_KEY);
+			double vy = jsonSpaceship.getDouble (VELOCITY_Y_KEY);
+
+			int roadIndex = jsonSpaceship.getInt (ROAD_INDEX_KEY);
+
+			int ownedBy = jsonSpaceship.getInt (OWNER_KEY);
+			int unitsNum = jsonSpaceship.getInt (UNIT_NUMBER_KEY);
+			int curTick = jsonSpaceship.getInt (CURRENT_TICK_NUMBER_KEY);
+			int maxTick = jsonSpaceship.getInt (MAXIMUM_TICK_NUMBER_KEY);
+			int tex = jsonSpaceship.getInt (TEXTURE_INDEX_KEY);
+
+			Road road = mRoads.get (roadIndex);
+			SpaceShip spaceShip = new SpaceShip (from, to, vx, vy, ownedBy, unitsNum, curTick, maxTick, tex, road);
+			road.addSpaceship (spaceShip);
+
+			mSpaceShips.add (spaceShip);
+		}
 	}
 
 	//GAME FUNCTION
@@ -219,9 +242,17 @@ public class InterstellarWarCore extends Thread {
 		Planet fromPlanet = mPlanets.get (from);
 		Planet toPlanet = mPlanets.get (to);
 		int unitNumber = fromPlanet.getUnitsNumber ();
+
 		if (unitNumber > 0) {
+			Road r = new Road (fromPlanet, toPlanet);
+			Road road = mRoads.get (mRoads.indexOf (r));
+
+			SpaceShip spaceShip = new SpaceShip (fromPlanet, toPlanet, unitNumber);
+			spaceShip.setRoad (road);
+
 			fromPlanet.setUnitsNumber (0);
-			mSpaceShips.add (new SpaceShip (fromPlanet, toPlanet, unitNumber));
+			road.addSpaceship (spaceShip);
+			mSpaceShips.add (spaceShip);
 		}
 	}
 
@@ -233,14 +264,51 @@ public class InterstellarWarCore extends Thread {
 			spaceShip.tick ();
 		}
 
-		Iterator <SpaceShip> iterator = mSpaceShips.iterator ();
+		Iterator<SpaceShip> iterator = mSpaceShips.iterator ();
 		while (iterator.hasNext ()) {
 			SpaceShip spaceShip = iterator.next ();
 			if (spaceShip.isArrived ()) {
+				spaceShip.getRoad ().removeSpaceships (spaceShip);
 				spaceShip.getToPlanet ().spaceShipArrived (spaceShip);
 				iterator.remove ();
 			}
 		}
+
+		List<SpaceShip> deleteCoreSpaceShips = new ArrayList<> ();
+//
+		for (Road road : mRoads) {
+			List<SpaceShip> spaceShips = road.getSpaceShips ();
+			List<SpaceShip> deleteRoadSpaceShips = new ArrayList<> ();
+			if (spaceShips.size () > 1) {
+				for (int i = 0; i < spaceShips.size (); i++) {
+					SpaceShip spaceShip1 = spaceShips.get (i);
+					for (int j = i + 1; j < spaceShips.size (); j++) {
+						SpaceShip spaceShip2 = spaceShips.get (j);
+						if (spaceShip1.isCollided (spaceShip2) && spaceShip1.getOwnedBy () != spaceShip2.getOwnedBy ()) {
+							if (spaceShip1.getUnitsNumber () > spaceShip2.getUnitsNumber ()) {
+								spaceShip1.setUnitsNumber (spaceShip1.getUnitsNumber () - spaceShip2.getUnitsNumber ());
+								deleteCoreSpaceShips.add (spaceShip2);
+								deleteRoadSpaceShips.add (spaceShip2);
+							} else if (spaceShip2.getUnitsNumber () > spaceShip1.getUnitsNumber ()) {
+								spaceShip2.setUnitsNumber (spaceShip2.getUnitsNumber () - spaceShip1.getUnitsNumber ());
+								deleteCoreSpaceShips.add (spaceShip1);
+								deleteRoadSpaceShips.add (spaceShip1);
+							} else {
+								spaceShip2.setUnitsNumber (0);
+								spaceShip1.setUnitsNumber (0);
+								deleteCoreSpaceShips.add (spaceShip1);
+								deleteCoreSpaceShips.add (spaceShip2);
+								deleteRoadSpaceShips.add (spaceShip1);
+								deleteRoadSpaceShips.add (spaceShip2);
+							}
+						}
+
+					}
+					road.removeSpaceships (deleteRoadSpaceShips);
+				}
+			}
+		}
+		mSpaceShips.removeAll (deleteCoreSpaceShips);
 	}
 
 	/**
@@ -294,16 +362,16 @@ public class InterstellarWarCore extends Thread {
 		return mMaxUsers;
 	}
 
-	public ArrayList <Planet> getPlanets () {
-		return mPlanets;
+	public List<Planet> getPlanets () {
+		return new ArrayList<> (mPlanets);
 	}
 
-	public ArrayList <Road> getRoads () {
-		return mRoads;
+	public List<Road> getRoads () {
+		return new ArrayList<> (mRoads);
 	}
 
-	public ArrayList <SpaceShip> getSpaceShips () {
-		return mSpaceShips;
+	public List<SpaceShip> getSpaceShips () {
+		return new ArrayList<> (mSpaceShips);
 	}
 
 	public int getBackgroundTextureIndex () {

@@ -2,9 +2,8 @@ package net.neczpal.interstellarwar.tests;
 
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
-import net.neczpal.interstellarwar.clientcommon.UserInterface;
+import net.neczpal.interstellarwar.clientcommon.NoUserInterface;
 import net.neczpal.interstellarwar.server.ServerConnection;
-import org.json.JSONArray;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +40,8 @@ public class ConnectionTest {
 	@Test
 	public void testEnterRoom () throws Exception {
 		mClientConnection.enterRoom (3);
-		sleep (100);
+
+		sleep (100);//WAIT UNTIL COMMAND RECEIVED
 		Assert.assertEquals ("User enters a Room", 3, mServerConnection.getUser (1).getRoomId ());
 	}
 
@@ -82,42 +82,8 @@ public class ConnectionTest {
 	public void testLeaveRoom () throws Exception {
 		mClientConnection.enterRoom (3);
 		sleep (100);//WAIT UNTIL COMMAND RECEIVED
-		Assert.assertEquals ("User entered Room 3", 3, mServerConnection.getUser (1).getRoomId ());
 		mClientConnection.leaveRoom ();
 		sleep (100);//WAIT UNTIL COMMAND RECEIVED
 		Assert.assertEquals ("User left Room, got roomId 0.", 0, mServerConnection.getUser (1).getRoomId ());
-	}
-
-	private class NoUserInterface implements UserInterface {
-
-		@Override
-		public void connectionReady () {
-
-		}
-
-		@Override
-		public void connectionDropped () {
-
-		}
-
-		@Override
-		public void listRooms (JSONArray roomData) {
-
-		}
-
-		@Override
-		public void setIsInRoom (boolean isInRoom) {
-
-		}
-
-		@Override
-		public void startGame (String mapName) {
-
-		}
-
-		@Override
-		public void stopGame () {
-
-		}
 	}
 }

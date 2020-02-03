@@ -1,5 +1,6 @@
 package net.neczpal.interstellarwar.server;
 
+import net.neczpal.interstellarwar.ai.InterstellarWarAI;
 import net.neczpal.interstellarwar.common.connection.CommandParamKey;
 import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
 import org.json.JSONObject;
@@ -16,11 +17,14 @@ public class Room {
 
 	private String mMapFileName;
 
-	private HashMap <Integer, Integer> mConnectionIds = new HashMap <> ();
+	private HashMap<Integer, Integer> mConnectionIds = new HashMap<> ();
 	private int mIndexes;
 
 	private ServerConnection mServerConnection;
 	private InterstellarWarServer mGameServer;
+
+	private List<InterstellarWarAI> mAIClients;
+	private volatile boolean mHasAIClient = false;
 
 	/**
 	 * Erstellt ein Zimmer auf dem Server
@@ -36,6 +40,8 @@ public class Room {
 		mGameServer = new InterstellarWarServer (core, this);
 		mRoomId = 0;
 		mIndexes = 1;
+		mAIClients = new ArrayList<> ();
+		mHasAIClient = false;
 	}
 
 	/**
@@ -124,6 +130,23 @@ public class Room {
 
 	//GETTERS, SETTERS
 
+	public boolean hasAIClient () {
+		return mHasAIClient;
+	}
+
+	public void addAIClient (InterstellarWarAI ai) {
+		mHasAIClient = true;
+		mAIClients.add (ai);
+	}
+
+	public void removeAllAIClients () {
+		mHasAIClient = false;
+		for (InterstellarWarAI ai : mAIClients) {
+			ai.stopAI ();
+		}
+		mAIClients.clear ();
+	}
+
 	public int getRoomId () {
 		return mRoomId;
 	}
@@ -162,6 +185,10 @@ public class Room {
 
 	public boolean isMapRunning () {
 		return mGameServer.getCore ().isRunning ();
+	}
+
+	public List<Integer> getAllUserIds () {
+		return new ArrayList<> (mConnectionIds.values ());
 	}
 
 	@Override

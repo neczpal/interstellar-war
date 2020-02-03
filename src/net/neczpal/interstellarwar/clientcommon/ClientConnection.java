@@ -20,6 +20,7 @@ public class ClientConnection extends Thread {
 	private UserInterface mUserInterface;
 	private InterstellarWarClient mGameClient;
 
+
 	private int mConnectionId;
 	private int mRoomIndex;
 
@@ -109,7 +110,8 @@ public class ClientConnection extends Thread {
 	 */
 	private void connectionReady (int newConnectionId) {
 		mConnectionId = newConnectionId;
-		mUserInterface.connectionReady ();
+		if (mUserInterface != null)
+			mUserInterface.connectionReady ();
 		mLogger.log (Level.INFO, "-> Connected to the server. ID (" + mConnectionId + ")");
 	}
 
@@ -129,7 +131,7 @@ public class ClientConnection extends Thread {
 	 * @param roomIndex Die Benutzerindex in dem Zimmer
 	 * @param mapData   Die Mapdata
 	 */
-	private void loadMap (int roomIndex, JSONArray mapData) {
+	private void loadMap (int roomIndex, JSONObject mapData) {
 		mRoomIndex = roomIndex;
 		InterstellarWarCore core = new InterstellarWarCore (mapData);
 		mGameClient = new InterstellarWarClient (core, this);
@@ -168,7 +170,7 @@ public class ClientConnection extends Thread {
 
 		switch (type) {
 			case CONNECTION_READY: {
-				Integer userId = command.getInt (CommandParamKey.USER_ID_KEY);
+				int userId = command.getInt (CommandParamKey.USER_ID_KEY);
 				connectionReady (userId);
 				break;
 			}
@@ -178,9 +180,9 @@ public class ClientConnection extends Thread {
 				break;
 			}
 			case GET_MAP_DATA: {
-				Integer userId = command.getInt (USER_ID_KEY);
-				JSONArray mapData = command.getJSONArray (MAP_DATA_KEY);
-				loadMap (userId, mapData);
+				int roomIndex = command.getInt (ROOM_INDEX_KEY);
+				JSONObject mapData = command.getJSONObject (MAP_DATA_KEY);
+				loadMap (roomIndex, mapData);
 				break;
 			}
 			case READY_TO_PLAY: {
@@ -215,6 +217,12 @@ public class ClientConnection extends Thread {
 	 */
 	public void exitServer () {
 		send (EXIT_SERVER);
+		mLogger.log (Level.INFO, "<- Exiting server");
+	}
+
+	public void fillRoomWithAi () {
+		send (FILL_ROOM_WITH_AI);
+		mLogger.log (Level.INFO, "<- Filling room with AI");
 	}
 
 	/**
@@ -305,5 +313,9 @@ public class ClientConnection extends Thread {
 
 	public void setUserInterface (UserInterface userInterface) {
 		mUserInterface = userInterface;
+	}
+
+	public int getConnectionId() {
+		return mConnectionId;
 	}
 }

@@ -6,6 +6,7 @@ public class CommandType {
     public static final String EXIT_SERVER = "EXIT_SERVER";
     public static final String LIST_ROOMS = "LIST_ROOMS";
     public static final String READY_TO_PLAY = "READY_TO_PLAY";
+    public static final String FILL_ROOM_WITH_AI = "FILL_ROOM_WITH_AI";
     public static final String ENTER_ROOM = "ENTER_ROOM";
     public static final String LEAVE_ROOM = "LEAVE_ROOM";
     public static final String START_ROOM = "START_ROOM";

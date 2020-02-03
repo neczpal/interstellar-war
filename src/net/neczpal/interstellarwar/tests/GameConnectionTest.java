@@ -2,10 +2,9 @@ package net.neczpal.interstellarwar.tests;
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
-import net.neczpal.interstellarwar.clientcommon.UserInterface;
+import net.neczpal.interstellarwar.clientcommon.NoUserInterface;
 import net.neczpal.interstellarwar.server.InterstellarWarServer;
 import net.neczpal.interstellarwar.server.ServerConnection;
-import org.json.JSONArray;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,36 +75,4 @@ public class GameConnectionTest {
 		Assert.assertTrue ("A spaceship is created on the other client", mInterstellarWarClient2.getCore ().getSpaceShips ().size () > 0);
 	}
 
-	private class NoUserInterface implements UserInterface {
-
-		@Override
-		public void connectionReady () {
-
-		}
-
-		@Override
-		public void connectionDropped () {
-
-		}
-
-		@Override
-		public void listRooms (JSONArray roomData) {
-
-		}
-
-		@Override
-		public void setIsInRoom (boolean isInRoom) {
-
-		}
-
-		@Override
-		public void startGame (String mapName) {
-
-		}
-
-		@Override
-		public void stopGame () {
-
-		}
-	}
 }

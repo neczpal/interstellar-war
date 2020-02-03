@@ -3,7 +3,6 @@ package net.neczpal.interstellarwar.clientcommon;
 import net.neczpal.interstellarwar.common.connection.CommandParamKey;
 import net.neczpal.interstellarwar.common.connection.CommandType;
 import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandParamKey.*;
@@ -37,9 +36,9 @@ public class InterstellarWarClient {
 
         switch (type) {
             case REFRESH_WHOLE_MAP: {
-                JSONArray mapData = command.getJSONArray (CommandParamKey.MAP_DATA_KEY);
-                mInterstellarWarCore.setData (mapData.toList ());
-                break;
+	            JSONObject mapData = command.getJSONObject (CommandParamKey.MAP_DATA_KEY);
+	            mInterstellarWarCore.setData (mapData);
+	            break;
             }
         }
     }
