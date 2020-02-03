@@ -29,13 +29,6 @@ public class ClientConnection {
         case wrongAddress
     }
 
-    /**
-     * Erstellt eine Verbindung mit dem Server
-     *
-     * @param adresse  IP-Adresse des Servers mit Port
-     * @param userName Benutzername der Klient
-     * @throws IOException falls die Verbindung kann nicht aufbauen
-     */
     init (adresse : String, userName : String, ui : UserInterface) throws {
         mUserName = userName;
         mIsRunning = false;
@@ -67,9 +60,7 @@ public class ClientConnection {
     }
 
     private  let bufferSize = 1024;
-    /**
-     * Lest die Befehle, die Server geschickt
-     */
+
     public func run () {
         mIsRunning = true;
 
@@ -95,7 +86,7 @@ public class ClientConnection {
                 for linesub in lines {
                     let line = String(linesub)
                     if(!line.isEmpty) {
-//                        print("Read line: \(line)")
+                        print("Read line: \(line)")
                         let jsonObject = JSON(parseJSON: line);
                         
                         self.receive (jsonObject);
@@ -120,9 +111,6 @@ public class ClientConnection {
 //        }
     }
 
-    /**
-     * Abbaut die Verbindung
-     */
     public func stopClientConnection () {
         mIsRunning = false;
         exitServer ();
@@ -135,34 +123,19 @@ public class ClientConnection {
 
     //RECEIVE
 
-    /**
-     * Die Verbindung ist aufgebaut
-     *
-     * @param newConnectionId die bekommte Verbindung-ID
-     */
+    
     private func connectionReady (_ newConnectionId : Int) {
         mConnectionId = newConnectionId;
         mUserInterface.connectionReady ();
         print("-> Connected to the server. ID (" + String(mConnectionId) + ")");
     }
 
-    /**
-     * Die Zimmerdata sind bekommen.
-     *
-     * @param allRoomData Die Zimmerdata
-     */
     private func listRooms (_ allRoomData : [JSON]) {
         mUserInterface.listRooms (allRoomData);
         print("-> RoomDatas loaded. Size (" + String(allRoomData.count) + ")");
     }
 
-    /**
-     * Ladet die Mappe ein
-     *
-     * @param roomIndex Die Benutzerindex in dem Zimmer
-     * @param mapData   Die Mapdata
-     */
-    private func loadMap (_ roomIndex : Int, _ mapData : [JSON]) {
+    private func loadMap (_ roomIndex : Int, _ mapData : JSON) {
 //        mRoomIndex = roomIndex;
 //        InterstellarWarCore core = new InterstellarWarCore (mapData);
 //        mGameClient = new InterstellarWarClient (core, this);
@@ -170,35 +143,21 @@ public class ClientConnection {
         print("-> MapData loaded. RoomIndex (" + String(mRoomIndex) + ")");
     }
 
-    /**
-     * Startet das Spiel
-     *
-     * @param mapName Der Name der Mappe
-     */
     private func startGame (_ mapName: String) {
         mUserInterface.startGame (mapName);
 //        mGameClient.getCore ().start (); ### TODO TODO TODO
         print("-> Started the game with Map (" + mapName + ")");
     }
 
-    /**
-     * Bekommt ein Spielbefehl
-     *
-     * @param command Der Spielbefehl
-     */
     private func gameCommand (_ command : JSON) {
 //        mGameClient.receive (command);//### TODO TODO TODO
         print("-> Received GameCommand (" + command.rawString()! + ")");
     }
 
-    /**
-     * Bekommt ein Befehl
-     *
-     * @param command Der Befehl
-     */
     public func receive (_ command : JSON) {
         let type = command[CommandParamKey.COMMAND_TYPE_KEY].string!
-
+        
+        
         switch (type) {
             
         case CommandType.CONNECTION_READY:
@@ -212,10 +171,10 @@ public class ClientConnection {
             listRooms (allRoomData);
             
         case CommandType.GET_MAP_DATA:
-            let userId = command[CommandParamKey.USER_ID_KEY].int!
-            let mapData = command[CommandParamKey.MAP_DATA_KEY].array!
+            let roomIndex = command[CommandParamKey.ROOM_INDEX_KEY].int!
+            let mapData = command[CommandParamKey.MAP_DATA_KEY]//#TODO
             
-            loadMap (userId, mapData);
+            loadMap (roomIndex, mapData);
             
         case CommandType.READY_TO_PLAY:
             let mapName = command[CommandParamKey.MAP_NAME_KEY].string!
@@ -232,9 +191,6 @@ public class ClientConnection {
 
     //SEND
 
-    /**
-     * Eintritt in dem Server
-     */
     public func enterServer () {
         
         var command = JSON();
@@ -246,20 +202,18 @@ public class ClientConnection {
         print("<- Connecting to the server Username (" + mUserName + ")");
     }
 
-    /**
-     * Verlasst dem Server
-     */
     public func exitServer () {
         send (CommandType.EXIT_SERVER);
         //#TODO mb check if rly succesfull
         mUserInterface.connectionDropped()
+        print("<- Exiting server");
+    }
+    
+    public func fillRoomWithAI () {
+        send (CommandType.FILL_ROOM_WITH_AI);
+        print("<- Filling room with AI");
     }
 
-    /**
-     * Eintitt in das Zimmer
-     *
-     * @param roomId Die Zimmer-ID
-     */
     public func enterRoom (_ roomId : Int) {
         var command = JSON();
         command[CommandParamKey.COMMAND_TYPE_KEY].string = CommandType.ENTER_ROOM
@@ -270,17 +224,11 @@ public class ClientConnection {
         print("<- Entering the Room Id (" + String(roomId) + ")");
     }
 
-    /**
-     * Beginnt das Spiel in dem Zimmer
-     */
     public func startRoom () {
         send (CommandType.START_ROOM);
         print("<- Starting the Room");
     }
 
-    /**
-     * Verlasst das Zimmer
-     */
     public func leaveRoom () {
         mUserInterface.stopGame ();
 
@@ -290,23 +238,12 @@ public class ClientConnection {
         print ("<- Leaving the Room");
     }
 
-    /**
-     * Sendet ein Befehl
-     *
-     * @param type Typ des Befehls
-     */
     public func send (_ commandType : String) {
         let command : JSON = [CommandParamKey.COMMAND_TYPE_KEY : commandType]
         
         send (command);
     }
     
-
-    /**
-     * Sendet ein Befehl
-     *
-     * @param command Der Befehl
-     */
     public func send (_ jsonCommand : JSON) {
         var command : JSON = jsonCommand
         
@@ -332,9 +269,6 @@ public class ClientConnection {
 //        }
     }
 
-    /**
-     * Beendet das Spiel, falls es läuft
-     */
     private func stopGame () {
 //        if (mGameClient != null && mGameClient.getCore ().isRunning ()) {
 //            mGameClient.getCore ().stopGame ();

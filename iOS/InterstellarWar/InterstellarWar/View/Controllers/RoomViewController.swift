@@ -51,7 +51,18 @@ class RoomViewController: UITableViewController, UserInterface {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let currentSection = sections[indexPath.section]
+        
+//        if currentSection == .buttons { #TODO Hide fillAI button if room is full
+//            if (indexPath.row == 1 && data.mUsers.count == data.mMaxUserCount) {
+//                let cell = tableView.dequeueReusableCell(withIdentifier: "fillAICell") ?? UITableViewCell(style: .default, reuseIdentifier: "fillAICell")
+//
+//                cell.isUserInteractionEnabled = false
+//                cell.textLabel!.isEnabled = false
+////                cell.detailTextLabel!.isEnabled = false
+//            }
+//        } else
         if currentSection == .users {
+            //#TODO how to avoid creating cells in storyboard (more dynamic layout)
             let cell = tableView.dequeueReusableCell(withIdentifier: "userCell") ?? UITableViewCell(style: .default, reuseIdentifier: "userCell")
 //             Display the results that we've found, if any. Otherwise, show "searching..."
             
@@ -158,8 +169,7 @@ class RoomViewController: UITableViewController, UserInterface {
     
     func fillWithAIButton () {
         if let con = sharedConnection {
-//            con.fillRoomWithAI() #TODO
-//            con.setUserInterface(roomViewController)
+            con.fillRoomWithAI()
         }
     }
     

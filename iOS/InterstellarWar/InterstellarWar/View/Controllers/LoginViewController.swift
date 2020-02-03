@@ -100,14 +100,20 @@ class LoginViewController: UITableViewController, UserInterface{
         let currentSection = sections[indexPath.section]
         if currentSection == .rooms {
             let cell = tableView.dequeueReusableCell(withIdentifier: "joinRoomCell") ?? UITableViewCell(style: .default, reuseIdentifier: "joinRoomCell")
+            
 //             Display the results that we've found, if any. Otherwise, show "searching..."
             
             
             if mRooms.isEmpty {
                 cell.textLabel?.text = "Searching for rooms..."
             } else {
-                let data = mRooms[indexPath.row];
-                cell.textLabel?.text = "\(data.mMapName) (\(data.mUsers.count)/\(data.mMaxUserCount))"
+                let row = indexPath.row;
+                if row < mRooms.count {
+                    let data = mRooms[indexPath.row]
+                    cell.textLabel?.text = "\(data.mMapName) (\(data.mUsers.count)/\(data.mMaxUserCount))"
+                } else {
+                    cell.textLabel?.text = "[MISSING INFO]"
+                }
                 
 //                let peerEndpoint = results[indexPath.row].endpoint
 //                if case let NWEndpoint.service(name: name, type: _, domain: _, interface: _) = peerEndpoint {
