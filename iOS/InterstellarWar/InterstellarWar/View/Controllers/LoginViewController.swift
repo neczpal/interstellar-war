@@ -18,6 +18,7 @@ class LoginViewController: UITableViewController, UserInterface{
     
     var shouldHide: [Bool] = [false, true, true]
     
+    var mRooms : [RoomData] = [RoomData]();
     
     var connection : ClientConnection?;
     
@@ -32,6 +33,9 @@ class LoginViewController: UITableViewController, UserInterface{
         
         nameField.text = "iOS"
         serverField.text = "localhost"
+        
+        
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "joinRoomCell")
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -68,8 +72,9 @@ class LoginViewController: UITableViewController, UserInterface{
         case .disconnect:
             return 1
         case .rooms:
-            return 7//#TODO
+            return max(mRooms.count, 1)
         }
+        
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -89,32 +94,27 @@ class LoginViewController: UITableViewController, UserInterface{
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let currentSection = sections[indexPath.section]
-//        indexPath.
-//        switch currentSection {
-//        case .disconnect :
-//            break
-//        case .login:
-//            break
-//        case .rooms:
-//            break
-//        }
-//        let currentSection = sections[indexPath.section]
-//        if currentSection == .rooms {
-//            let cell = tableView.dequeueReusableCell(withIdentifier: "joinGameCell") ?? UITableViewCell(style: .default, reuseIdentifier: "joinGameCell")
-//            // Display the results that we've found, if any. Otherwise, show "searching..."
-//            if results.isEmpty {
-//                cell.textLabel?.text = "Searching for games..."
-//            } else {
+        let currentSection = sections[indexPath.section]
+        if currentSection == .rooms {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "joinRoomCell") ?? UITableViewCell(style: .default, reuseIdentifier: "joinRoomCell")
+//             Display the results that we've found, if any. Otherwise, show "searching..."
+            
+            
+            if mRooms.isEmpty {
+                cell.textLabel?.text = "Searching for rooms..."
+            } else {
+                let data = mRooms[indexPath.row];
+                cell.textLabel?.text = "\(data.mMapName) (\(data.mUsers.count)/\(data.mMaxUserCount))"
+                
 //                let peerEndpoint = results[indexPath.row].endpoint
 //                if case let NWEndpoint.service(name: name, type: _, domain: _, interface: _) = peerEndpoint {
 //                    cell.textLabel?.text = name
 //                } else {
 //                    cell.textLabel?.text = "Unknown Endpoint"
 //                }
-//            }
-//            return cell
-//        }
+            }
+            return cell
+        }
         return super.tableView(tableView, cellForRowAt: indexPath)
     }
     
@@ -126,12 +126,11 @@ class LoginViewController: UITableViewController, UserInterface{
                 loginServerButton()
             }
         case .rooms:
-            break
-//            if !results.isEmpty {
-//                // Handle the user tapping on a discovered game
-//                let result = results[indexPath.row]
-//                performSegue(withIdentifier: "showPasscodeSegue", sender: result)
-//            } #TODO
+            if !mRooms.isEmpty {
+                // Handle the user tapping on a discovered game
+                let data = mRooms[indexPath.row]
+                performSegue(withIdentifier: "ShowRoom", sender: data)
+            }
         case .disconnect:
             if indexPath.row == 0 {
                 disconnectServerButton()
@@ -248,7 +247,16 @@ class LoginViewController: UITableViewController, UserInterface{
         }
     }
 
-    func listRooms (_ roomData : [JSON]) {
+    func listRooms (_ allRoomData : [JSON]) {
+        mRooms = [RoomData] ()
+        
+        for json in allRoomData {
+            mRooms.append(RoomData(json: json))
+        }
+        
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
         
     }
 

@@ -376,7 +376,7 @@
                     <connections>
                         <outlet property="nameField" destination="Xva-iY-9sa" id="g9B-gu-E91"/>
                         <outlet property="serverField" destination="3nu-bv-gVF" id="Vsd-8I-93N"/>
-                        <segue destination="iOM-od-3Xs" kind="show" id="Nk2-xs-DfB"/>
+                        <segue destination="iOM-od-3Xs" kind="show" identifier="ShowRoom" id="Nk2-xs-DfB"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZLT-Ze-Ip9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

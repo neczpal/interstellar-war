@@ -98,7 +98,7 @@ public class ClientConnection {
 //                        print("Read line: \(line)")
                         let jsonObject = JSON(parseJSON: line);
                         
-                        receive (jsonObject);
+                        self.receive (jsonObject);
                     }
                 }
                 
