@@ -195,7 +195,11 @@ class RoomViewController: UITableViewController, UserInterface {
     }
     
     func connectionDropped() {
-        //#TODO
+        //IDK if this works prob buggy
+        self.navigationController?.popViewController(animated: true);
+        if let con = sharedConnection {
+            con.exitServer()
+        }
     }
     
     func listRooms(_ roomData: [JSON]) {
@@ -215,11 +219,17 @@ class RoomViewController: UITableViewController, UserInterface {
     }
     
     func setIsInRoom(_ isInRoom: Bool) {
+        if (isInRoom == false) {
+            
+        }
         //
     }
     
     func startGame(_ mapName: String) {
-        //
+        
+        DispatchQueue.main.async {
+            self.performSegue (withIdentifier: "ShowGame", sender: self)
+        }
     }
     
     func stopGame() {

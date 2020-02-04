@@ -139,6 +139,7 @@ class LoginViewController: UITableViewController, UserInterface{
                 // Handle the user tapping on a discovered game
                 let data = mRooms[indexPath.row]
                 performSegue (withIdentifier: "ShowRoom", sender: data)
+                
             }
         case .disconnect:
             if indexPath.row == 0 {
