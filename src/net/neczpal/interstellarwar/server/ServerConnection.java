@@ -35,7 +35,9 @@ public class ServerConnection extends Thread {
 
 	private volatile boolean mIsRunning = false;
 
-	private final Object lock = new Object ();
+	private final Object clientLock = new Object ();
+	private final Object roomLock = new Object ();
+
 
 	private Logger mLogger = Logger.getLogger (ServerConnection.class.getCanonicalName ());
 
@@ -109,11 +111,13 @@ public class ServerConnection extends Thread {
 		try {
 			Room room = new Room (this, mapName);
 			room.setRoomId (mRoomIdCounter);
-			mRooms.put (mRoomIdCounter++, room);
+			synchronized (roomLock) {
+				mRooms.put (mRoomIdCounter++, room);
+			}
 			mLogger.log (Level.INFO, "New room created with the Map (" + mapName + ")");
 		} catch (IOException ex) {
 			mLogger.log (Level.WARNING, "Server couldn't add Room, because Map (" + mapName + ") couldn't load: " + ex.getMessage ());
-		}
+			}
 	}
 
 	/**
@@ -133,7 +137,7 @@ public class ServerConnection extends Thread {
 	 * @param id Der ID der Benutzer
 	 */
 	public void removeClient (int id) {
-		synchronized (lock) {
+		synchronized (clientLock) {
 			mClients.remove (id);
 			mLogger.log (Level.INFO, "Client removed with the ID (" + id + ")");
 
@@ -164,9 +168,13 @@ public class ServerConnection extends Thread {
 	 * @return Ein Liste von dem alle Zimmer-Data auf dem Server
 	 */
 	public List<JSONObject> getAllRoomData () {
+
 		List<JSONObject> allRoomData = new ArrayList<> ();
-		for (Room room : mRooms.values ()) {
-			allRoomData.add (room.getData ());
+
+		synchronized (roomLock) {
+			for (Room room : mRooms.values ()) {
+				allRoomData.add (room.getData ());
+			}
 		}
 
 		return allRoomData;
@@ -199,7 +207,7 @@ public class ServerConnection extends Thread {
 	 */
 	private void enterServer (String name, int port) {
 		int id = mClientIdCounter++;
-		synchronized (lock) {
+		synchronized (clientLock) {
 			int tempIndex = findClientByPort (port);
 			Client client = mTemporaryClients.get (tempIndex);
 			mClients.put (id, client);
@@ -316,13 +324,15 @@ public class ServerConnection extends Thread {
 
 			if (room.isEmpty () && room.isMapRunning ()) {
 				room.stopGame ();
-				mRooms.remove (roomId);
+				synchronized (roomLock) {
+					mRooms.remove (roomId);
+				}
 			}
 			user.setRoomId (0);
 
 			listRoom ();
 			mLogger.log (Level.INFO, "-> User (" + user + ") left the Room (" + room + ")");
-		}
+			}
 	}
 
 	private void fillRoomWithAi (User user) {
@@ -456,7 +466,7 @@ public class ServerConnection extends Thread {
 	 * @param command Der Befehl
 	 */
 	public void send (JSONObject command) {
-		synchronized (lock) {
+		synchronized (clientLock) {
 			Iterator<HashMap.Entry<Integer, Client>> iterator = mClients.entrySet ().iterator ();
 			while (iterator.hasNext () && mIsRunning) {
 				HashMap.Entry<Integer, Client> entry = iterator.next ();

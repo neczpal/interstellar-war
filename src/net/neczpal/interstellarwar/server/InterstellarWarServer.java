@@ -37,8 +37,8 @@ public class InterstellarWarServer {
 
 		switch (type) {
 			case START_MOVE_SPACESHIP: {
-				int fromIndex = command.getInt (FROM_INDEX_KEY);
-				int toIndex = command.getInt (TO_INDEX_KEY);
+				int fromIndex = command.getInt (FROM_ID_KEY);
+				int toIndex = command.getInt (TO_ID_KEY);
 				mInterstellarWarCore.startMoveSpaceShip (fromIndex, toIndex);
 				{
 					JSONObject roomCommand = new JSONObject ();

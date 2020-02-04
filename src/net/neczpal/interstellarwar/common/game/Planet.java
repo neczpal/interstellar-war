@@ -9,6 +9,8 @@ public class Planet implements Serializable {
 	public static final int PLANET_TYPES = 18;
 	private static final long serialVersionUID = 2683452581122892189L;
 
+	private int mId;
+
 	private double mX;
 	private double mY;
 	private double mRadius;
@@ -30,8 +32,8 @@ public class Planet implements Serializable {
 	 * @param ownedBy     Die Nummer von Spieler, die diesem Planet dominiert
 	 * @param unitsNumber Die Anzahl der Einheit auf dem Planet
 	 */
-	Planet (float x, float y, float radius, int ownedBy, int unitsNumber) {
-		this (x, y, radius, ownedBy, unitsNumber, (int) (Math.random () * PLANET_TYPES));
+	Planet (int id, double x, double y, double radius, int ownedBy, int unitsNumber) {
+		this (id, x, y, radius, ownedBy, unitsNumber, (int) (Math.random () * PLANET_TYPES));
 	}
 
 	/**
@@ -44,15 +46,16 @@ public class Planet implements Serializable {
 	 * @param unitsNumber Die Anzahl der Einheit auf dem Planet
 	 * @param tex         Die Texture des Planets
 	 */
-	Planet (float x, float y, float radius, int ownedBy, int unitsNumber, int tex) {
+	Planet (int id, double x, double y, double radius, int ownedBy, int unitsNumber, int tex) {
 		mTextureIndex = tex;
 
+		mId = id;
 		mX = x;
 		mY = y;
 		mRadius = radius;
 		mUnitsNumber = unitsNumber;
 		mOwnedBy = ownedBy;
-		mNeighbors = new ArrayList <> ();
+		mNeighbors = new ArrayList<> ();
 	}
 
 	/**
@@ -145,8 +148,32 @@ public class Planet implements Serializable {
 		return mTextureIndex;
 	}
 
+	public void setTextureIndex (int textureIndex) {
+		this.mTextureIndex = textureIndex;
+	}
+
 	public List<Planet> getNeighbors () {
 		return mNeighbors;
+	}
+
+	public void setX (double x) {
+		this.mX = x;
+	}
+
+	public void setY (double y) {
+		this.mY = mY;
+	}
+
+	public void setRadius (double radius) {
+		this.mRadius = radius;
+	}
+
+	public void setOwnedBy (int ownedBy) {
+		this.mOwnedBy = ownedBy;
+	}
+
+	public int getId () {
+		return mId;
 	}
 
 	@Override

@@ -54,15 +54,15 @@ public class InterstellarWarClient {
 	 * @param unitNumber die Anzahl der Einheiten des Raumschiffes
 	 */
 	public void startMoveSpaceShip (int fromIndex, int toIndex, int tickNumber, int unitNumber) {
-        JSONObject command = new JSONObject ();
-        command.put (CommandParamKey.COMMAND_TYPE_KEY, CommandType.GAME_COMMAND);
-        command.put (GAME_COMMAND_TYPE_KEY, START_MOVE_SPACESHIP);
-        command.put (FROM_INDEX_KEY, fromIndex);
-        command.put (TO_INDEX_KEY, toIndex);
-        command.put (TICK_NUMBER_KEY, tickNumber);
-        command.put (UNIT_NUMBER_KEY, unitNumber);
+		JSONObject command = new JSONObject ();
+		command.put (CommandParamKey.COMMAND_TYPE_KEY, CommandType.GAME_COMMAND);
+		command.put (GAME_COMMAND_TYPE_KEY, START_MOVE_SPACESHIP);
+		command.put (FROM_ID_KEY, fromIndex);
+		command.put (TO_ID_KEY, toIndex);
+		command.put (TICK_NUMBER_KEY, tickNumber);
+		command.put (UNIT_NUMBER_KEY, unitNumber);
 
-        mClientConnection.send (command);
+		mClientConnection.send (command);
 	}
 
 	/**

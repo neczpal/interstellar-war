@@ -21,27 +21,27 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 
 public class InterstellarWarPanel {
-    private static final int EDGE_MOVE_DISTANCE = 20;
-    private static final int EDGE_MOVE_UNIT = 2;
-    private InterstellarWarClient mInterstellarWarClient;
-    private InterstellarWarCore mCore;
-    private Rect mBackground;
+	private static final int EDGE_MOVE_DISTANCE = 20;
+	private static final int EDGE_MOVE_UNIT = 2;
+	private InterstellarWarClient mInterstellarWarClient;
+	private InterstellarWarCore mCore;
+	private Rect mBackground;
 	private Point mViewPort = new Point (0, 0);
 
-    private boolean mWasMouseDown = false;
+	private boolean mWasMouseDown = false;
 
-    private int mSelectedPlanetFromIndex = -1;
-    private int mSelectedPlanetToIndex = -1;
+	private int mSelectedPlanetFromIndex = -1;
+	private int mSelectedPlanetToId = -1;
 
-    private Textures mTextures;
+	private Textures mTextures;
 
-    private boolean isDrawing = false;//#TODO
+	private boolean isDrawing = false;//#TODO
 
-    /**
-     * Erstellt das Spielpanel
-     *
-     * @param client Das Spiel-Klient
-     */
+	/**
+	 * Erstellt das Spielpanel
+	 *
+	 * @param client Das Spiel-Klient
+	 */
 	public InterstellarWarPanel (InterstellarWarClient client) {
 		mCore = client.getCore ();
 		mInterstellarWarClient = client;
@@ -78,7 +78,7 @@ public class InterstellarWarPanel {
 	private void initViewPort () {
 		for (Planet planet : mCore.getPlanets ()) {
 			if (planet.getOwnedBy () == getInterstellarWarClient ().getRoomIndex ()) {
-				mViewPort = new Point (Display.getWidth () / 2 - planet.getX (), Display.getHeight () / 2 - planet.getY ());
+				mViewPort = new Point (Display.getWidth () / 2.0 - planet.getX (), Display.getHeight () / 2.0 - planet.getY ());
 			}
 		}
 	}
@@ -103,8 +103,8 @@ public class InterstellarWarPanel {
             for (int i = 0; i < planets.size (); i++) {
                 Planet planet = planets.get (i);
                 if (planet.isInside (point.getX (), point.getY ()) && mInterstellarWarClient.getRoomIndex () == planet.getOwnedBy ()) {
-                    mSelectedPlanetFromIndex = i;
-                    break;
+	                mSelectedPlanetFromIndex = planet.getId ();
+	                break;
                 }
             }
         } else if (Mouse.isButtonDown (0) && mWasMouseDown && mSelectedPlanetFromIndex != -1) {
@@ -115,14 +115,14 @@ public class InterstellarWarPanel {
             for (int i = 0; i < planets.size (); i++) {
                 Planet planet = planets.get (i);
                 if (planet.isInside (point.getX (), point.getY ()) && planet.isNeighbor (planets.get (mSelectedPlanetFromIndex))) {
-                    this.mSelectedPlanetToIndex = i;
-                    isThere = true;
-                    break;
+	                this.mSelectedPlanetToId = planet.getId ();
+	                isThere = true;
+	                break;
                 }
             }
             if (!isThere) {
-                this.mSelectedPlanetToIndex = -1;
-			}
+	            this.mSelectedPlanetToId = -1;
+            }
 		} else if (!Mouse.isButtonDown (0)) {
 
 			if (mWasMouseDown) {
@@ -133,20 +133,20 @@ public class InterstellarWarPanel {
                     Point point = getMousePosition ();
 
                     for (int i = 0; i < planets.size (); i++) {
-                        Planet planet = planets.get (i);
-                        if (planet.isInside (point.getX (), point.getY ()) && planet.isNeighbor (planets.get (mSelectedPlanetFromIndex))) {
-                            this.mSelectedPlanetToIndex = i;
-                            if (planets.get (mSelectedPlanetFromIndex).getOwnedBy () == mInterstellarWarClient.getRoomIndex ()) {
-                                mInterstellarWarClient.startMoveSpaceShip (mSelectedPlanetFromIndex, mSelectedPlanetToIndex, mCore.getTickNumber (), planets.get (mSelectedPlanetFromIndex).getUnitsNumber ());
-                            }
-                            break;
-                        }
-					}
+	                    Planet planet = planets.get (i);
+	                    if (planet.isInside (point.getX (), point.getY ()) && planet.isNeighbor (mCore.getPlanet (mSelectedPlanetFromIndex))) {
+		                    this.mSelectedPlanetToId = planet.getId ();
+		                    if (planets.get (mSelectedPlanetFromIndex).getOwnedBy () == mInterstellarWarClient.getRoomIndex ()) {
+			                    mInterstellarWarClient.startMoveSpaceShip (mSelectedPlanetFromIndex, mSelectedPlanetToId, mCore.getTickNumber (), mCore.getPlanet (mSelectedPlanetFromIndex).getUnitsNumber ());
+		                    }
+		                    break;
+	                    }
+                    }
 
                 }
             } else {
-                this.mSelectedPlanetFromIndex = -1;
-                this.mSelectedPlanetToIndex = -1;
+				this.mSelectedPlanetFromIndex = -1;
+				this.mSelectedPlanetToId = -1;
 			}
 		}
 	}
@@ -187,41 +187,41 @@ public class InterstellarWarPanel {
 		GL11.glTranslated (mViewPort.getX (), mViewPort.getY (), 0);
 
 		if (mSelectedPlanetFromIndex != -1) {
-			Planet selectedPlanet = planets.get (mSelectedPlanetFromIndex);
+			Planet selectedPlanet = mCore.getPlanet (mSelectedPlanetFromIndex);
 			GLUtil.drawCircle (selectedPlanet.getX (), selectedPlanet.getY (), selectedPlanet.getRadius (), Color.values ()[selectedPlanet.getOwnedBy ()]);
 		}
-		if (mSelectedPlanetToIndex != -1) {
-			Planet selectedPlanet = planets.get (mSelectedPlanetToIndex);
-            GLUtil.drawCircle (selectedPlanet.getX (), selectedPlanet.getY (), selectedPlanet.getRadius (), Color.values ()[selectedPlanet.getOwnedBy ()]);
-        }
+		if (mSelectedPlanetToId != -1) {
+			Planet selectedPlanet = mCore.getPlanet (mSelectedPlanetToId);
+			GLUtil.drawCircle (selectedPlanet.getX (), selectedPlanet.getY (), selectedPlanet.getRadius (), Color.values ()[selectedPlanet.getOwnedBy ()]);
+		}
 
-        isDrawing = true;
-        for (Road road : roads) {
-            drawRoad (road);
-        }
+		isDrawing = true;
+		for (Road road : roads) {
+			drawRoad (road);
+		}
 
-        for (int i = 0; i < planets.size (); i++) {
-            Planet planet = planets.get (i);
-            drawPlanet (planet);
-        }
+		for (int i = 0; i < planets.size (); i++) {
+			Planet planet = planets.get (i);
+			drawPlanet (planet);
+		}
 
-        for (SpaceShip spaceShip : spaceShips) {
-            try {
-                drawSpaceShip (spaceShip);
-            } catch (ConcurrentModificationException ex) {
-            }
-        }
+		for (SpaceShip spaceShip : spaceShips) {
+			try {
+				drawSpaceShip (spaceShip);
+			} catch (ConcurrentModificationException ex) {
+			}
+		}
 
-        if (mSelectedPlanetToIndex != -1) {
-            Planet selectedFromPlanet = planets.get (mSelectedPlanetFromIndex);
-            Planet selectedToPlanet = planets.get (mSelectedPlanetToIndex);
+		if (mSelectedPlanetToId != -1) {
+			Planet selectedFromPlanet = mCore.getPlanet (mSelectedPlanetFromIndex);
+			Planet selectedToPlanet = mCore.getPlanet (mSelectedPlanetToId);
 
-            GLUtil.drawArrow (new Point (selectedFromPlanet.getX (), selectedFromPlanet.getY ()), new Point (selectedToPlanet.getX (), selectedToPlanet.getY ()), Color.values ()[selectedFromPlanet.getOwnedBy ()]);
-        }
+			GLUtil.drawArrow (new Point (selectedFromPlanet.getX (), selectedFromPlanet.getY ()), new Point (selectedToPlanet.getX (), selectedToPlanet.getY ()), Color.values ()[selectedFromPlanet.getOwnedBy ()]);
+		}
 
-        GL11.glPopMatrix ();
+		GL11.glPopMatrix ();
 
-        isDrawing = false;
+		isDrawing = false;
 	}
 
 	/**

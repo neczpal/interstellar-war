@@ -26,8 +26,9 @@ public class DesktopUI implements UserInterface {
 	}
 
 	public static void main (String[] args) {
+
 		DesktopUI mUI = new DesktopUI ();
-		mUI.openLogin();
+		mUI.openLogin ();
 	}
 
 	/**

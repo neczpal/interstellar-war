@@ -55,8 +55,8 @@ public class InterstellarWarAI extends Thread implements UserInterface {
                     try {
                         if (target != null) {
                             if (planet.getOwnedBy () == mConnection.getRoomIndex ()) {
-                                mGameClient.startMoveSpaceShip (mGameClient.getCore ().getPlanets ().indexOf (planet),
-                                        mGameClient.getCore ().getPlanets ().indexOf (target),
+                                mGameClient.startMoveSpaceShip (planet.getId (),
+                                        target.getId (),
                                         mGameClient.getCore ().getTickNumber (),
                                         planet.getUnitsNumber ());
                                 break;
@@ -72,8 +72,8 @@ public class InterstellarWarAI extends Thread implements UserInterface {
                     try {
                         if (target != null) {
                             if (planet.getOwnedBy () == mConnection.getRoomIndex ()) {
-                                int fromIndex = mGameClient.getCore ().getPlanets ().indexOf (planet);
-                                int toIndex = mGameClient.getCore ().getPlanets ().indexOf (target);
+                                int fromIndex = planet.getId ();
+                                int toIndex = target.getId ();
                                 if (fromIndex != -1 && toIndex != -1) {
                                     mGameClient.startMoveSpaceShip (fromIndex,
                                             toIndex,

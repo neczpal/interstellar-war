@@ -3,12 +3,13 @@ package net.neczpal.interstellarwar.common.game;
 import net.neczpal.interstellarwar.desktop.geom.Point;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 public class SpaceShip implements Serializable {
-	public static final int SPACESHIP_TYPES = 11;
-	private static final long serialVersionUID = 3683452581122892189L;
+    public static final int SPACESHIP_TYPES = 11;
+    private static final long serialVersionUID = 3683452581122892189L;
     private static final int SPACE_SHIP_SPEED = 6;
+
+    private int mId;
 
     private int mUnitsNumber;
     private int mOwnedBy;
@@ -30,10 +31,11 @@ public class SpaceShip implements Serializable {
      * @param toPlanet    Der Planet wohin das Raumschiff einfahrt
      * @param unitsNumber Die Anzahl der Einheits, die transportiert wird
      */
-    SpaceShip (Planet fromPlanet, Planet toPlanet,
+    SpaceShip (int id, Planet fromPlanet, Planet toPlanet,
                int unitsNumber) {
         mTextureIndex = (int) (Math.random () * SPACESHIP_TYPES);
 
+        mId = id;
         mUnitsNumber = unitsNumber;
         mCurrentTick = 0;
         mFromPlanet = fromPlanet;
@@ -81,13 +83,14 @@ public class SpaceShip implements Serializable {
 //        mOwnedBy = ownedBy;
 //	}
 
-    SpaceShip (Planet fromPlanet, Planet toPlanet,
+    SpaceShip (int id,
+               Planet fromPlanet, Planet toPlanet,
                double vx, double vy,
                int ownedBy, int unitsNumber,
                int currentTick, int maxTick,
                int textureIndex,
                Road road) {
-
+        mId = id;
         mTextureIndex = textureIndex;
         mUnitsNumber = unitsNumber;
         mCurrentTick = currentTick;
@@ -156,10 +159,6 @@ public class SpaceShip implements Serializable {
         return mRoad;
     }
 
-    public void setRoad (Road road) {
-        mRoad = road;
-    }
-
     public double getPreciseX () {
         return (mToPlanet.getX () - mFromPlanet.getX ()) + getCurrentTick () * getVx ();
     }
@@ -173,7 +172,7 @@ public class SpaceShip implements Serializable {
     }
 
     public boolean isCollided (SpaceShip other) {
-        return mCurrentTick + other.mCurrentTick >= mMaxTick &&
+        return mCurrentTick + other.mCurrentTick >= mMaxTick - 1 &&//# -1 so no through lagging during a fram
                 this.getToPlanet ().equals (other.getFromPlanet ()) &&
                 this.getFromPlanet ().equals (other.getToPlanet ());
     }
@@ -182,18 +181,59 @@ public class SpaceShip implements Serializable {
         this.mUnitsNumber = unitsNumber;
     }
 
+
+    public void setOwnedBy (int ownedBy) {
+        this.mOwnedBy = ownedBy;
+    }
+
+    public void setMaxTick (int maxTick) {
+        this.mMaxTick = maxTick;
+    }
+
+    public void setCurrentTick (int currentTick) {
+        this.mCurrentTick = currentTick;
+    }
+
+    public void setFromPlanet (Planet fromPlanet) {
+        this.mFromPlanet = fromPlanet;
+    }
+
+    public void setToPlanet (Planet toPlanet) {
+        this.mToPlanet = toPlanet;
+    }
+
+    public void setRoad (Road road) {
+        this.mRoad = road;
+    }
+
+    public void setVx (double mVx) {
+        this.mVx = mVx;
+    }
+
+    public void setVy (double mVy) {
+        this.mVy = mVy;
+    }
+
+    public void setTextureIndex (int mTextureIndex) {
+        this.mTextureIndex = mTextureIndex;
+    }
+
+    public int getId () {
+        return mId;
+    }
+
     @Override
     public boolean equals (Object o) {
         if (this == o) return true;
         if (o == null || getClass () != o.getClass ()) return false;
         SpaceShip spaceShip = (SpaceShip) o;
-        return mUnitsNumber == spaceShip.mUnitsNumber &&
-                mOwnedBy == spaceShip.mOwnedBy &&
-                mMaxTick == spaceShip.mMaxTick &&
-                mCurrentTick == spaceShip.mCurrentTick &&
-                mTextureIndex == spaceShip.mTextureIndex &&
-                Objects.equals (mFromPlanet, spaceShip.mFromPlanet) &&
-                Objects.equals (mToPlanet, spaceShip.mToPlanet);
+        return mId == spaceShip.mId;// &&
+//                mOwnedBy == spaceShip.mOwnedBy &&
+//                mMaxTick == spaceShip.mMaxTick &&
+//                mCurrentTick == spaceShip.mCurrentTick &&
+//                mTextureIndex == spaceShip.mTextureIndex &&
+//                Objects.equals (mFromPlanet, spaceShip.mFromPlanet) &&
+//                Objects.equals (mToPlanet, spaceShip.mToPlanet);
     }
 
 }
