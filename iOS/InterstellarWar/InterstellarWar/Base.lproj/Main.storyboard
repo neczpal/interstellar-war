@@ -17,7 +17,7 @@
                     </navigationBar>
                     <connections>
                         <segue destination="dmB-FO-Olk" kind="relationship" relationship="rootViewController" id="g2V-gq-F7a"/>
-                        <segue destination="dmB-FO-Olk" kind="presentation" id="3aH-bW-nzn"/>
+                        <segue destination="dmB-FO-Olk" kind="presentation" identifier="root view" id="3aH-bW-nzn"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Qoj-ow-JUt" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -29,7 +29,7 @@
             <objects>
                 <tableViewController id="dmB-FO-Olk" userLabel="Login" customClass="LoginViewController" customModule="InterstellarWar" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="0zB-Sh-zjH">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="758"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <sections>
@@ -581,7 +581,7 @@
             <objects>
                 <tableViewController id="iOM-od-3Xs" userLabel="Room" customClass="RoomViewController" customModule="InterstellarWar" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="A5j-pP-gFY">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="758"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <sections>
@@ -834,7 +834,7 @@
             <objects>
                 <viewController id="0qb-qQ-wRl" userLabel="GameViewController" customClass="GameViewController" customModule="InterstellarWar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="NwO-yR-wSY" customClass="SKView">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="758"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="ig5-Fi-aeS"/>
@@ -847,6 +847,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="g2V-gq-F7a"/>
+        <segue reference="3aH-bW-nzn"/>
     </inferredMetricsTieBreakers>
 </document>

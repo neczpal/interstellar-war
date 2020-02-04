@@ -10,16 +10,16 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+public class GameScene: SKScene {
+    private static let EDGE_MOVE_DISTANCE = 20
+    private static let EDGE_MOVE_UNIT = 2
     
     let screenHeight : Double = Double(UIScreen.main.bounds.size.height)
     let screenWidth  : Double = Double(UIScreen.main.bounds.size.width)
     
-    private static let EDGE_MOVE_DISTANCE = 20;
-    private static let EDGE_MOVE_UNIT = 2;
-//    private InterstellarWarClient mInterstellarWarClient;#TODO
+    private var mInterstellarWarClient : InterstellarWarClient?
     private var mCore : InterstellarWarCore?;
-    private var mBackground : Any?;//#TODO
+//    private var mBackground : Any?;//#TODO
     private var mViewPort = CGPoint (x: 0, y: 0);
 
     private var mWasMouseDown = false;
@@ -49,9 +49,9 @@ class GameScene: SKScene {
 //    ]
 
     
-    override func didMove(to view: SKView) {
-    
-    }
+//    override func didMove(to view: SKView) {
+//
+//    }
     
     
     func touchDown(atPoint pos : CGPoint) {
@@ -65,24 +65,24 @@ class GameScene: SKScene {
         
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
-    
-    override func update(_ currentTime: TimeInterval) {
-        
-    }
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+//    }
+//
+//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
+//    }
+//
+//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+//    }
+//
+//    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+//    }
+//
+//
+//    override func update(_ currentTime: TimeInterval) {
+//
+//    }
 }
