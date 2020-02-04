@@ -10,8 +10,8 @@ import Foundation
 public class InterstellarWarCommandParamKey {
     public static let GAME_COMMAND_TYPE_KEY = "game-command-type";
 
-    public static let FROM_INDEX_KEY = "from-index";
-    public static let TO_INDEX_KEY = "to-index";
+    public static let FROM_ID_KEY = "from-index";
+    public static let TO_ID_KEY = "to-index";
     public static let TICK_NUMBER_KEY = "tick-number";
     public static let UNIT_NUMBER_KEY = "unit-number";
     
@@ -24,6 +24,7 @@ public class InterstellarWarCommandParamKey {
     public static let VELOCITY_X_KEY = "velocity-x";
     public static let VELOCITY_Y_KEY = "velocity-y";
     
+    public static let GAME_OBJECT_ID_KEY = "object-id";
     
     public static let OWNER_KEY = "owner";
     

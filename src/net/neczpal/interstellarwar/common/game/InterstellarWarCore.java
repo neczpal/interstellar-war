@@ -192,31 +192,31 @@ public class InterstellarWarCore extends Thread {
 
 			planet.setX (jsonPlanet.getDouble (POSITION_X_KEY));
 			planet.setY (jsonPlanet.getDouble (POSITION_Y_KEY));
-			planet.setRadius (jsonPlanet.getInt (RADIUS_KEY));
+			planet.setRadius (jsonPlanet.getDouble (RADIUS_KEY));
 			planet.setOwnedBy (jsonPlanet.getInt (OWNER_KEY));
 			planet.setUnitsNumber (jsonPlanet.getInt (UNIT_NUMBER_KEY));
 			planet.setTextureIndex (jsonPlanet.getInt (TEXTURE_INDEX_KEY));
 
 		}
 		// # No road is changed during game # - just in case code -
-		for (int j = 0; j < roadsCount; j++) {
-			JSONObject jsonRoad = jsonRoads.getJSONObject (j);
-
-//			int id = jsonRoad.getInt (GAME_OBJECT_ID_KEY);
-			int fromId = jsonRoad.getInt (FROM_ID_KEY);
-			int toId = jsonRoad.getInt (TO_ID_KEY);
-			Road.RoadKey key = new Road.RoadKey (fromId, toId);
-
-			Road road = mRoads.get (key);
-
-
-			Planet from = mPlanets.get (fromId);
-			Planet to = mPlanets.get (toId);
-
-//			Road road = new Road (id, from, to);
+//		for (int j = 0; j < roadsCount; j++) {
+//			JSONObject jsonRoad = jsonRoads.getJSONObject (j);
 //
-//			mRoads.put (id, road);
-		}
+////			int id = jsonRoad.getInt (GAME_OBJECT_ID_KEY);
+//			int fromId = jsonRoad.getInt (FROM_ID_KEY);
+//			int toId = jsonRoad.getInt (TO_ID_KEY);
+//			Road.RoadKey key = new Road.RoadKey (fromId, toId);
+//
+//			Road road = mRoads.get (key);
+//
+//
+//			Planet from = mPlanets.get (fromId);
+//			Planet to = mPlanets.get (toId);
+//
+////			Road road = new Road (id, from, to);
+////
+////			mRoads.put (id, road);
+//		}
 
 		for (int j = 0; j < spaceShipsCount; j++) {
 			JSONObject jsonSpaceship = jsonSpaceships.getJSONObject (j);
@@ -261,7 +261,7 @@ public class InterstellarWarCore extends Thread {
 		}
 	}
 
-	public void initData (JSONObject data) {
+	private void initData (JSONObject data) {
 		mBackgroundTextureIndex = data.getInt (BG_TEXTURE_INDEX_KEY);
 		mMapName = data.getString (MAP_NAME_KEY);
 		mMaxUsers = data.getInt (MAP_MAX_USER_COUNT_KEY);
@@ -282,9 +282,9 @@ public class InterstellarWarCore extends Thread {
 			JSONObject jsonPlanet = jsonPlanets.getJSONObject (j);
 
 			int id = jsonPlanet.getInt (GAME_OBJECT_ID_KEY);
-			int x = jsonPlanet.getInt (POSITION_X_KEY);
-			int y = jsonPlanet.getInt (POSITION_Y_KEY);
-			int r = jsonPlanet.getInt (RADIUS_KEY);
+			double x = jsonPlanet.getDouble (POSITION_X_KEY);
+			double y = jsonPlanet.getDouble (POSITION_Y_KEY);
+			double r = jsonPlanet.getDouble (RADIUS_KEY);
 			int ownedBy = jsonPlanet.getInt (OWNER_KEY);
 			int unitNum = jsonPlanet.getInt (UNIT_NUMBER_KEY);
 			int tex = jsonPlanet.getInt (TEXTURE_INDEX_KEY);

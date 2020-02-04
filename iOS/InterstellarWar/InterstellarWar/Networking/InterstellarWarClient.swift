@@ -46,8 +46,8 @@ public class InterstellarWarClient {
         
         command[CommandParamKey.COMMAND_TYPE_KEY].string = CommandType.GAME_COMMAND
         command[PK.GAME_COMMAND_TYPE_KEY].string = InterstellarWarCommandType.START_MOVE_SPACESHIP
-        command[PK.FROM_INDEX_KEY].int = fromIndex
-        command[PK.TO_INDEX_KEY].int = toIndex
+        command[PK.FROM_ID_KEY].int = fromIndex
+        command[PK.TO_ID_KEY].int = toIndex
         command[PK.TICK_NUMBER_KEY].int = tickNumber
         command[PK.UNIT_NUMBER_KEY].int = unitNumber
         
