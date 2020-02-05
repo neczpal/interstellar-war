@@ -11,6 +11,9 @@ import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.clientcommon.UserInterface;
 import net.neczpal.interstellarwar.common.connection.RoomData;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -37,7 +40,7 @@ public class LoginActivity extends Activity implements UserInterface {
 						try {
 							mConnection = new ClientConnection (addressEditText.getText ().toString (), usernameEditText.getText ().toString ());
 							mConnection.setUserInterface (LoginActivity.this);
-						} catch (IOException e) {
+						} catch (IOException | JSONException e) {
 							e.printStackTrace ();
 						}
 					}
@@ -59,7 +62,7 @@ public class LoginActivity extends Activity implements UserInterface {
 	}
 
 	@Override
-	public void listRooms (ArrayList <RoomData> arrayList) {
+	public void listRooms (JSONArray arrayList) {
 
 	}
 

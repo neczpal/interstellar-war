@@ -10,7 +10,11 @@ import android.widget.ListView;
 import net.neczpal.interstellarwar.clientcommon.UserInterface;
 import net.neczpal.interstellarwar.common.connection.RoomData;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class LoungeActivity extends Activity implements UserInterface {
 
@@ -29,7 +33,11 @@ public class LoungeActivity extends Activity implements UserInterface {
 				AsyncTask.execute (new Runnable () {
 					@Override
 					public void run () {
-						LoginActivity.mConnection.enterRoom (roomData.getRoomId ());
+						try {
+							LoginActivity.mConnection.enterRoom(roomData.getRoomId());
+						}catch(JSONException ex) {
+
+						}
 					}
 				});
 			}
@@ -54,11 +62,20 @@ public class LoungeActivity extends Activity implements UserInterface {
 	}
 
 	@Override
-	public void listRooms (final ArrayList <RoomData> arrayList) {
+	public void listRooms(final JSONArray roomData) {
 		runOnUiThread (new Runnable () {
 			@Override
 			public void run () {
-				mRoomsListView.setAdapter (new RoomDataArrayAdapter (LoungeActivity.this, R.layout.view_roomlist_element, arrayList));
+				List<RoomData> allRoomData = new ArrayList<> ();
+
+				for (int i = 0; i < roomData.length (); i++) {
+					try {
+						allRoomData.add (new RoomData (roomData.getJSONObject (i)));
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+				mRoomsListView.setAdapter (new RoomDataArrayAdapter (LoungeActivity.this, R.layout.view_roomlist_element, allRoomData));
 			}
 		});
 	}

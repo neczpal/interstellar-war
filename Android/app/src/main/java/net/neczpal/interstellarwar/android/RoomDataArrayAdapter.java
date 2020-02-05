@@ -2,7 +2,6 @@ package net.neczpal.interstellarwar.android;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,7 @@ import android.widget.TextView;
 import net.neczpal.interstellarwar.common.connection.RoomData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by neczp on 2016. 11. 06..
@@ -20,16 +20,15 @@ public class RoomDataArrayAdapter extends ArrayAdapter <RoomData> {
 
 	private Context mContext;
 	private int mResourceId;
-	private ArrayList <RoomData> mRoomDatas;
+	private List <RoomData> mRoomDatas;
 
-	public RoomDataArrayAdapter (Context context, int resource, ArrayList <RoomData> roomDatas) {
+	public RoomDataArrayAdapter (Context context, int resource, List<RoomData> roomDatas) {
 		super (context, resource, roomDatas);
 		mContext = context;
 		mResourceId = resource;
 		mRoomDatas = roomDatas;
 	}
 
-	@NonNull
 	@Override
 	public View getView (int position, View convertView, ViewGroup parent) {
 

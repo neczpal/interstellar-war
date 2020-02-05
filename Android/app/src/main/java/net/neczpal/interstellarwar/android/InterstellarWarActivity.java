@@ -7,6 +7,9 @@ import android.os.Bundle;
 import net.neczpal.interstellarwar.clientcommon.UserInterface;
 import net.neczpal.interstellarwar.common.connection.RoomData;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
 public class InterstellarWarActivity extends Activity implements UserInterface, Runnable {
@@ -38,7 +41,11 @@ public class InterstellarWarActivity extends Activity implements UserInterface, 
 	@Override
 	public void onBackPressed () {
 		super.onBackPressed ();
-		LoginActivity.mConnection.leaveRoom ();
+		try {
+			LoginActivity.mConnection.leaveRoom ();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -51,7 +58,7 @@ public class InterstellarWarActivity extends Activity implements UserInterface, 
 	}
 
 	@Override
-	public void listRooms (ArrayList <RoomData> arrayList) {
+	public void listRooms (JSONArray arrayList) {
 
 	}
 

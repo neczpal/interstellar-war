@@ -11,7 +11,7 @@ import net.neczpal.interstellarwar.common.game.Road;
 import net.neczpal.interstellarwar.common.game.SpaceShip;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class InterstellarWarView extends SurfaceView {
 
@@ -85,7 +85,7 @@ public class InterstellarWarView extends SurfaceView {
 	private void initViewPort () {
 		for (Planet planet : mCore.getPlanets ()) {
 			if (planet.getOwnedBy () == mInterstellarWarClient.getRoomIndex ()) {
-				mViewPort = new PointF (getWidth () / 2 - planet.getX (), getHeight () / 2 - planet.getY ());
+				mViewPort = new PointF ((float) (getWidth () / 2 - planet.getX ()), (float) (getHeight () / 2 - planet.getY ()));
 			}
 		}
 	}
@@ -95,15 +95,15 @@ public class InterstellarWarView extends SurfaceView {
 	}
 
 	private void initPlanetsPositions () {
-		ArrayList <Planet> planets = mCore.getPlanets ();
+		List<Planet> planets = mCore.getPlanets ();
 		mPlanetsDimens = new RectF[planets.size ()];
 		for (int i = 0; i < planets.size (); i++) {
 			Planet planet = planets.get (i);
 			mPlanetsDimens[i] = new RectF (
-					planet.getX () - planet.getRadius () / 2,
-					planet.getY () - planet.getRadius () / 2,
-					planet.getX () + planet.getRadius () / 2,
-					planet.getY () + planet.getRadius () / 2);
+					(float) (planet.getX () - planet.getRadius () / 2),
+					(float) (planet.getY () - planet.getRadius () / 2),
+					(float) (planet.getX () + planet.getRadius () / 2),
+					(float) (planet.getY () + planet.getRadius () / 2));
 		}
 	}
 
@@ -119,9 +119,9 @@ public class InterstellarWarView extends SurfaceView {
 	protected void onDraw (Canvas canvas) {
 		super.onDraw (canvas);
 
-		ArrayList <Planet> planets = mCore.getPlanets ();
-		ArrayList <Road> roads = mCore.getRoads ();
-		ArrayList <SpaceShip> spaceShips = mCore.getSpaceShips ();
+		List <Planet> planets = mCore.getPlanets ();
+		List <Road> roads = mCore.getRoads ();
+		List <SpaceShip> spaceShips = mCore.getSpaceShips ();
 
 		drawBackground (canvas);
 
@@ -153,7 +153,7 @@ public class InterstellarWarView extends SurfaceView {
 		Planet from = road.getFrom ();
 		Planet to = road.getTo ();
 
-		canvas.drawLine (from.getX () * mZoom, from.getY () * mZoom, to.getX () * mZoom, to.getY () * mZoom, paint);
+		canvas.drawLine ((float) (from.getX () * mZoom), (float) (from.getY () * mZoom), (float) (to.getX () * mZoom), (float) (to.getY () * mZoom), paint);
 	}
 
 	private void drawPlanet (Canvas canvas, Planet planet, int index) {
@@ -165,8 +165,8 @@ public class InterstellarWarView extends SurfaceView {
 	private void drawSpaceShip (Canvas canvas, SpaceShip spaceShip) {
 		paint.setColor (colors[spaceShip.getOwnedBy ()]);
 		Planet from = spaceShip.getFromPlanet ();
-		canvas.drawCircle (from.getX () + spaceShip.getCurrentTick () * spaceShip.getVx (),
-				from.getY () + spaceShip.getCurrentTick () * spaceShip.getVy (), 5, paint);
+		canvas.drawCircle ((float) (from.getX () + spaceShip.getCurrentTick () * spaceShip.getVx ()),
+				(float) (from.getY () + spaceShip.getCurrentTick () * spaceShip.getVy ()), 5, paint);
 	}
 
 	@Override
