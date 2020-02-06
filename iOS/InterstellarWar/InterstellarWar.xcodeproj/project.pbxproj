@@ -23,6 +23,7 @@
 		967CB80423E22DA800115E98 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 967CB80223E22DA800115E98 /* Main.storyboard */; };
 		967CB80623E22DAD00115E98 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 967CB80523E22DAD00115E98 /* Assets.xcassets */; };
 		967CB80923E22DAD00115E98 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 967CB80723E22DAD00115E98 /* LaunchScreen.storyboard */; };
+		9691300423EC324000902FCE /* Textures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9691300323EC324000902FCE /* Textures.swift */; };
 		9696F61623E73CE30035B1F8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9696F61523E73CE30035B1F8 /* LoginViewController.swift */; };
 		9696F61823E73D5E0035B1F8 /* RoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9696F61723E73D5E0035B1F8 /* RoomViewController.swift */; };
 		9696F61A23E7492F0035B1F8 /* UserInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9696F61923E7492F0035B1F8 /* UserInterface.swift */; };
@@ -51,6 +52,7 @@
 		967CB80523E22DAD00115E98 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		967CB80823E22DAD00115E98 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		967CB80A23E22DAD00115E98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9691300323EC324000902FCE /* Textures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Textures.swift; sourceTree = "<group>"; };
 		9696F61523E73CE30035B1F8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		9696F61723E73D5E0035B1F8 /* RoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomViewController.swift; sourceTree = "<group>"; };
 		9696F61923E7492F0035B1F8 /* UserInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInterface.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 			children = (
 				964F334D23E30318004C2AC7 /* game */,
 				964F334323E301B6004C2AC7 /* ui */,
+				9691300323EC324000902FCE /* Textures.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9696F61623E73CE30035B1F8 /* LoginViewController.swift in Sources */,
+				9691300423EC324000902FCE /* Textures.swift in Sources */,
 				964F335723E31310004C2AC7 /* ClientConnection.swift in Sources */,
 				964F335B23E31D9C004C2AC7 /* CommandParamKey.swift in Sources */,
 				96B8B6E023E9779700955DE4 /* InterstellarWarClient.swift in Sources */,

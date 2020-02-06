@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SpriteKit
 
 public func == (lhs: Planet, rhs: Planet) -> Bool {
     return lhs.getId () == rhs.getId ()
@@ -14,6 +15,8 @@ public func == (lhs: Planet, rhs: Planet) -> Bool {
 
 public class Planet : Equatable {
     public static let PLANET_TYPES = 18
+    
+    private static let PADDING = CGFloat(30.0)
     
     private var mId : Int
 
@@ -26,6 +29,9 @@ public class Planet : Equatable {
     private var mOwnedBy : Int
     private var mUnitsNumber : Int
     private var mNeighbors : [Planet]
+    
+    private var mNode : SKSpriteNode
+    private var mLabelNode : SKLabelNode
 
     convenience init (id : Int, x  : Double, y : Double, radius : Double, ownedBy : Int, unitsNumber : Int) {
         self.init (id: id, x: x, y: y, radius: radius, ownedBy: ownedBy, unitsNumber: unitsNumber, tex: Int.random(in: 0..<Planet.PLANET_TYPES))
@@ -40,6 +46,26 @@ public class Planet : Equatable {
         mUnitsNumber = unitsNumber
         mOwnedBy = ownedBy
         mNeighbors = [Planet]()
+        
+        mNode = SKSpriteNode(texture: TEXTURES.planet[tex])
+        mNode.position = CGPoint(x: mX, y: mY)
+        mNode.size = CGSize(width: radius*2, height: radius*2)
+        mNode.colorBlendFactor = 1.0
+        mNode.color = COLOR[mOwnedBy]
+        
+        mLabelNode = SKLabelNode(text: "\(mUnitsNumber)")
+        mLabelNode.fontName = "Arial"
+        let scalingFactor = min(
+            CGFloat(radius * 2) / (mLabelNode.frame.width+Planet.PADDING),
+            CGFloat(radius * 2) / (mLabelNode.frame.height+Planet.PADDING))
+
+        // Change the fontSize.
+        mLabelNode.fontSize *= scalingFactor
+
+        // Optionally move the SKLabelNode to the center of the rectangle.
+        mLabelNode.position = CGPoint(x: 0.0, y: 0.0 - Double(mLabelNode.frame.height / 2.0))
+        
+        mNode.addChild(mLabelNode)
     }
 
     func linkTo (other : Planet) {
@@ -49,18 +75,21 @@ public class Planet : Equatable {
 
     func spawnUnit () {
         if (mOwnedBy > 0) {
-            mUnitsNumber += 1
+            setUnitsNumber (mUnitsNumber+1)
         }
     }
 
     func spaceShipArrived (_ spaceShip : SpaceShip) {
         if (spaceShip.getOwnedBy () == mOwnedBy) {
-            mUnitsNumber += spaceShip.getUnitsNumber ()
+            setUnitsNumber(mUnitsNumber + spaceShip.getUnitsNumber ())
         } else {
-            mUnitsNumber -= spaceShip.getUnitsNumber ()
-            if (mUnitsNumber < 0) {
-                mOwnedBy = spaceShip.getOwnedBy ()
-                mUnitsNumber = abs (mUnitsNumber)
+            let newUnitsNumber = mUnitsNumber - spaceShip.getUnitsNumber ()
+            
+            if (newUnitsNumber < 0) {
+                setOwnedBy(ownedBy: spaceShip.getOwnedBy ())
+                setUnitsNumber(abs(newUnitsNumber))
+            } else {
+                setUnitsNumber(newUnitsNumber)
             }
         }
     }
@@ -113,10 +142,12 @@ public class Planet : Equatable {
     
     public func setUnitsNumber (_ unitsNumber : Int) {
         self.mUnitsNumber = unitsNumber
+        self.mLabelNode.text = "\(unitsNumber)";
     }
 
     public func setTextureIndex (textureIndex : Int) {
         mTextureIndex = textureIndex
+        mNode.texture = TEXTURES.planet[textureIndex]
     }
 
     public func getNeighbors () -> [Planet] {
@@ -125,18 +156,26 @@ public class Planet : Equatable {
 
     public func setX (x: Double) {
         mX = x
+        mNode.position.x = CGFloat(x)
     }
 
     public func setY (y: Double) {
         mY = y
+        mNode.position.y = CGFloat(y)
     }
 
     public func setRadius (radius: Double) {
         mRadius = radius
+        mNode.size = CGSize(width: 2 * radius, height: 2 * radius)
     }
 
     public func setOwnedBy (ownedBy: Int) {
         mOwnedBy = ownedBy
+        mNode.color = COLOR[ownedBy]
+    }
+    
+    public func getNode () -> SKSpriteNode {
+        return mNode
     }
 
 }

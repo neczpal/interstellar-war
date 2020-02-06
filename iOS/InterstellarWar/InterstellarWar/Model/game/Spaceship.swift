@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SpriteKit
 
 public func == (lhs: SpaceShip, rhs: SpaceShip) -> Bool {
     return lhs.getId () == rhs.getId ()
@@ -15,6 +16,7 @@ public func == (lhs: SpaceShip, rhs: SpaceShip) -> Bool {
 public class SpaceShip : Equatable {
     public static let SPACESHIP_TYPES = 11
     private static let SPACE_SHIP_SPEED = 6.0
+    private static let PADDING = CGFloat(30.0)
     
     private var mId : Int
     
@@ -30,29 +32,27 @@ public class SpaceShip : Equatable {
     private var mVx : Double, mVy : Double
  
     private var mTextureIndex : Int
+    
+    private var mNode : SKSpriteNode
+    private var mLabelNode : SKLabelNode
 
-    init (id: Int, road: Road, from fromPlanet : Planet, to toPlanet : Planet, numberOfUnits unitsNumber : Int) {
+    convenience init (id: Int, road: Road, from fromPlanet : Planet, to toPlanet : Planet, numberOfUnits unitsNumber : Int) {
         
-        mId = id
-        mTextureIndex = Int.random(in: 0..<SpaceShip.SPACESHIP_TYPES)
-        mUnitsNumber = unitsNumber
-        mCurrentTick = 0
-        mFromPlanet = fromPlanet
-        mToPlanet = toPlanet
-        mRoad = road
-
-        mOwnedBy = mFromPlanet.getOwnedBy ()
-
         let lx = Double(toPlanet.getX () - fromPlanet.getX ())
         let ly = Double(toPlanet.getY () - fromPlanet.getY ())
         let length = fromPlanet.distance (toPlanet)
-
-        mMaxTick = Int(length / SpaceShip.SPACE_SHIP_SPEED)
-
-        mVx = lx / length * SpaceShip.SPACE_SHIP_SPEED
-        mVy = ly / length * SpaceShip.SPACE_SHIP_SPEED
         
-        mRoad.addSpaceship(spaceShip: self)
+        self.init(id: id,
+                  road: road,
+                  from: fromPlanet,
+                  to: toPlanet,
+                  vx: lx / length * SpaceShip.SPACE_SHIP_SPEED,
+                  vy: ly / length * SpaceShip.SPACE_SHIP_SPEED,
+                  ownedBy : fromPlanet.getOwnedBy(),
+                  numberOfUnits: unitsNumber,
+                  currentTick : 0,
+                  maxTick : Int(length / SpaceShip.SPACE_SHIP_SPEED),
+                  textureIndex : Int.random(in: 0..<SpaceShip.SPACESHIP_TYPES))
     }
 
     init (id: Int, road: Road, from fromPlanet : Planet, to toPlanet : Planet, vx : Double, vy: Double, ownedBy : Int, numberOfUnits unitsNumber : Int, currentTick : Int, maxTick : Int, textureIndex : Int) {
@@ -68,6 +68,32 @@ public class SpaceShip : Equatable {
         mVy = vy
         mOwnedBy = ownedBy
         
+        //Node set
+        mNode = SKSpriteNode(texture: TEXTURES.spaceship[mTextureIndex])
+        mNode.position = CGPoint(x: fromPlanet.getX(), y: fromPlanet.getY())
+        mNode.size = CGSize(width: TEXTURES.spaceship_dimens[mTextureIndex].width,
+                            height: TEXTURES.spaceship_dimens[mTextureIndex].height)
+        
+        let angle = atan (mVy / mVx)
+        mNode.colorBlendFactor = 1.0
+        mNode.color = COLOR[mOwnedBy]
+        mNode.zRotation = CGFloat(angle)
+        
+        mLabelNode = SKLabelNode(text: "\(mUnitsNumber)")
+        mLabelNode.fontName = "Arial"
+        let scalingFactor = min(
+            CGFloat(TEXTURES.spaceship_dimens[mTextureIndex].width) / (mLabelNode.frame.width+SpaceShip.PADDING),
+            CGFloat(TEXTURES.spaceship_dimens[mTextureIndex].height) / (mLabelNode.frame.height+SpaceShip.PADDING))
+
+        // Change the fontSize.
+        mLabelNode.fontSize *= scalingFactor
+
+        // Optionally move the SKLabelNode to the center of the rectangle.
+        mLabelNode.position = CGPoint(x: 0.0, y: 0.0 + Double(mLabelNode.frame.height / 2.0))
+        
+        mLabelNode.zRotation = CGFloat( -angle)
+        mNode.addChild(mLabelNode)
+        
         mRoad.addSpaceship(spaceShip: self)
     }
 
@@ -76,6 +102,8 @@ public class SpaceShip : Equatable {
      */
     func tick () {
         mCurrentTick += 1
+        mNode.position.x += CGFloat(mVx)
+        mNode.position.y += CGFloat(mVy)
     }
 
     /**
@@ -131,10 +159,12 @@ public class SpaceShip : Equatable {
     
     func setUnitsNumber (unitsNumber: Int) {
         mUnitsNumber = unitsNumber
+        mLabelNode.text = "\(unitsNumber)";
     }
 
     func setOwnedBy (ownedBy: Int) {
         mOwnedBy = ownedBy
+        mNode.color = COLOR[ownedBy]
     }
 
     func setMaxTick (maxTick: Int) {
@@ -142,6 +172,9 @@ public class SpaceShip : Equatable {
     }
 
     func setCurrentTick (currentTick: Int) {
+        mNode.position.x += CGFloat(Double(mCurrentTick - currentTick) * mVx)
+        mNode.position.y += CGFloat(Double(mCurrentTick - currentTick) * mVy)
+        
         mCurrentTick = currentTick
     }
 
@@ -167,6 +200,13 @@ public class SpaceShip : Equatable {
 
     func setTextureIndex (textureIndex: Int) {
         mTextureIndex = textureIndex
+        mNode.texture = TEXTURES.spaceship[textureIndex]
+        mNode.size = CGSize(width: TEXTURES.spaceship_dimens[textureIndex].width,
+                            height: TEXTURES.spaceship_dimens[textureIndex].height)
+    }
+    
+    func getNode () -> SKSpriteNode{
+        return mNode
     }
 
 }

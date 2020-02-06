@@ -168,9 +168,6 @@ public class InterstellarWarCore extends Thread {
 	 * @param data Der List die enthält die Spieldata
 	 */
 	public void setData (JSONObject data) {
-		if (mTickNumber != data.getInt (MAP_TICK_NUMBER_KEY)) {
-			System.err.println ("IMPORTANT tick dif:" + (mTickNumber - data.getInt (MAP_TICK_NUMBER_KEY)));
-		}
 		mTickNumber = data.getInt (MAP_TICK_NUMBER_KEY);
 		mBackgroundTextureIndex = data.getInt (BG_TEXTURE_INDEX_KEY);
 		mMapName = data.getString (MAP_NAME_KEY);
@@ -508,6 +505,5 @@ public class InterstellarWarCore extends Thread {
 	public boolean isRunning () {
 		return mIsRunning;
 	}
-
 
 }

@@ -10,73 +10,142 @@
 import SpriteKit
 import GameplayKit
 
-public class GameScene: SKScene {
+class GameScene: SKScene {
     private static let EDGE_MOVE_DISTANCE = 20
     private static let EDGE_MOVE_UNIT = 2
     
     let screenHeight : Double = Double(UIScreen.main.bounds.size.height)
     let screenWidth  : Double = Double(UIScreen.main.bounds.size.width)
     
-    private var mInterstellarWarClient : InterstellarWarClient?
-    private var mCore : InterstellarWarCore?;
+    //#TODO write setter
+    var mInterstellarWarClient : InterstellarWarClient?
+    var mCore : InterstellarWarCore?;
+    
+    private var worldNode : SKNode?
+    private var bgNode : SKNode?
+    
 //    private var mBackground : Any?;//#TODO
     private var mViewPort = CGPoint (x: 0, y: 0);
+    private var mZoom = 1.0
 
     private var mWasMouseDown = false;
 
     private var mSelectedPlanetFromIndex = -1;
     private var mSelectedPlanetToIndex = -1;
-
-//    private Textures mTextures; prob wont use this
-
-//    private boolean isDrawing = false;//#TODO
-    
-//    private var label : SKLabelNode?
-//    private var spinnyNode : SKShapeNode?
-//    private var textureNode : SKSpriteNode?
     
     
-//    private let snapperTextures = [
-////        SKTexture(imageNamed: ("legycsapo_00000")),
-////        SKTexture(imageNamed: ("legycsapo_00001")),
-////        SKTexture(imageNamed: ("legycsapo_00002")),
-////        SKTexture(imageNamed: ("legycsapo_00003"))
-//    ]
-//    private let swatterSound = [
-////       SKAction.playSoundFileNamed("swatter_1.wav", waitForCompletion: true),
-////       SKAction.playSoundFileNamed("swatter_2.wav", waitForCompletion: true),
-////       SKAction.playSoundFileNamed("swatter_3.wav", waitForCompletion: true)
-//    ]
-
+    public func buildUp() {
+        worldNode = mCore!.getWorldNode()
+        bgNode = mCore!.getBackgroundNode()
+        
+        addChild(worldNode!)
+        addChild(bgNode!)
+    }
     
-//    override func didMove(to view: SKView) {
-//
-//    }
-    
+    public func destroy() {
+        removeChildren(in: [worldNode!, bgNode!])
+    }
     
     func touchDown(atPoint pos : CGPoint) {
-        
+        addChild(mCore!.getWorldNode())
     }
     
     func touchMoved(toPoint pos : CGPoint) {
+        
     }
     
     func touchUp(atPoint pos : CGPoint) {
         
     }
     
+    var fingers = [UITouch?](repeating: nil, count:5)
+
+    var x: CGFloat = 0.0
+    var y: CGFloat = 0.0
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        print("Touches began!")
+        
+        super.touchesBegan(touches, with: event)
+        for touch in touches{
+            let point = touch.location(in: self.view)
+            for (index,finger)  in fingers.enumerated() {
+                if finger == nil {
+                    fingers[index] = touch
+                    x = point.x
+                    y = point.y
+                    print("finger \(index+1): x=\(point.x) , y=\(point.y)")
+                    break
+                }
+            }
+        }
+        
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        print("Touches moved!")
+        super.touchesMoved(touches, with: event)
+        for touch in touches {
+            let point = touch.location(in: self.view)
+            for (index,finger) in fingers.enumerated() {
+                if let finger = finger, finger == touch {
+                    worldNode!.position.x += point.x - x
+                    worldNode!.position.y -= point.y - y
+                    x = point.x
+                    y = point.y
+                    print("finger \(index+1): x=\(point.x) , y=\(point.y)")
+                    break
+                }
+            }
+        }
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        print("Touches ended!")
+        super.touchesEnded(touches, with: event)
+        for touch in touches {
+            for (index,finger) in fingers.enumerated() {
+                if let finger = finger, finger == touch {
+                    x = 0.0
+                    y = 0.0
+                    fingers[index] = nil
+                    break
+                }
+            }
+        }
+        
+        
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        print("Touches canceled!")
+        super.touchesCancelled(touches, with: event)
+//        guard let touches = touches else {
+//            return
+//        }
+        
+        touchesEnded(touches, with: event)
+    }
+    
+    
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
-//    }
 //
+//        for t in touches {
+//            t.
+//            self.touchDown(atPoint: t.location(in: self))
+//
+//
+//        }
+//    }
+
 //    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
 //    }
-//
+
 //    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
 //    }
-//
+
 //    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
 //    }
@@ -85,4 +154,7 @@ public class GameScene: SKScene {
 //    override func update(_ currentTime: TimeInterval) {
 //
 //    }
+    
+    
+    
 }

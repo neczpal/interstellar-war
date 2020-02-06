@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SpriteKit
 
 public class InterstellarWarCore {
     public static let BACKGROUND_TYPES = 5;
@@ -26,6 +27,9 @@ public class InterstellarWarCore {
     private var mSpaceshipIdCounter : Int = 0
     
     private typealias PK = InterstellarWarCommandParamKey
+    
+    private var mWorldNode : SKNode
+    private var mBackgroundNode : SKSpriteNode
 
     init (jsonData : JSON) {
         mMapName = ""
@@ -36,8 +40,10 @@ public class InterstellarWarCore {
         mBackgroundTextureIndex = -1
         mTickNumber = 0
         mIsRunning = false
+        mWorldNode = SKNode()
+        mBackgroundNode = SKSpriteNode()
         
-        setData(data: jsonData)
+        initData(data: jsonData)
     }
 
     public func getData () -> JSON {
@@ -170,9 +176,11 @@ public class InterstellarWarCore {
                 spaceShip.setCurrentTick (currentTick: currentTick);
                 spaceShip.setMaxTick (maxTick: maxTick);
                 spaceShip.setTextureIndex (textureIndex: tex);
-                    
+                
             } else {
-                mSpaceShips[id] = SpaceShip(id: id, road: road, from: fromPlanet, to: toPlanet, vx: vx, vy: vy, ownedBy: owner, numberOfUnits: units, currentTick: currentTick, maxTick: maxTick, textureIndex: tex)
+                let spaceShip = SpaceShip(id: id, road: road, from: fromPlanet, to: toPlanet, vx: vx, vy: vy, ownedBy: owner, numberOfUnits: units, currentTick: currentTick, maxTick: maxTick, textureIndex: tex)
+                mWorldNode.addChild(spaceShip.getNode())
+                mSpaceShips[id] = spaceShip
             }
         
         }
@@ -182,6 +190,10 @@ public class InterstellarWarCore {
     private func initData (data : JSON) {
         
         mBackgroundTextureIndex = data[PK.BG_TEXTURE_INDEX_KEY].int!
+        
+        mBackgroundNode = SKSpriteNode(texture: TEXTURES.background[mBackgroundTextureIndex])
+        mBackgroundNode.zPosition = -1
+        
         mMapName = data[PK.MAP_NAME_KEY].string!
         mMaxUsers = data[PK.MAP_MAX_USER_COUNT_KEY].int!
         
@@ -197,7 +209,10 @@ public class InterstellarWarCore {
             let units = planetJson[PK.UNIT_NUMBER_KEY].int!
             let tex = planetJson[PK.TEXTURE_INDEX_KEY].int!
             
-            mPlanets[id] = Planet(id: id, x: x, y: y, radius: r, ownedBy: owner, unitsNumber: units, tex: tex)
+            let planet = Planet(id: id, x: x, y: y, radius: r, ownedBy: owner, unitsNumber: units, tex: tex)
+            
+            mPlanets[id] = planet
+            mWorldNode.addChild(planet.getNode())
         }
         
         mRoads = [RoadKey : Road]()
@@ -213,7 +228,10 @@ public class InterstellarWarCore {
             
             fromPlanet.linkTo(other: toPlanet)
             
-            mRoads[key] = Road(key: key, from: fromPlanet, to: toPlanet)
+            let road = Road(key: key, from: fromPlanet, to: toPlanet)
+            
+            mRoads[key] = road
+            mWorldNode.addChild(road.getNode())
         }
         mSpaceShips = [Int : SpaceShip]()
         
@@ -267,10 +285,13 @@ public class InterstellarWarCore {
             spaceShip.tick ();
             if(spaceShip.isArrived ()) {
                 spaceShip.getToPlanet ().spaceShipArrived (spaceShip);
+                mWorldNode.removeChildren(in: [spaceShip.getNode()])
             }
         }
         
         mSpaceShips = mSpaceShips.filter {!$0.value.isArrived()}
+        
+        //#TODO collides
     }
 
     private func spawnUnits () {
@@ -279,12 +300,20 @@ public class InterstellarWarCore {
         }
     }
 
+    public func start () {
+        let queue = DispatchQueue(label: "com.aneczpal.interstellar.core", qos: .userInteractive)
+        
+        queue.async {
+            self.run()
+        }
+    }
+    
     public func run () {
         mIsRunning = true;
         mTickNumber = 1;
         while (mIsRunning) {
 //            try {
-                Thread.sleep (forTimeInterval: 50);
+            Thread.sleep (forTimeInterval: 0.05);
                 mTickNumber += 1;
 
                 moveSpaceShips ();
@@ -347,6 +376,13 @@ public class InterstellarWarCore {
 
     public func isRunning () -> Bool{
         return mIsRunning;
+    }
+    
+    public func getWorldNode () -> SKNode {
+        return mWorldNode
+    }
+    public func getBackgroundNode () -> SKNode {
+        return mBackgroundNode
     }
 
 

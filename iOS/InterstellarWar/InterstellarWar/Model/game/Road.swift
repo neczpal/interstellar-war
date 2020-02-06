@@ -6,7 +6,7 @@
 //  Copyright © 2020. Neczpál Ábel. All rights reserved.
 //
 
-import Foundation
+import SpriteKit
 
 public class RoadKey : Hashable {
     public func hash(into hasher: inout Hasher) {
@@ -34,6 +34,8 @@ public class Road {
     private var mFrom : Planet, mTo : Planet
     
     private var mSpaceShips : [SpaceShip]
+    
+    private var mNode : SKShapeNode
 
     
     init(key: RoadKey, from : Planet, to : Planet) {
@@ -41,6 +43,13 @@ public class Road {
         mFrom = from
         mTo = to
         mSpaceShips = [SpaceShip] ()
+        
+        
+        var path = CGMutablePath()
+        path.move(to: CGPoint(x: from.getX(), y: from.getY()))
+        path.addLine(to: CGPoint(x: to.getX(), y: to.getY()))
+        
+        mNode = SKShapeNode(path: path)
     }
 
     // GETTERS
@@ -69,6 +78,10 @@ public class Road {
 
     public func getSpaceShips () -> [SpaceShip] {
         return mSpaceShips;
+    }
+    
+    public func getNode () -> SKShapeNode {
+        return mNode
     }
 
 
