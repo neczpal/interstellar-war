@@ -12,7 +12,7 @@ import GameplayKit
 
 class GameViewController: UIViewController, UserInterface{
     
-//    private var mGameScene : GameScene?
+    private var mGameScene : GameScene?
     
 //    var mCore : InterstellarWarCore?
     
@@ -33,6 +33,7 @@ class GameViewController: UIViewController, UserInterface{
                 scene.mCore!.start()
                 scene.buildUp()
                 
+                mGameScene = scene
                 // Present the scene
                 view.presentScene(scene)
                 
@@ -59,6 +60,22 @@ class GameViewController: UIViewController, UserInterface{
     override var prefersStatusBarHidden: Bool {
         return false
     }
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//            super.viewWillDisappear(animated)
+//            if isMovingFromParent {
+//                if let viewControllers = self.navigationController?.viewControllers {
+//                    if (viewControllers.count >= 1) {
+//                        let previousViewController = viewControllers[viewControllers.count-2] as! LoginViewController
+//                        // whatever you want to do
+//                        if let con = sharedConnection {
+//                            con.leaveRoom()
+//                            con.setUserInterface(previousViewController)
+//                        }
+//                    }
+//                }
+//            }
+//        }
     
     func connectionReady() {
 //        <#code#>

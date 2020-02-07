@@ -252,6 +252,7 @@ public class ClientConnection {
         
         mOut!.write(UnsafePointer<UInt8>(encodedDataArray), maxLength: encodedDataArray.count)
         
+        
 //            if (!mSocket.isClosed ()) {
 //                mOut.write (command.toString () + "\n");
 //                mOut.flush ();

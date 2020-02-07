@@ -24,6 +24,7 @@ class GameScene: SKScene {
     private var worldNode : SKNode?
     private var bgNode : SKNode?
     
+    
 //    private var mBackground : Any?;//#TODO
     private var mViewPort = CGPoint (x: 0, y: 0);
     private var mZoom = 1.0
@@ -38,6 +39,7 @@ class GameScene: SKScene {
         worldNode = mCore!.getWorldNode()
         bgNode = mCore!.getBackgroundNode()
         
+        
         addChild(worldNode!)
         addChild(bgNode!)
     }
@@ -47,7 +49,7 @@ class GameScene: SKScene {
     }
     
     func touchDown(atPoint pos : CGPoint) {
-        addChild(mCore!.getWorldNode())
+//        addChild(mCore!.getWorldNode())
     }
     
     func touchMoved(toPoint pos : CGPoint) {
@@ -65,16 +67,28 @@ class GameScene: SKScene {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         print("Touches began!")
-        
         super.touchesBegan(touches, with: event)
+        let planets = mCore!.getPlanets ();
+        
         for touch in touches{
-            let point = touch.location(in: self.view)
+            let point = touch.location(in: self)
             for (index,finger)  in fingers.enumerated() {
                 if finger == nil {
                     fingers[index] = touch
+                    let realX = point.x - worldNode!.position.x
+                    let realY = point.y - worldNode!.position.y
+                    for (_, planet) in planets {
+                        if (planet.isInside (Double(realX), Double(realY)) && mInterstellarWarClient!.getRoomIndex () == planet.getOwnedBy ()) {
+                            mSelectedPlanetFromIndex = planet.getId ();
+                            break;
+                        }
+                    }
+                    
                     x = point.x
                     y = point.y
-                    print("finger \(index+1): x=\(point.x) , y=\(point.y)")
+                    print("Real \(index+1): x=\(realX) , y=\(realY)")
+                    print("Pos \(index+1): x=\(point.x) , y=\(point.y)")
+                    
                     break
                 }
             }
@@ -83,17 +97,20 @@ class GameScene: SKScene {
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("Touches moved!")
+//        print("Touches moved!")
+        
         super.touchesMoved(touches, with: event)
         for touch in touches {
-            let point = touch.location(in: self.view)
-            for (index,finger) in fingers.enumerated() {
+            let point = touch.location(in: self)
+            for (_,finger) in fingers.enumerated() {
                 if let finger = finger, finger == touch {
-                    worldNode!.position.x += point.x - x
-                    worldNode!.position.y -= point.y - y
-                    x = point.x
-                    y = point.y
-                    print("finger \(index+1): x=\(point.x) , y=\(point.y)")
+                    if(mSelectedPlanetFromIndex == -1) {
+                        worldNode!.position.x += point.x - x
+                        worldNode!.position.y += point.y - y
+                        x = point.x
+                        y = point.y
+                    }
+//                    print("finger \(index+1): x=\(point.x) , y=\(point.y)")
                     break
                 }
             }
@@ -101,13 +118,37 @@ class GameScene: SKScene {
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("Touches ended!")
+//        print("Touches ended!")
         super.touchesEnded(touches, with: event)
+        
+        let planets = mCore!.getPlanets ();
+        
         for touch in touches {
+            let point = touch.location(in: self)
             for (index,finger) in fingers.enumerated() {
                 if let finger = finger, finger == touch {
-                    x = 0.0
-                    y = 0.0
+                    if (mSelectedPlanetFromIndex == -1) {
+                        x = 0.0
+                        y = 0.0
+                    } else {
+                        let realX = point.x - worldNode!.position.x
+                        let realY = point.y - worldNode!.position.y
+                        
+                        for (_, planet) in planets {
+                            if (planet.isInside (Double(realX), Double(realY)) &&
+                                planet.isNeighbor (
+                                    planets[mSelectedPlanetFromIndex]!)
+                                ) {
+                                if (planets[mSelectedPlanetFromIndex]!.getOwnedBy () == mInterstellarWarClient!.getRoomIndex ()) {
+                                    
+                                    mInterstellarWarClient!.startMoveSpaceShip (mSelectedPlanetFromIndex, planet.getId(), mCore!.getTickNumber (), planets[mSelectedPlanetFromIndex]!.getUnitsNumber ());
+                                }
+                                break;
+                            }
+                        }
+                        mSelectedPlanetFromIndex = -1
+                    }
+                    
                     fingers[index] = nil
                     break
                 }

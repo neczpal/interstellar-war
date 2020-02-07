@@ -45,7 +45,7 @@ public class Road {
         mSpaceShips = [SpaceShip] ()
         
         
-        var path = CGMutablePath()
+        let path = CGMutablePath()
         path.move(to: CGPoint(x: from.getX(), y: from.getY()))
         path.addLine(to: CGPoint(x: to.getX(), y: to.getY()))
         
