@@ -30,6 +30,8 @@ public class InterstellarWarCore {
     
     private var mWorldNode : SKNode
     private var mBackgroundNode : SKSpriteNode
+    
+    var lock = DispatchSemaphore(value: 1)
 
     init (jsonData : JSON) {
         mMapName = ""
@@ -115,6 +117,7 @@ public class InterstellarWarCore {
     }
     
     public func setData (data : JSON) {
+        lock.wait()
         
         mBackgroundTextureIndex = data[PK.BG_TEXTURE_INDEX_KEY].int!
         mMapName = data[PK.MAP_NAME_KEY].string!
@@ -185,10 +188,11 @@ public class InterstellarWarCore {
         
         }
         
+        lock.signal()
     }
     
     private func initData (data : JSON) {
-        
+        lock.wait()
         mBackgroundTextureIndex = data[PK.BG_TEXTURE_INDEX_KEY].int!
         
         mBackgroundNode = SKSpriteNode(texture: TEXTURES.background[mBackgroundTextureIndex])
@@ -260,6 +264,7 @@ public class InterstellarWarCore {
             mSpaceShips[id] = SpaceShip(id: id, road: road, from: fromPlanet, to: toPlanet, vx: vx, vy: vy, ownedBy: owner, numberOfUnits: units, currentTick: currentTick, maxTick: maxTick, textureIndex: tex)
         }
         
+        lock.signal()
     }
 
 
@@ -284,14 +289,75 @@ public class InterstellarWarCore {
         for spaceShip in mSpaceShips.values {
             spaceShip.tick ();
             if(spaceShip.isArrived ()) {
+                let road = spaceShip.getRoad()
+                road.removeSpaceship(id: spaceShip.getId())
                 spaceShip.getToPlanet ().spaceShipArrived (spaceShip);
-                mWorldNode.removeChildren(in: [spaceShip.getNode()])
+                
+                spaceShip.getNode().removeAllChildren()
+                spaceShip.getNode().removeFromParent()
+//                mWorldNode.removeChildren(in: [spaceShip.getNode()])
             }
         }
         
         mSpaceShips = mSpaceShips.filter {!$0.value.isArrived()}
         
-        //#TODO collides
+        var deleteCoreSpaceShips = [Int] ()
+
+        for road in mRoads.values {
+            let spaceShips = road.getSpaceShips()
+            var deleteRoadSpaceShips : Set<Int> = Set<Int>()
+
+            if (spaceShips.count > 1) {
+                for i in 0..<spaceShips.count {
+                    let spaceShip1 = spaceShips[i]
+                    for j in (i+1)..<spaceShips.count {
+                        let spaceShip2 = spaceShips[j]
+                        if (spaceShip1.isCollided (with: spaceShip2) && spaceShip1.getOwnedBy () != spaceShip2.getOwnedBy ()) {
+                            if (spaceShip1.getUnitsNumber () > spaceShip2.getUnitsNumber ()) {
+                                spaceShip1.setUnitsNumber (
+                                    unitsNumber: spaceShip1.getUnitsNumber () - spaceShip2.getUnitsNumber ());
+                                deleteCoreSpaceShips.append (spaceShip2.getId ());
+                                deleteRoadSpaceShips.insert (spaceShip2.getId ());
+                            } else if (spaceShip2.getUnitsNumber () > spaceShip1.getUnitsNumber ()) {
+                                spaceShip2.setUnitsNumber(
+                                    unitsNumber: spaceShip2.getUnitsNumber () - spaceShip1.getUnitsNumber ())
+                                deleteCoreSpaceShips.append (spaceShip1.getId ());
+                                deleteRoadSpaceShips.insert (spaceShip1.getId ());
+                            } else {
+                                spaceShip2.setUnitsNumber (unitsNumber: 0);
+                                spaceShip1.setUnitsNumber (unitsNumber: 0);
+                                deleteCoreSpaceShips.append (spaceShip1.getId ())
+                                deleteCoreSpaceShips.append (spaceShip2.getId ())
+                                deleteRoadSpaceShips.insert (spaceShip1.getId ())
+                                deleteRoadSpaceShips.insert (spaceShip2.getId ())
+                            }
+                        }
+                    }
+                }
+                road.removeSpaceships(ids: deleteRoadSpaceShips)
+//                for index in deleteRoadSpaceShips.sorted().reversed() {
+//                    road.removeSpaceship(index: index)
+//                }
+            }
+        }
+        for key in deleteCoreSpaceShips {
+            if ( mSpaceShips.keys.contains(key) ) {
+                mSpaceShips[key]!.getNode().removeAllChildren()
+                mSpaceShips[key]!.getNode().removeFromParent()
+            }
+        }
+        
+        lock.wait()
+        
+        
+        mSpaceShips = mSpaceShips.filter({
+            !deleteCoreSpaceShips.contains($0.key)})
+////                mWorldNode.removeChildren(in: [mSpaceShips[key]!.getNode()])
+//                mSpaceShips.removeValue(forKey: key)
+//            }
+//        }
+        
+        lock.signal()
     }
 
     private func spawnUnits () {
@@ -301,8 +367,8 @@ public class InterstellarWarCore {
     }
 
     public func start () {
-        let queue = DispatchQueue(label: "com.aneczpal.interstellar.core", qos: .userInteractive)
-        
+        let queue = DispatchQueue(label: "com.aneczpal.interstellar.core", qos: .default)
+
         queue.async {
             self.run()
         }

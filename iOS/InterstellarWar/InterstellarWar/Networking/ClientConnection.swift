@@ -45,14 +45,13 @@ public class ClientConnection {
     }
 
     public func start () {
-        let queue = DispatchQueue(label: "com.aneczpal.interstellar.connection", qos: .background)
-        
+        let queue = DispatchQueue(label: "com.aneczpal.interstellar.connection", qos: .default)
         queue.async {
             self.run()
         }
     }
     
-    private  let bufferSize = 1024;
+    private  let bufferSize = 4048;
 
     private func run () {
         mIsRunning = true;
@@ -65,11 +64,19 @@ public class ClientConnection {
                 
                 
                 let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+                defer { buffer.deallocate() }
                 while (mIn!.hasBytesAvailable) {
-                    let numberOfBytes = mIn!.read(buffer, maxLength: bufferSize)
-                    data.append(buffer, count: numberOfBytes);
+                    let read = mIn!.read(buffer, maxLength: bufferSize)
+                    if (read == 0) {
+                        break  // EOF
+                    } else if read < 0 {
+                        print("ERROR IN INPUTSTREAM")
+                        break
+                    }
+                    
+                    data.append(buffer, count: read);
                 }
-                
+//                buffer.deallocate()
                 let string = String(data: data, encoding: String.Encoding.utf8)!
                 
                 //Split strings to lines
@@ -79,10 +86,11 @@ public class ClientConnection {
                 for linesub in lines {
                     let line = String(linesub)
                     if(!line.isEmpty) {
-//                        print("Read line: \(line)")
-                        let jsonObject = JSON(parseJSON: line);
-                        
-                        self.receive (jsonObject);
+                        print("Read line: \(line)")
+                        if "}" == line.last && "{" == line.first {
+                            let jsonObject = JSON(parseJSON: line)
+                            self.receive (jsonObject);
+                        }
                     }
                 }
                 
@@ -149,6 +157,10 @@ public class ClientConnection {
     }
 
     public func receive (_ command : JSON) {
+        if !command.exists() {
+            return;
+        }
+        
         let type = command[CommandParamKey.COMMAND_TYPE_KEY].string!
         
         

@@ -109,8 +109,14 @@ public class SpaceShip : Equatable {
     /**
      * @return Entscheidet ob das Raumschiff angekommt ist.
      */
-    func isArrived () -> Bool{
+    func isArrived () -> Bool {
         return mCurrentTick >= mMaxTick
+    }
+    
+    func isCollided (with other: SpaceShip) -> Bool {
+        return mCurrentTick+other.mCurrentTick >= mMaxTick-2 &&
+            mToPlanet == other.mFromPlanet &&
+            mFromPlanet == other.mToPlanet
     }
 
     // GETTERS
@@ -153,6 +159,10 @@ public class SpaceShip : Equatable {
 
     func getTextureIndex () -> Int {
         return mTextureIndex
+    }
+    
+    func getRoad () -> Road {
+        return mRoad
     }
     
     //SETTERS

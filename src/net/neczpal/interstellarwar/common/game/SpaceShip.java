@@ -172,7 +172,7 @@ public class SpaceShip implements Serializable {
     }
 
     public boolean isCollided (SpaceShip other) {
-        return mCurrentTick + other.mCurrentTick >= mMaxTick - 1 &&//# -1 so no through lagging during a fram
+        return mCurrentTick + other.mCurrentTick >= mMaxTick - 2 &&//# -2 so no through lagging during a fram #TODO
                 this.getToPlanet ().equals (other.getFromPlanet ()) &&
                 this.getFromPlanet ().equals (other.getToPlanet ());
     }

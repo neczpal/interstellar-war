@@ -33,16 +33,17 @@ public class Road {
     
     private var mFrom : Planet, mTo : Planet
     
-    private var mSpaceShips : [SpaceShip]
+    private var mSpaceShips : [Int: SpaceShip]
     
     private var mNode : SKShapeNode
 
+    private var lock = DispatchSemaphore(value: 1)
     
     init(key: RoadKey, from : Planet, to : Planet) {
         mKey = key
         mFrom = from
         mTo = to
-        mSpaceShips = [SpaceShip] ()
+        mSpaceShips = [Int: SpaceShip] ()
         
         
         let path = CGMutablePath()
@@ -63,21 +64,33 @@ public class Road {
     }
     
     public func addSpaceship (spaceShip: SpaceShip) {
-        if (!mSpaceShips.contains (spaceShip)){
-            mSpaceShips.append (spaceShip);
+        lock.wait()
+        
+        if (!mSpaceShips.keys.contains (spaceShip.getId())){
+            mSpaceShips[spaceShip.getId()] = spaceShip;
         }
+        
+        lock.signal()
     }
 
-//    public func removeSpaceship (spaceShip: SpaceShip) {
-//        mSpaceShips.remove
-//    }
+    public func removeSpaceships (ids: Set<Int>) {
+        lock.wait()
+        
+        mSpaceShips = mSpaceShips.filter { !ids.contains($0.key)}
+        
+        lock.signal()
+    }
 //
-//    public func removeSpaceships (spaceShips: SpaceShip) {
-//        mSpaceShips.removeAl
-//    }
+    public func removeSpaceship (id: Int) {
+        lock.wait()
+        
+        mSpaceShips.removeValue(forKey: id)
+        
+        lock.signal()
+    }
 
     public func getSpaceShips () -> [SpaceShip] {
-        return mSpaceShips;
+        return mSpaceShips.values.map {$0}
     }
     
     public func getNode () -> SKShapeNode {

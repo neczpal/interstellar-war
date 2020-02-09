@@ -61,8 +61,10 @@ class GameViewController: UIViewController, UserInterface{
         return false
     }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//            super.viewWillDisappear(animated)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        mGameScene!.destroy()
 //            if isMovingFromParent {
 //                if let viewControllers = self.navigationController?.viewControllers {
 //                    if (viewControllers.count >= 1) {
@@ -75,7 +77,7 @@ class GameViewController: UIViewController, UserInterface{
 //                    }
 //                }
 //            }
-//        }
+        }
     
     func connectionReady() {
 //        <#code#>
