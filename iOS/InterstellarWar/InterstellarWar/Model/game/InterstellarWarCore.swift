@@ -23,6 +23,7 @@ public class InterstellarWarCore {
 
     private var mTickNumber : Int;
     private var mIsRunning : Bool = false;
+    private var mTimer : Timer?
     
     private var mSpaceshipIdCounter : Int = 0
     
@@ -119,6 +120,7 @@ public class InterstellarWarCore {
     public func setData (data : JSON) {
         lock.wait()
         
+        mTickNumber = data[PK.MAP_TICK_NUMBER_KEY].int!
         mBackgroundTextureIndex = data[PK.BG_TEXTURE_INDEX_KEY].int!
         mMapName = data[PK.MAP_NAME_KEY].string!
         mMaxUsers = data[PK.MAP_MAX_USER_COUNT_KEY].int!
@@ -127,13 +129,13 @@ public class InterstellarWarCore {
         for planetJson in data[PK.PLANETS_KEY].array! {
             let id = planetJson[PK.GAME_OBJECT_ID_KEY].int!
             let planet = mPlanets[id]!
-            
-            planet.setX(x: planetJson[PK.POSITION_X_KEY].double!)
-            planet.setY(y: planetJson[PK.POSITION_Y_KEY].double!)
-            planet.setRadius(radius: planetJson[PK.RADIUS_KEY].double!)
+
+//            planet.setX(x: planetJson[PK.POSITION_X_KEY].double!)
+//            planet.setY(y: planetJson[PK.POSITION_Y_KEY].double!)
+//            planet.setRadius(radius: planetJson[PK.RADIUS_KEY].double!)
             planet.setOwnedBy(ownedBy: planetJson[PK.OWNER_KEY].int!)
             planet.setUnitsNumber(planetJson[PK.UNIT_NUMBER_KEY].int!)
-            planet.setTextureIndex(textureIndex: planetJson[PK.TEXTURE_INDEX_KEY].int!)
+//            planet.setTextureIndex(textureIndex: planetJson[PK.TEXTURE_INDEX_KEY].int!)
             
         }
         
@@ -172,13 +174,13 @@ public class InterstellarWarCore {
             //Is spaceship already created?
             if(mSpaceShips.keys.contains(id)) {
                 let spaceShip = mSpaceShips[id]!
-                spaceShip.setVx (vx: vx);
-                spaceShip.setVy (vy: vy);
-                spaceShip.setRoad (road: road);
+//                spaceShip.setVx (vx: vx);
+//                spaceShip.setVy (vy: vy);
+//                spaceShip.setRoad (road: road);
                 spaceShip.setUnitsNumber (unitsNumber: units);
                 spaceShip.setCurrentTick (currentTick: currentTick);
-                spaceShip.setMaxTick (maxTick: maxTick);
-                spaceShip.setTextureIndex (textureIndex: tex);
+//                spaceShip.setMaxTick (maxTick: maxTick);
+//                spaceShip.setTextureIndex (textureIndex: tex);
                 
             } else {
                 let spaceShip = SpaceShip(id: id, road: road, from: fromPlanet, to: toPlanet, vx: vx, vy: vy, ownedBy: owner, numberOfUnits: units, currentTick: currentTick, maxTick: maxTick, textureIndex: tex)
@@ -347,7 +349,6 @@ public class InterstellarWarCore {
             }
         }
         
-        lock.wait()
         
         
         mSpaceShips = mSpaceShips.filter({
@@ -356,8 +357,6 @@ public class InterstellarWarCore {
 //                mSpaceShips.removeValue(forKey: key)
 //            }
 //        }
-        
-        lock.signal()
     }
 
     private func spawnUnits () {
@@ -367,35 +366,43 @@ public class InterstellarWarCore {
     }
 
     public func start () {
-        let queue = DispatchQueue(label: "com.aneczpal.interstellar.core", qos: .default)
+//        let queue = DispatchQueue(label: "com.aneczpal.interstellar.core", qos: .default)
 
-        queue.async {
-            self.run()
-        }
+//        queue.async {
+//            self.run()
+
+            self.mTimer = Timer.scheduledTimer(timeInterval: 0.05, target: self, selector: #selector(self.run), userInfo: nil, repeats: true)
+            
+//        }
     }
     
-    public func run () {
-        mIsRunning = true;
-        mTickNumber = 1;
-        while (mIsRunning) {
+    @objc func run () {
+//        mIsRunning = true;
+//        mTickNumber = 1;
+//        while (mIsRunning) {
 //            try {
-            Thread.sleep (forTimeInterval: 0.05);
-                mTickNumber += 1;
+//            Thread.sleep (forTimeInterval: 0.05);
+            
+            lock.wait()
+            
+            mTickNumber += 1;
+        
+            moveSpaceShips ();
 
-                moveSpaceShips ();
-
-                if (mTickNumber % 32 == 0) {
-                    spawnUnits ();
-                }
-
+            if (mTickNumber % 32 == 0) {
+                spawnUnits ();
+            }
+            
+            lock.signal()
 //            } catch (InterruptedException e) {
 //                e.printStackTrace ();
 //            }
-        }
+//        }
     }
 
     public func stopGame () {
         mIsRunning = false;
+        mTimer?.invalidate()
     }
 
 
@@ -437,6 +444,10 @@ public class InterstellarWarCore {
     }
 
     public func getTickNumber () -> Int {
+        lock.wait()
+        defer {
+            lock.signal()
+        }
         return mTickNumber;
     }
 
