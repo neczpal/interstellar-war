@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +25,7 @@ public class LobbyFrame extends JFrame {
 	private JList mRoomUserList;
 	private JButton mJoinOrLeaveButton;
 	private JButton mStartButton;
+	private JButton mFillRoomWithAIButton;
 
 	private RoomsDataTableModel mRoomsDataTableModel;
 	private UserListModel mUserListModel;
@@ -35,56 +35,61 @@ public class LobbyFrame extends JFrame {
 	private int mSelectedRoomId = -1;
 	private boolean mIsInRoom = false;
 
-	private HashMap <Integer, ArrayList <String>> mAllRoomUsers = new HashMap <> ();
+	private HashMap<Integer, List<String>> mAllRoomUsers = new HashMap<> ();
 
-	/**
-	 * Erstellt das Zimmer
-	 *
-	 * @param clientConnection Die Client-Verbindung
-	 */
-	public LobbyFrame (ClientConnection clientConnection) {
-		super ("Rooms");
+    /**
+     * Erstellt das Zimmer
+     *
+     * @param clientConnection Die Client-Verbindung
+     */
+    public LobbyFrame (ClientConnection clientConnection) {
+	    super ("Rooms");
 
-		mConnection = clientConnection;
+	    mConnection = clientConnection;
 
-		try {
-			setIconImage (Loader.loadImage ("res/icon.png"));
-		} catch (IOException e) {
-			e.printStackTrace ();
-		}
+	    try {
+		    setIconImage (Loader.loadImage ("res/icon.png"));
+	    } catch (IOException e) {
+		    e.printStackTrace ();
+	    }
 
-		setLayout (new BorderLayout ());
-		setLocationByPlatform (true);
-		setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
-		setSize (720, 500);
-		setResizable (false);
-		addWindowListener (new WindowAdapter () {
-			@Override
-			public void windowClosing (WindowEvent e) {
-				mConnection.stopClientConnection ();
-			}
-		});
+	    setLayout (new BorderLayout ());
+	    setLocationByPlatform (true);
+	    setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
+	    setSize (820, 500);
+	    setResizable (false);
+	    addWindowListener (new WindowAdapter () {
+		    @Override
+		    public void windowClosing (WindowEvent e) {
+			    mConnection.stopClientConnection ();
+		    }
+	    });
 
-		JPanel leftPanel = new JPanel ();
-		leftPanel.setBorder (BorderFactory.createEmptyBorder (20, 20, 20, 10));
+	    JPanel leftPanel = new JPanel ();
+	    leftPanel.setBorder (BorderFactory.createEmptyBorder (20, 20, 20, 10));
 
-		mRoomsDataTableModel = new RoomsDataTableModel ();
+	    mRoomsDataTableModel = new RoomsDataTableModel ();
 
-		mRoomsTable = new JTable (mRoomsDataTableModel);
-		mRoomsTable.getTableHeader ().setReorderingAllowed (false);
-		mRoomsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
-		mRoomsTable.getSelectionModel ().addListSelectionListener (new ListSelectionListener () {
-			@Override
-			public void valueChanged (ListSelectionEvent e) {
-				int selectedRow = mRoomsTable.getSelectedRow ();
+	    mRoomsTable = new JTable (mRoomsDataTableModel);
+	    mRoomsTable.getTableHeader ().setReorderingAllowed (false);
+	    mRoomsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
+	    mRoomsTable.getSelectionModel ().addListSelectionListener (new ListSelectionListener () {
+		    @Override
+		    public void valueChanged (ListSelectionEvent e) {
+			    int selectedRow = mRoomsTable.getSelectedRow ();
 				if (selectedRow != -1) {
 					mSelectedRoomId = mRoomsDataTableModel.getId (selectedRow);
-					mUserListModel.setUserNames (mAllRoomUsers.get (mSelectedRoomId));
-					String[] userCount = mRoomsDataTableModel.getValueAt (selectedRow, 1).toString ().split ("/");
-					if ((userCount[0].equals (userCount[1]) || (boolean) mRoomsDataTableModel.getValueAt (selectedRow, 2)) && !mIsInRoom) {
-						mJoinOrLeaveButton.setEnabled (false);
+					List<String> userNames = mAllRoomUsers.get (mSelectedRoomId);
+					if (userNames != null) {
+						mUserListModel.setUserNames (userNames);
+						String[] userCount = mRoomsDataTableModel.getValueAt (selectedRow, 1).toString ().split ("/");
+						if ((userCount[0].equals (userCount[1]) || (boolean) mRoomsDataTableModel.getValueAt (selectedRow, 2)) && !mIsInRoom) {
+							mJoinOrLeaveButton.setEnabled (false);
+						} else {
+							mJoinOrLeaveButton.setEnabled (true);
+						}
 					} else {
-						mJoinOrLeaveButton.setEnabled (true);
+						mSelectedRoomId = -1;
 					}
 				}
 			}
@@ -119,28 +124,39 @@ public class LobbyFrame extends JFrame {
 			}
 		});
 
-		mStartButton = new JButton ("Start");
-		mStartButton.addActionListener (new ActionListener () {
-			@Override
-			public void actionPerformed (ActionEvent e) {
-				mConnection.startRoom ();
-			}
-		});
-		mStartButton.setEnabled (false);
+	    mStartButton = new JButton ("Start");
+	    mStartButton.addActionListener (new ActionListener () {
+		    @Override
+		    public void actionPerformed (ActionEvent e) {
+			    mConnection.startRoom ();
+		    }
+	    });
+	    mStartButton.setEnabled (false);
 
-		roomButtonsPanel.add (mJoinOrLeaveButton);
-		roomButtonsPanel.add (mStartButton);
+	    mFillRoomWithAIButton = new JButton ("Fill AI");
 
-		//		rightPanel.add (mRoomPicture);
-		rightPanel.add (new
+	    mFillRoomWithAIButton.addActionListener (new ActionListener () {
+		    @Override
+		    public void actionPerformed (ActionEvent e) {
+			    mConnection.fillRoomWithAi ();
+		    }
+	    });
+	    mFillRoomWithAIButton.setEnabled (false);
 
-				JScrollPane (mRoomUserList));
-		rightPanel.add (roomButtonsPanel);
+	    roomButtonsPanel.add (mJoinOrLeaveButton);
+	    roomButtonsPanel.add (mStartButton);
+	    roomButtonsPanel.add (mFillRoomWithAIButton);
 
-		add (leftPanel, BorderLayout.LINE_START);
+	    //		rightPanel.add (mRoomPicture);
+	    rightPanel.add (new
 
-		add (rightPanel, BorderLayout.LINE_END);
-	}
+			    JScrollPane (mRoomUserList));
+	    rightPanel.add (roomButtonsPanel);
+
+	    add (leftPanel, BorderLayout.LINE_START);
+
+	    add (rightPanel, BorderLayout.LINE_END);
+    }
 
 	/**
 	 * Ladet die Zimmerdaten
@@ -161,6 +177,12 @@ public class LobbyFrame extends JFrame {
 
 			if (roomData.getRoomId () == mSelectedRoomId) {
 				newSelection = i;
+
+				if (roomData.getUsers ().size () < roomData.getMaxUserCount () && mIsInRoom && !roomData.isRunning ()) {
+					mFillRoomWithAIButton.setEnabled (true);
+				} else {
+					mFillRoomWithAIButton.setEnabled (false);
+				}
 
 				if (roomData.getUsers ().size () == roomData.getMaxUserCount () && mIsInRoom && !roomData.isRunning ()) {
 					mStartButton.setEnabled (true);

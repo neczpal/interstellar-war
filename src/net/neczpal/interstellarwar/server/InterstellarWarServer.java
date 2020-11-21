@@ -1,8 +1,14 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.connection.Command;
-import net.neczpal.interstellarwar.common.game.InterstellarWarCommand;
+import net.neczpal.interstellarwar.common.connection.CommandParamKey;
+import net.neczpal.interstellarwar.common.connection.CommandType;
 import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
+import org.json.JSONObject;
+
+import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandParamKey.*;
+import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandType.REFRESH_WHOLE_MAP;
+import static net.neczpal.interstellarwar.common.game.InterstellarWarCommandType.START_MOVE_SPACESHIP;
+
 
 public class InterstellarWarServer {
 	private InterstellarWarCore mInterstellarWarCore;
@@ -26,13 +32,24 @@ public class InterstellarWarServer {
 	 *
 	 * @param command Der Spiel-Befehl
 	 */
-	public void receive (Command command) {
-		switch ((InterstellarWarCommand) command.data[1]) {
-			case START_MOVE_SPACESHIP:
-				mInterstellarWarCore.startMoveSpaceShip ((int) command.data[2], (int) command.data[3]);
+	public void receive (JSONObject command) {
+		String type = command.getString (GAME_COMMAND_TYPE_KEY);
 
-				mConnection.send (Command.Type.GAME_COMMAND, InterstellarWarCommand.REFRESH_WHOLE_MAP, mInterstellarWarCore.getData ());
+		switch (type) {
+			case START_MOVE_SPACESHIP: {
+				int fromIndex = command.getInt (FROM_ID_KEY);
+				int toIndex = command.getInt (TO_ID_KEY);
+				mInterstellarWarCore.startMoveSpaceShip (fromIndex, toIndex);
+				{
+					JSONObject roomCommand = new JSONObject ();
+					roomCommand.put (CommandParamKey.COMMAND_TYPE_KEY, CommandType.GAME_COMMAND);
+					roomCommand.put (GAME_COMMAND_TYPE_KEY, REFRESH_WHOLE_MAP);
+					roomCommand.put (CommandParamKey.MAP_DATA_KEY, mInterstellarWarCore.getData ());
+
+					mConnection.send (roomCommand);
+				}
 				break;
+			}
 		}
 	}
 

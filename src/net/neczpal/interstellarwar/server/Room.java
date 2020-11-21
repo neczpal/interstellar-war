@@ -1,14 +1,15 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.connection.Command;
-import net.neczpal.interstellarwar.common.connection.RoomData;
+import net.neczpal.interstellarwar.ai.InterstellarWarAI;
+import net.neczpal.interstellarwar.common.connection.CommandParamKey;
 import net.neczpal.interstellarwar.common.game.InterstellarWarCore;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class Room {
 
@@ -16,11 +17,14 @@ public class Room {
 
 	private String mMapFileName;
 
-	private HashMap <Integer, Integer> mConnectionIds = new HashMap <> ();
+	private HashMap<Integer, Integer> mConnectionIds = new HashMap<> ();
 	private int mIndexes;
 
 	private ServerConnection mServerConnection;
 	private InterstellarWarServer mGameServer;
+
+	private List<InterstellarWarAI> mAIClients;
+	private volatile boolean mHasAIClient = false;
 
 	/**
 	 * Erstellt ein Zimmer auf dem Server
@@ -36,6 +40,8 @@ public class Room {
 		mGameServer = new InterstellarWarServer (core, this);
 		mRoomId = 0;
 		mIndexes = 1;
+		mAIClients = new ArrayList<> ();
+		mHasAIClient = false;
 	}
 
 	/**
@@ -57,7 +63,7 @@ public class Room {
 	 *
 	 * @param command Der Befehl
 	 */
-	public void receive (Command command) {
+	public void receive (JSONObject command) {
 		mGameServer.receive (command);
 	}
 
@@ -86,31 +92,20 @@ public class Room {
 	/**
 	 * @return Das Zimmer-Data des Zimmers
 	 */
-	public RoomData getData () {
-		ArrayList <String> mUsers = new ArrayList <> ();
+	public JSONObject getData () {
+		List<String> mUsers = new ArrayList<> ();
 		for (Integer key : mConnectionIds.keySet ()) {
 			mUsers.add (mServerConnection.getUser (key).getName ());
 		}
-		return new RoomData (mRoomId, getMapFantasyName (), mUsers, getMaxUserCount (), isMapRunning ());
-	}
 
-	/**
-	 * Sendet ein Befehl zu den Klienten des Zimmers
-	 *
-	 * @param type Der Typ des Befehls
-	 */
-	public void send (Command.Type type) {
-		send (new Command (type));
-	}
+		JSONObject roomData = new JSONObject ();
+		roomData.put (CommandParamKey.ROOM_ID_KEY, mRoomId);
+		roomData.put (CommandParamKey.MAP_NAME_KEY, getMapFantasyName ());
+		roomData.put (CommandParamKey.USER_LIST_KEY, mUsers);
+		roomData.put (CommandParamKey.MAX_USER_COUNT_KEY, getMaxUserCount ());
+		roomData.put (CommandParamKey.IS_ROOM_RUNNING_KEY, isMapRunning ());
 
-	/**
-	 * Sendet ein Befehl zu den Klient des Zimmers
-	 *
-	 * @param type Der Typ des Befehls
-	 * @param data Der Data des Befehls
-	 */
-	public void send (Command.Type type, Serializable... data) {
-		send (new Command (type, data));
+		return roomData;
 	}
 
 	/**
@@ -118,11 +113,11 @@ public class Room {
 	 *
 	 * @param command Der Befehl
 	 */
-	public void send (Command command) {
-		HashMap <Integer, Client> clients = mServerConnection.getClients ();
-		Iterator <HashMap.Entry <Integer, Client>> iterator = clients.entrySet ().iterator ();
+	public void send (JSONObject command) {
+		HashMap<Integer, Client> clients = mServerConnection.getClients ();
+		Iterator<HashMap.Entry<Integer, Client>> iterator = clients.entrySet ().iterator ();
 		while (iterator.hasNext () && mServerConnection.isAlive ()) {
-			HashMap.Entry <Integer, Client> entry = iterator.next ();
+			HashMap.Entry<Integer, Client> entry = iterator.next ();
 			if (mConnectionIds.containsKey (entry.getKey ())) {
 				if (!entry.getValue ().send (command)) {
 					iterator.remove ();
@@ -134,6 +129,23 @@ public class Room {
 
 
 	//GETTERS, SETTERS
+
+	public boolean hasAIClient () {
+		return mHasAIClient;
+	}
+
+	public void addAIClient (InterstellarWarAI ai) {
+		mHasAIClient = true;
+		mAIClients.add (ai);
+	}
+
+	public void removeAllAIClients () {
+		mHasAIClient = false;
+		for (InterstellarWarAI ai : mAIClients) {
+			ai.stopAI ();
+		}
+		mAIClients.clear ();
+	}
 
 	public int getRoomId () {
 		return mRoomId;
@@ -173,6 +185,10 @@ public class Room {
 
 	public boolean isMapRunning () {
 		return mGameServer.getCore ().isRunning ();
+	}
+
+	public List<Integer> getAllUserIds () {
+		return new ArrayList<> (mConnectionIds.values ());
 	}
 
 	@Override

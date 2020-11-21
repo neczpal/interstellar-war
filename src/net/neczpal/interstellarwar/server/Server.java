@@ -1,6 +1,6 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.connection.RoomData;
+import org.json.JSONObject;
 
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -86,8 +86,8 @@ public class Server extends Thread {
 	 */
 	private void listRooms () {
 		System.out.println ("ROOMS:");
-		for (RoomData room : mServerConnection.getRoomData ()) {
-			System.out.println (room.getRoomId () + ":\t" + room.getMapName () + "\t" + room.getUsers ().size () + "/" + room.getMaxUserCount ());
+		for (JSONObject room : mServerConnection.getAllRoomData ()) {
+			System.out.println (room.getInt ("room-id") + ":\t" + room.getString ("map-name") + "\t" + room.getJSONArray ("users").length () + "/" + room.getInt ("max-user"));
 		}
 	}
 

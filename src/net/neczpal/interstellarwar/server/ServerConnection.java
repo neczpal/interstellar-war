@@ -1,10 +1,9 @@
 package net.neczpal.interstellarwar.server;
 
-import net.neczpal.interstellarwar.common.connection.Command;
-import net.neczpal.interstellarwar.common.connection.RoomData;
+import net.neczpal.interstellarwar.ai.InterstellarWarAI;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +11,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static net.neczpal.interstellarwar.common.connection.CommandParamKey.*;
+import static net.neczpal.interstellarwar.common.connection.CommandType.*;
+
 
 public class ServerConnection extends Thread {
 
@@ -22,15 +25,20 @@ public class ServerConnection extends Thread {
 
 	private ServerSocket mServerSocket;
 
-	private HashMap <Integer, Room> mRooms = new HashMap <> ();
+	private HashMap<Integer, Room> mRooms = new HashMap<> ();
 	private RoomServer mRoomServer;
 
-	private HashMap <Integer, Client> mClients = new HashMap <> ();
-	private List <Client> mTemporaryClients = new ArrayList <> ();
+	private HashMap<Integer, Client> mClients = new HashMap<> ();
+	private List<Client> mTemporaryClients = new ArrayList<> ();
 
-	private HashMap <Integer, User> mUsers = new HashMap <> ();
+	private HashMap<Integer, User> mUsers = new HashMap<> ();
 
 	private volatile boolean mIsRunning = false;
+
+	private final Object clientLock = new Object ();
+	private final Object roomLock = new Object ();
+
+
 	private Logger mLogger = Logger.getLogger (ServerConnection.class.getCanonicalName ());
 
 	/**
@@ -65,6 +73,8 @@ public class ServerConnection extends Thread {
 		addRoom ("map05");
 		addRoom ("map06");
 		addRoom ("map07");
+		addRoom ("map08");
+		addRoom ("map09");
 
 		mRoomServer.start ();
 		mIsRunning = true;
@@ -101,11 +111,13 @@ public class ServerConnection extends Thread {
 		try {
 			Room room = new Room (this, mapName);
 			room.setRoomId (mRoomIdCounter);
-			mRooms.put (mRoomIdCounter++, room);
+			synchronized (roomLock) {
+				mRooms.put (mRoomIdCounter++, room);
+			}
 			mLogger.log (Level.INFO, "New room created with the Map (" + mapName + ")");
 		} catch (IOException ex) {
 			mLogger.log (Level.WARNING, "Server couldn't add Room, because Map (" + mapName + ") couldn't load: " + ex.getMessage ());
-		}
+			}
 	}
 
 	/**
@@ -125,14 +137,16 @@ public class ServerConnection extends Thread {
 	 * @param id Der ID der Benutzer
 	 */
 	public void removeClient (int id) {
-		mClients.remove (id);
-		mLogger.log (Level.INFO, "Client removed with the ID (" + id + ")");
+		synchronized (clientLock) {
+			mClients.remove (id);
+			mLogger.log (Level.INFO, "Client removed with the ID (" + id + ")");
 
-		User user = getUser (id);
-		if (user == null)
-			return;
-		leaveRoom (user);
-		mUsers.remove (user.getId ());
+			User user = getUser (id);
+			if (user == null)
+				return;
+			leaveRoom (user);
+			mUsers.remove (user.getId ());
+		}
 	}
 
 	/**
@@ -153,13 +167,17 @@ public class ServerConnection extends Thread {
 	/**
 	 * @return Ein Liste von dem alle Zimmer-Data auf dem Server
 	 */
-	public ArrayList <RoomData> getRoomData () {
-		ArrayList <RoomData> roomDatas = new ArrayList <> ();
-		for (Room room : mRooms.values ()) {
-			roomDatas.add (room.getData ());
+	public List<JSONObject> getAllRoomData () {
+
+		List<JSONObject> allRoomData = new ArrayList<> ();
+
+		synchronized (roomLock) {
+			for (Room room : mRooms.values ()) {
+				allRoomData.add (room.getData ());
+			}
 		}
 
-		return roomDatas;
+		return allRoomData;
 	}
 
 	/**
@@ -188,19 +206,34 @@ public class ServerConnection extends Thread {
 	 * @param port Das Port der Klient
 	 */
 	private void enterServer (String name, int port) {
-		int tempIndex = findClientByPort (port);
-		Client client = mTemporaryClients.get (tempIndex);
 		int id = mClientIdCounter++;
-		mClients.put (id, client);
-		mTemporaryClients.remove (tempIndex);
+		synchronized (clientLock) {
+			int tempIndex = findClientByPort (port);
+			Client client = mTemporaryClients.get (tempIndex);
+			mClients.put (id, client);
+			mTemporaryClients.remove (tempIndex);
+			User newUser = new User (name, id);
+			mUsers.put (id, newUser);
 
-		User newUser = new User (name, id);
-		mUsers.put (id, newUser);
+			mLogger.log (Level.INFO, "-> User (" + newUser + ") entered the server");
+		}
 
-		sendToId (id, new Command (Command.Type.CONNECTION_READY, id));
-		sendToId (id, Command.Type.LIST_ROOMS, getRoomData ());
+		{
+			JSONObject command = new JSONObject ();
+			command.put (COMMAND_TYPE_KEY, CONNECTION_READY);
+			command.put (USER_ID_KEY, id);
 
-		mLogger.log (Level.INFO, "-> User (" + newUser + ") entered the server");
+			sendToId (id, command);
+		}
+		{
+			JSONObject command = new JSONObject ();
+			command.put (COMMAND_TYPE_KEY, LIST_ROOMS);
+			command.put (USER_ID_KEY, id);
+			command.put (ALL_ROOM_DATA_KEY, getAllRoomData ());
+
+			sendToId (id, command);
+		}
+
 	}
 
 	/**
@@ -224,8 +257,15 @@ public class ServerConnection extends Thread {
 		if (room != null && !room.isFull () && !room.isMapRunning ()) {
 			user.setRoomId (room.getRoomId ());
 			room.addUser (user);
-			sendToId (user.getId (), new Command (Command.Type.MAP_DATA, user.getRoomIndex (), room.getGameServer ().getCore ().getData ()));
+			{
+				JSONObject command = new JSONObject ();
+				command.put (COMMAND_TYPE_KEY, GET_MAP_DATA);
+				command.put (ROOM_INDEX_KEY, user.getRoomIndex ());
+				command.put (MAP_DATA_KEY, room.getGameServer ().getCore ().getData ());
+				command.put (USER_ID_KEY, user.getId ());
 
+				sendToId (user.getId (), command);
+			}
 			listRoom ();
 			mLogger.log (Level.INFO, "-> User (" + user + ") connected to the Room (" + room + ")");
 		} else {
@@ -240,13 +280,28 @@ public class ServerConnection extends Thread {
 	 */
 	private void startRoom (User user) {
 		Room room = getRoom (user.getRoomId ());
-		if (room != null && room.isFull () && !room.isMapRunning ()) {
-			room.send (Command.Type.READY_TO_PLAY, room.getMapFantasyName ());
-			room.startGame ();
-			addRoom (room.getMapName ());
+		if (room != null) {
+			if (!room.isMapRunning ()) {
+				if (room.isFull ()) {
+					{
+						JSONObject command = new JSONObject ();
+						command.put (COMMAND_TYPE_KEY, READY_TO_PLAY);
+						command.put (MAP_NAME_KEY, room.getMapFantasyName ());
 
-			listRoom ();
-			mLogger.log (Level.INFO, "-> User (" + user + ") started the game in the Room (" + room + ")");
+						room.send (command);
+					}
+					room.startGame ();
+					addRoom (room.getMapName ()); // #TODO duplicate maps if ppl leave after the game
+
+					listRoom ();
+					mLogger.log (Level.INFO, "-> User (" + user + ") started the game in the Room (" + room + ")");
+
+				} else {
+					mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not full");
+				}
+			} else {
+				mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not running");
+			}
 		} else {
 			mLogger.log (Level.WARNING, "-> User (" + user + ") couldn't start the game in the Room (" + room + "), because it was not yet full/running/not existing");
 		}
@@ -257,19 +312,36 @@ public class ServerConnection extends Thread {
 	 *
 	 * @param user Der Benutzer
 	 */
-	private void leaveRoom (User user) {
+	public void leaveRoom (User user) {
 		int roomId = user.getRoomId ();
 		if (roomId != 0) {
 			Room room = getRoom (roomId);
 			room.removeUser (user);
+
+			if (room.hasAIClient ()) {
+				room.removeAllAIClients ();
+			}
+
 			if (room.isEmpty () && room.isMapRunning ()) {
 				room.stopGame ();
-				mRooms.remove (roomId);
+				synchronized (roomLock) {
+					mRooms.remove (roomId);
+				}
 			}
 			user.setRoomId (0);
 
 			listRoom ();
 			mLogger.log (Level.INFO, "-> User (" + user + ") left the Room (" + room + ")");
+			}
+	}
+
+	private void fillRoomWithAi (User user) {
+		Room room = getRoom (user.getRoomId ());
+		if (room != null) {
+			int numberOfAIs = room.getMaxUserCount () - room.getUserCount ();
+			for (int i = 0; i < numberOfAIs; i++) {
+				room.addAIClient (new InterstellarWarAI ("localhost", "AI[" + i + "]", room.getRoomId ()));
+			}
 		}
 	}
 
@@ -279,10 +351,14 @@ public class ServerConnection extends Thread {
 	 * @param user    Der Benutzer
 	 * @param command Der Spiel-Befehl
 	 */
-	private void gameCommand (User user, Command command) {
-		Room room = getRoom (user.getRoomId ());
-		mLogger.log (Level.INFO, "-> Received GameCommand (" + command + ")from User (" + user + ") in the Room (" + room + ")");
-		room.receive (command);
+	private void gameCommand (User user, JSONObject command) {
+		if (user != null) {
+			Room room = getRoom (user.getRoomId ());
+			mLogger.log (Level.INFO, "-> Received GameCommand (" + command + ")from User (" + user + ") in the Room (" + room + ")");
+			if (room != null) {
+				room.receive (command);
+			}
+		}
 	}
 
 	/**
@@ -291,28 +367,50 @@ public class ServerConnection extends Thread {
 	 * @param command     Der Befehl
 	 * @param currentPort Das Port der Benutzer
 	 */
-	public void receive (Command command, int currentPort) {
-		switch (command.type) {
-			case ENTER_SERVER:
-				enterServer ((String) command.data[1], currentPort);
+	public void receive (JSONObject command, int currentPort) {
+		String type = command.getString (COMMAND_TYPE_KEY);
+
+		switch (type) {
+			case ENTER_SERVER: {
+				String name = command.getString (USER_NAME_KEY);
+				enterServer (name, currentPort);
 				break;
-			case EXIT_SERVER:
-				exitServer (getUser (command.data[0]));
+			}
+			case EXIT_SERVER: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				exitServer (getUser (userId));
 				break;
-			case LEAVE_ROOM:
-				leaveRoom (getUser (command.data[0]));
+			}
+			case LEAVE_ROOM: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				leaveRoom (getUser (userId));
 				break;
-			case ENTER_ROOM:
-				enterRoom (getUser (command.data[0]), getRoom (command.data[1]));
+			}
+			case ENTER_ROOM: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				Integer roomId = command.getInt (ROOM_ID_KEY);
+				enterRoom (getUser (userId), getRoom (roomId));
 				break;
-			case START_ROOM:
-				startRoom (getUser (command.data[0]));
+			}
+			case FILL_ROOM_WITH_AI: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				fillRoomWithAi (getUser (userId));
 				break;
-			case GAME_COMMAND:
-				gameCommand (getUser (command.data[0]), command);
+			}
+			case START_ROOM: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				startRoom (getUser (userId));
 				break;
+			}
+			case GAME_COMMAND: {
+				Integer userId = command.getInt (USER_ID_KEY);
+//				JSONObject gameCommand = command.getJSONObject(InterstellarWarCommandParamKey.GAME_COMMAND_KEY);
+				gameCommand (getUser (userId), command);
+				break;
+			}
 		}
 	}
+
 
 	//SEND
 
@@ -320,30 +418,34 @@ public class ServerConnection extends Thread {
 	 * Sendet die Zimmer-Data zu den Benutzern
 	 */
 	public void listRoom () {
-		ArrayList <RoomData> roomDatas = getRoomData ();
-		send (Command.Type.LIST_ROOMS, getRoomData ());
-		mLogger.log (Level.INFO, "<- Sending RoomDatas Size(" + roomDatas.size () + ")");
+		List<JSONObject> allRoomData = getAllRoomData ();
+		{
+			JSONObject command = new JSONObject ();
+			command.put (COMMAND_TYPE_KEY, LIST_ROOMS);
+			command.put (ALL_ROOM_DATA_KEY, allRoomData);
+
+			send (command);
+		}
+		mLogger.log (Level.INFO, "Clients Size(" + mClients.size () + ")");
+		mLogger.log (Level.INFO, "<- Sending RoomDatas Size(" + allRoomData.size () + ")");
 	}
 
-	/**
-	 * Sendet ein Befehl zu dem Benutzer
-	 *
-	 * @param id   Das ID der Benutzer
-	 * @param type Das Typ der Befehl
-	 */
-	public void sendToId (int id, Command.Type type) {
-		sendToId (id, new Command (type));
-	}
+	public void removeAIsIfNoMoreHumanPlaying (Room room) {
+		if (!room.isEmpty ()) {
+			boolean shouldRemove = true;
+			List<Integer> userIds = room.getAllUserIds ();
+			for (Integer userId : userIds) {
+				User user = getUser (userId);
+				if (!user.getName ().contains ("AI")) {
+					shouldRemove = false;
+					break;
+				}
+			}
 
-	/**
-	 * Sendet ein Befehl zu dem Benutzer
-	 *
-	 * @param id   Das ID der Benutzer
-	 * @param type Das Typ der Befehl
-	 * @param data Das Data der Befehl
-	 */
-	public void sendToId (int id, Command.Type type, Serializable... data) {
-		sendToId (id, new Command (type, data));
+			if (shouldRemove) {
+				room.removeAllAIClients ();
+			}
+		}
 	}
 
 	/**
@@ -352,7 +454,7 @@ public class ServerConnection extends Thread {
 	 * @param id      Das ID der Benutzer
 	 * @param command Der Befehl
 	 */
-	public void sendToId (int id, Command command) {
+	public void sendToId (int id, JSONObject command) {
 		Client client = mClients.get (id);
 		if (client != null && !client.send (command)) {
 			removeClient (id);
@@ -362,34 +464,17 @@ public class ServerConnection extends Thread {
 	/**
 	 * Sender ein Befehl zu den allen Benutzern
 	 *
-	 * @param type Das Typ der Befehl
-	 */
-	public void send (Command.Type type) {
-		send (new Command (type));
-	}
-
-	/**
-	 * Sender ein Befehl zu den allen Benutzern
-	 *
-	 * @param type Das Typ der Befehl
-	 * @param data Das Data der Befehl
-	 */
-	public void send (Command.Type type, Serializable... data) {
-		send (new Command (type, data));
-	}
-
-	/**
-	 * Sender ein Befehl zu den allen Benutzern
-	 *
 	 * @param command Der Befehl
 	 */
-	public synchronized void send (Command command) {
-		Iterator <HashMap.Entry <Integer, Client>> iterator = mClients.entrySet ().iterator ();
-		while (iterator.hasNext () && mIsRunning) {
-			HashMap.Entry <Integer, Client> entry = iterator.next ();
-			if (!entry.getValue ().send (command)) {
-				iterator.remove ();
-				removeClient (entry.getKey ());
+	public void send (JSONObject command) {
+		synchronized (clientLock) {
+			Iterator<HashMap.Entry<Integer, Client>> iterator = mClients.entrySet ().iterator ();
+			while (iterator.hasNext () && mIsRunning) {
+				HashMap.Entry<Integer, Client> entry = iterator.next ();
+				if (!entry.getValue ().send (command)) {
+					iterator.remove ();
+					removeClient (entry.getKey ());
+				}
 			}
 		}
 	}
@@ -400,4 +485,5 @@ public class ServerConnection extends Thread {
 	public HashMap <Integer, Client> getClients () {
 		return mClients;
 	}
+
 }

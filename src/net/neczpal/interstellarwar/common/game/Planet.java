@@ -2,20 +2,25 @@ package net.neczpal.interstellarwar.common.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Planet implements Serializable {
 	public static final int PLANET_TYPES = 18;
 	private static final long serialVersionUID = 2683452581122892189L;
 
-	private float mX;
-	private float mY;
-	private float mRadius;
+	private int mId;
+
+	private double mX;
+	private double mY;
+	private double mRadius;
 
 	private int mTextureIndex;
 
 	private int mOwnedBy;
 	private int mUnitsNumber;
-	private ArrayList <Planet> mNeighbors;
+
+	private List<Planet> mNeighbors;
 
 
 	/**
@@ -27,8 +32,8 @@ public class Planet implements Serializable {
 	 * @param ownedBy     Die Nummer von Spieler, die diesem Planet dominiert
 	 * @param unitsNumber Die Anzahl der Einheit auf dem Planet
 	 */
-	Planet (float x, float y, float radius, int ownedBy, int unitsNumber) {
-		this (x, y, radius, ownedBy, unitsNumber, (int) (Math.random () * PLANET_TYPES));
+	Planet (int id, double x, double y, double radius, int ownedBy, int unitsNumber) {
+		this (id, x, y, radius, ownedBy, unitsNumber, (int) (Math.random () * PLANET_TYPES));
 	}
 
 	/**
@@ -41,15 +46,16 @@ public class Planet implements Serializable {
 	 * @param unitsNumber Die Anzahl der Einheit auf dem Planet
 	 * @param tex         Die Texture des Planets
 	 */
-	Planet (float x, float y, float radius, int ownedBy, int unitsNumber, int tex) {
+	Planet (int id, double x, double y, double radius, int ownedBy, int unitsNumber, int tex) {
 		mTextureIndex = tex;
 
+		mId = id;
 		mX = x;
 		mY = y;
 		mRadius = radius;
 		mUnitsNumber = unitsNumber;
 		mOwnedBy = ownedBy;
-		mNeighbors = new ArrayList <> ();
+		mNeighbors = new ArrayList<> ();
 	}
 
 	/**
@@ -91,8 +97,8 @@ public class Planet implements Serializable {
 	 * @param p der andere Planet
 	 * @return Die Entfernung von dem anderen Planet
 	 */
-	public float distance (Planet p) {
-		return (float) Math.sqrt (Math.pow (p.getX () - getX (), 2) + Math.pow (p.getY () - getY (), 2));
+	public double distance (Planet p) {
+		return Math.sqrt (Math.pow (p.getX () - getX (), 2) + Math.pow (p.getY () - getY (), 2));
 	}
 
 	/**
@@ -100,7 +106,7 @@ public class Planet implements Serializable {
 	 * @param py Position auf dem Y-Achse
 	 * @return Entscheidet ob ein Punkt (px, py) innerhalb ist
 	 */
-	public boolean isInside (float px, float py) {
+	public boolean isInside (double px, double py) {
 		return Math.pow (px - mX, 2) + Math.pow ((py - mY), 2) <= mRadius * mRadius;
 	}
 
@@ -114,15 +120,15 @@ public class Planet implements Serializable {
 
 	//SETTER, GETTERS
 
-	public float getX () {
+	public double getX () {
 		return mX;
 	}
 
-	public float getY () {
+	public double getY () {
 		return mY;
 	}
 
-	public float getRadius () {
+	public double getRadius () {
 		return mRadius;
 	}
 
@@ -142,4 +148,46 @@ public class Planet implements Serializable {
 		return mTextureIndex;
 	}
 
+	public void setTextureIndex (int textureIndex) {
+		this.mTextureIndex = textureIndex;
+	}
+
+	public List<Planet> getNeighbors () {
+		return mNeighbors;
+	}
+
+	public void setX (double x) {
+		this.mX = x;
+	}
+
+	public void setY (double y) {
+		this.mY = mY;
+	}
+
+	public void setRadius (double radius) {
+		this.mRadius = radius;
+	}
+
+	public void setOwnedBy (int ownedBy) {
+		this.mOwnedBy = ownedBy;
+	}
+
+	public int getId () {
+		return mId;
+	}
+
+	@Override
+	public boolean equals (Object o) {
+		if (this == o) return true;
+		if (o == null || getClass () != o.getClass ()) return false;
+		Planet planet = (Planet) o;
+		return Double.compare (planet.mX, mX) == 0 &&
+				Double.compare (planet.mY, mY) == 0 &&
+				Double.compare (planet.mRadius, mRadius) == 0;
+	}
+
+	@Override
+	public int hashCode () {
+		return Objects.hash (mX, mY, mRadius);
+	}
 }

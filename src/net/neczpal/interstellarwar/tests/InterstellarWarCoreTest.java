@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class InterstellarWarCoreTest {
 	private InterstellarWarCore mCore;
@@ -36,19 +36,19 @@ public class InterstellarWarCoreTest {
 
 	@Test
 	public void testCapturedPlanetSpawnUnit () throws Exception {
-		ArrayList <Planet> planets = mCore.getPlanets ();
+		List<Planet> planets = mCore.getPlanets ();
 		int selectedPlanetIndex = 0;
 
 		Planet selectedPlanet = planets.get (selectedPlanetIndex);
 		int lastUnitsNumber = selectedPlanet.getUnitsNumber ();
 
-		Thread.sleep (1600);
+		Thread.sleep (1900);
 		Assert.assertEquals ("Unit spawned", lastUnitsNumber + 1, selectedPlanet.getUnitsNumber ());
 	}
 
 	@Test
 	public void testUncapturedPlanetNotSpawnUnit () throws Exception {
-		ArrayList <Planet> planets = mCore.getPlanets ();
+		List<Planet> planets = mCore.getPlanets ();
 		int selectedPlanetIndex = 1;
 
 		Planet selectedPlanet = planets.get (selectedPlanetIndex);
@@ -60,7 +60,7 @@ public class InterstellarWarCoreTest {
 
 	@Test
 	public void testSpaceShipMove () throws Exception {
-		ArrayList <Planet> planets = mCore.getPlanets ();
+		List<Planet> planets = mCore.getPlanets ();
 		int selectedFromPlanetIndex = 0;
 		int selectedToPlanetIndex = 1;
 
