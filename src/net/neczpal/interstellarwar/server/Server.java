@@ -87,7 +87,7 @@ public class Server extends Thread {
 	private void listRooms () {
 		System.out.println ("ROOMS:");
 		for (JSONObject room : mServerConnection.getAllRoomData ()) {
-			System.out.println (room.getInt ("room-id") + ":\t" + room.getString ("map-name") + "\t" + room.getJSONArray ("users").length () + "/" + room.getInt ("max-user"));
+			System.out.println (room.getInt ("room-id") + ":\t" + room.getString ("map-name") + "\t" + room.getJSONArray ("user-list").length () + "/" + room.getInt ("max-user-count"));
 		}
 	}
 
