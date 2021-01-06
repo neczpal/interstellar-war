@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="DesktopUI" type="Application" factoryName="Application" singleton="false" nameIsGenerated="true">
+  <configuration default="false" name="DesktopUI-OSX" type="Application" factoryName="Application" singleton="false">
     <option name="MAIN_CLASS_NAME" value="net.neczpal.interstellarwar.desktop.ui.DesktopUI" />
     <module name="interstellar-war" />
     <option name="VM_PARAMETERS" value="-Djava.library.path=natives/osx" />
