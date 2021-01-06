@@ -22,11 +22,6 @@ public class InterstellarWarClient {
 
     // RECEIVE
 
-    /**
-     * Bekommt ein Befehl
-     *
-     * @param command Der Befehl
-     */
     public func receive (_ command : JSON) {
         let type = command[PK.GAME_COMMAND_TYPE_KEY].string;
         
@@ -54,9 +49,6 @@ public class InterstellarWarClient {
         mClientConnection.send (command);
     }
 
-    /**
-     * Verlasst das Zimmer
-     */
     public func leaveRoom () {
         mClientConnection.leaveRoom ();
     }
@@ -70,4 +62,5 @@ public class InterstellarWarClient {
     public func getCore () -> InterstellarWarCore {
         return mInterstellarWarCore;
     }
+    
 }

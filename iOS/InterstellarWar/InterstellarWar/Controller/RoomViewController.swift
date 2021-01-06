@@ -183,11 +183,18 @@ class RoomViewController: UITableViewController, UserInterface {
     }
     
     // MARK: - Navigation
-//
-//    // In a storyboard-based application, you will often want to do a little preparation before navigation
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        
-//    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "ShowGame") {
+            let gameViewController = segue.destination as! GameViewController
+            let mapName = sender as! String
+            
+            gameViewController.navigationItem.title = mapName
+            
+            if let con = sharedConnection {
+                con.setUserInterface(gameViewController)
+            }
+        }
+    }
 
     
     func connectionReady() {
@@ -228,7 +235,8 @@ class RoomViewController: UITableViewController, UserInterface {
     func startGame(_ mapName: String) {
         
         DispatchQueue.main.async {
-            self.performSegue (withIdentifier: "ShowGame", sender: self)
+            
+            self.performSegue (withIdentifier: "ShowGame", sender: mapName)
         }
     }
     

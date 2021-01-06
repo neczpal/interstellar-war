@@ -10,24 +10,36 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-class GameViewController: UIViewController {
-
+class GameViewController: UIViewController, UserInterface{
+    
+    private var mGameScene : GameScene?
+    
+//    var mCore : InterstellarWarCore?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         if let view = self.view as! SKView? {
             // Load the SKScene from 'GameScene.sks'
-            if let scene = SKScene(fileNamed: "GameScene") {
+//            if let scene = GameScene(fileNamed: "GameScene")
+            
+            if let scene = GameScene(fileNamed: "GameScene") {
                 // Set the scale mode to scale to fit the window
                 scene.scaleMode = .aspectFill
                 scene.size = self.view.frame.size
+                
+                scene.mInterstellarWarClient = sharedConnection!.getGameClient()
+                scene.mCore = scene.mInterstellarWarClient!.getCore()
+                scene.mCore!.start()
+                scene.buildUp()
+                
+                mGameScene = scene
                 // Present the scene
                 view.presentScene(scene)
+                
             }
             
-            view.ignoresSiblingOrder = true
-            
+            view.ignoresSiblingOrder = false
             view.showsFPS = true
             view.showsNodeCount = true
         }
@@ -46,6 +58,48 @@ class GameViewController: UIViewController {
     }
 
     override var prefersStatusBarHidden: Bool {
-        return true
+        return false
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        mGameScene!.destroy()
+//            if isMovingFromParent {
+//                if let viewControllers = self.navigationController?.viewControllers {
+//                    if (viewControllers.count >= 1) {
+//                        let previousViewController = viewControllers[viewControllers.count-2] as! LoginViewController
+//                        // whatever you want to do
+//                        if let con = sharedConnection {
+//                            con.leaveRoom()
+//                            con.setUserInterface(previousViewController)
+//                        }
+//                    }
+//                }
+//            }
+        }
+    
+    func connectionReady() {
+//        <#code#>
+    }
+    
+    func connectionDropped() {
+//        <#code#>
+    }
+    
+    func listRooms(_ roomData: [JSON]) {
+//        <#code#>
+    }
+    
+    func setIsInRoom(_ isInRoom: Bool) {
+//        <#code#>
+    }
+    
+    func startGame(_ mapName: String) {
+//        <#code#>
+    }
+    
+    func stopGame() {
+//        <#code#>
     }
 }

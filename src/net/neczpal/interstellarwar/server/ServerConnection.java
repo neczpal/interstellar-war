@@ -426,6 +426,7 @@ public class ServerConnection extends Thread {
 
 			send (command);
 		}
+		mLogger.log (Level.INFO, "Clients Size(" + mClients.size () + ")");
 		mLogger.log (Level.INFO, "<- Sending RoomDatas Size(" + allRoomData.size () + ")");
 	}
 

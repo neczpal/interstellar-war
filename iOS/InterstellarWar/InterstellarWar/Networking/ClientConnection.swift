@@ -12,8 +12,8 @@ import Foundation
 
 public class ClientConnection {
 
-    private var mUserInterface : UserInterface;
-//    private InterstellarWarClient mGameClient; #TODO
+    private var mUserInterface : UserInterface
+    private var mGameClient : InterstellarWarClient?
 
     private var mConnectionId : Int = -1;
     private var mRoomIndex : Int = -1;
@@ -25,10 +25,6 @@ public class ClientConnection {
     var mIn : InputStream?
     var mOut : OutputStream?
     
-    enum ConnectionError : Error {
-        case wrongAddress
-    }
-
     init (adresse : String, userName : String, ui : UserInterface) throws {
         mUserName = userName;
         mIsRunning = false;
@@ -39,29 +35,25 @@ public class ClientConnection {
         
         Stream.getStreamsToHost(withName: host, port: port, inputStream: &mIn, outputStream: &mOut)
         
-        if (mIn == nil || mOut == nil) {
-            throw ConnectionError.wrongAddress
-        }
-        
-        
         mIn!.open()
         mOut!.open()
         
         enterServer ();
 
-        let queue = DispatchQueue(label: "com.aneczpal.interstellar", qos: .background)
-        
-        queue.async {
-            self.run()
-        }
-        
-//        this.start ();
+        self.start()
         
     }
 
-    private  let bufferSize = 1024;
+    public func start () {
+        let queue = DispatchQueue(label: "com.aneczpal.interstellar.connection", qos: .default)
+        queue.async {
+            self.run()
+        }
+    }
+    
+    private  let bufferSize = 4048;
 
-    public func run () {
+    private func run () {
         mIsRunning = true;
 
 //        try {
@@ -72,11 +64,19 @@ public class ClientConnection {
                 
                 
                 let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+                defer { buffer.deallocate() }
                 while (mIn!.hasBytesAvailable) {
-                    let numberOfBytes = mIn!.read(buffer, maxLength: bufferSize)
-                    data.append(buffer, count: numberOfBytes);
+                    let read = mIn!.read(buffer, maxLength: bufferSize)
+                    if (read == 0) {
+                        break  // EOF
+                    } else if read < 0 {
+                        print("ERROR IN INPUTSTREAM")
+                        break
+                    }
+                    
+                    data.append(buffer, count: read);
                 }
-                
+//                buffer.deallocate()
                 let string = String(data: data, encoding: String.Encoding.utf8)!
                 
                 //Split strings to lines
@@ -87,9 +87,10 @@ public class ClientConnection {
                     let line = String(linesub)
                     if(!line.isEmpty) {
                         print("Read line: \(line)")
-                        let jsonObject = JSON(parseJSON: line);
-                        
-                        self.receive (jsonObject);
+                        if "}" == line.last && "{" == line.first {
+                            let jsonObject = JSON(parseJSON: line)
+                            self.receive (jsonObject);
+                        }
                     }
                 }
                 
@@ -136,25 +137,30 @@ public class ClientConnection {
     }
 
     private func loadMap (_ roomIndex : Int, _ mapData : JSON) {
-//        mRoomIndex = roomIndex;
-//        InterstellarWarCore core = new InterstellarWarCore (mapData);
-//        mGameClient = new InterstellarWarClient (core, this);
+        mRoomIndex = roomIndex;
+        let core = InterstellarWarCore (jsonData: mapData);
+        mGameClient = InterstellarWarClient (interstellarWarCore: core, clientConnection: self);
+        
         mUserInterface.setIsInRoom (true);
         print("-> MapData loaded. RoomIndex (" + String(mRoomIndex) + ")");
     }
 
     private func startGame (_ mapName: String) {
         mUserInterface.startGame (mapName);
-//        mGameClient.getCore ().start (); ### TODO TODO TODO
+//        mGameClient!.getCore ().start () #TODO
         print("-> Started the game with Map (" + mapName + ")");
     }
 
     private func gameCommand (_ command : JSON) {
-//        mGameClient.receive (command);//### TODO TODO TODO
-        print("-> Received GameCommand (" + command.rawString()! + ")");
+        mGameClient!.receive (command)
+//        print("-> Received GameCommand (" + command.rawString()! + ")");
     }
 
     public func receive (_ command : JSON) {
+        if !command.exists() {
+            return;
+        }
+        
         let type = command[CommandParamKey.COMMAND_TYPE_KEY].string!
         
         
@@ -258,6 +264,7 @@ public class ClientConnection {
         
         mOut!.write(UnsafePointer<UInt8>(encodedDataArray), maxLength: encodedDataArray.count)
         
+        
 //            if (!mSocket.isClosed ()) {
 //                mOut.write (command.toString () + "\n");
 //                mOut.flush ();
@@ -285,10 +292,10 @@ public class ClientConnection {
         return mRoomIndex;
     }
 
-//    public InterstellarWarClient getGameClient () {
-//        return mGameClient;
-//    }
-//
+    public func getGameClient () -> InterstellarWarClient? {
+        return mGameClient;
+    }
+
     func setUserInterface (_ userInterface : UserInterface) {
         mUserInterface = userInterface;
     }

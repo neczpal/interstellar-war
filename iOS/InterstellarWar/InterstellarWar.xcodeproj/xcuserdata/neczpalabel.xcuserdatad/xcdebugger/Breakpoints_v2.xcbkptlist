@@ -14,9 +14,9 @@
             filePath = "InterstellarWar/Networking/ClientConnection.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "129"
-            endingLineNumber = "129"
-            landmarkName = "connectionReady(_:)"
+            startingLineNumber = "140"
+            endingLineNumber = "140"
+            landmarkName = "loadMap(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -50,38 +50,6 @@
             endingLineNumber = "262"
             landmarkName = "connectionDropped()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "4D6A4663-F83B-4D81-BD75-CF809AFB2171 - 525a6011851495cc"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "InterstellarWar.LoginViewController.connectionDropped() -&gt; ()"
-                  moduleName = "InterstellarWar"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/neczpalabel/IdeaProjects/interstellar-war/iOS/InterstellarWar/InterstellarWar/View/Controllers/LoginViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "256"
-                  endingLineNumber = "256"
-                  offsetFromSymbolStart = "150">
-               </Location>
-               <Location
-                  uuid = "4D6A4663-F83B-4D81-BD75-CF809AFB2171 - 2d2bc7246538d1b8"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 () -&gt; () in InterstellarWar.LoginViewController.connectionDropped() -&gt; ()"
-                  moduleName = "InterstellarWar"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/neczpalabel/IdeaProjects/interstellar-war/iOS/InterstellarWar/InterstellarWar/View/Controllers/LoginViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "257"
-                  endingLineNumber = "257"
-                  offsetFromSymbolStart = "57">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -327,22 +295,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7F11D72C-E8D5-4659-803F-2B89CB203102"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "InterstellarWar/Networking/ClientConnection.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "171"
-            endingLineNumber = "171"
-            landmarkName = "receive(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "6DA1F348-D774-4127-B15A-1E943EC46CB8"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -369,6 +321,38 @@
             startingLineNumber = "277"
             endingLineNumber = "277"
             landmarkName = "listRooms(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9F2F6F5A-9447-4EB9-8CEA-DDCA9D32E154"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "InterstellarWar/Controller/GameViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1D201E5B-5AAD-4766-A786-088A35BBD464"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "InterstellarWar/Model/game/InterstellarWarCore.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "308"
+            endingLineNumber = "308"
+            landmarkName = "moveSpaceShips()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
