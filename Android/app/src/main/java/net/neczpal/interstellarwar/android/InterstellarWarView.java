@@ -28,7 +28,7 @@ public class InterstellarWarView extends SurfaceView {
 	private PointF mViewPort;
 	private RectF[] mPlanetsDimens;
 	private RectF mBackgroundDimens;
-	private float mZoom = 1f;//#TODO ZOOM
+	private float mZoom = 2f;//#TODO ZOOM
 
 	private int mWidth = 400;
 	private int mHeight = 400;
@@ -100,10 +100,10 @@ public class InterstellarWarView extends SurfaceView {
 		for (int i = 0; i < planets.size (); i++) {
 			Planet planet = planets.get (i);
 			mPlanetsDimens[i] = new RectF (
-					(float) (planet.getX () - planet.getRadius () / 2),
-					(float) (planet.getY () - planet.getRadius () / 2),
-					(float) (planet.getX () + planet.getRadius () / 2),
-					(float) (planet.getY () + planet.getRadius () / 2));
+					(float) (planet.getX () - planet.getRadius () / 2) * mZoom,
+					(float) (planet.getY () - planet.getRadius () / 2) * mZoom,
+					(float) (planet.getX () + planet.getRadius () / 2) * mZoom,
+					(float) (planet.getY () + planet.getRadius () / 2) * mZoom);
 		}
 	}
 
@@ -165,8 +165,8 @@ public class InterstellarWarView extends SurfaceView {
 	private void drawSpaceShip (Canvas canvas, SpaceShip spaceShip) {
 		paint.setColor (colors[spaceShip.getOwnedBy ()]);
 		Planet from = spaceShip.getFromPlanet ();
-		canvas.drawCircle ((float) (from.getX () + spaceShip.getCurrentTick () * spaceShip.getVx ()),
-				(float) (from.getY () + spaceShip.getCurrentTick () * spaceShip.getVy ()), 5, paint);
+		canvas.drawCircle ((float) (from.getX () + spaceShip.getCurrentTick () * spaceShip.getVx ())  * mZoom ,
+				(float) (from.getY () + spaceShip.getCurrentTick () * spaceShip.getVy ())  * mZoom, 5 * mZoom, paint);
 	}
 
 	@Override
