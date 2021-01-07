@@ -5,10 +5,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -345,6 +342,40 @@ public class ServerConnection extends Thread {
 		}
 	}
 
+	private void sendChatMessage (User user, String message) {
+		Room room = getRoom(user.getRoomId());
+
+		List<Integer> recipients;
+
+		if (room == null) {
+		    recipients = new ArrayList<>();
+		    Set<Integer> ids = mUsers.keySet();
+
+		    for(Integer id : ids) {
+		    	if (mUsers.get(id).getRoomId() != 0) {
+					recipients.add(id);
+				}
+			}
+
+		} else {
+		    recipients = room.getAllUserIds();
+        }
+
+		for (Integer id : recipients) {
+
+			JSONObject command = new JSONObject ();
+
+			command.put (COMMAND_TYPE_KEY, SEND_CHAT_COMMAND);
+			command.put (ROOM_INDEX_KEY, user.getRoomIndex ());
+			command.put (USER_ID_KEY, user.getId ());
+			command.put (USER_NAME_KEY, user.getName());
+			command.put (MESSAGE_KEY, message);
+
+			sendToId (id, command);
+		}
+
+	}
+
 	/**
 	 * Bekommt ein Spiel-Befehl von dem Benutzer
 	 *
@@ -402,6 +433,14 @@ public class ServerConnection extends Thread {
 				startRoom (getUser (userId));
 				break;
 			}
+			case SEND_CHAT_COMMAND: {
+				Integer userId = command.getInt (USER_ID_KEY);
+				String message = command.getString (MESSAGE_KEY);
+
+				sendChatMessage (getUser (userId), message);
+				break;
+			}
+
 			case GAME_COMMAND: {
 				Integer userId = command.getInt (USER_ID_KEY);
 //				JSONObject gameCommand = command.getJSONObject(InterstellarWarCommandParamKey.GAME_COMMAND_KEY);

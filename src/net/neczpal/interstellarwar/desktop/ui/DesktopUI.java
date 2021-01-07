@@ -14,7 +14,7 @@ import java.util.List;
 
 public class DesktopUI implements UserInterface {
 	private LoginFrame mLoginFrame;
-	private LobbyFrame mRoomsFrame;
+	private LobbyFrame mLobbyFrame;
 	private GameFrame mGameFrame;
 	private ClientConnection mConnection;
 
@@ -42,15 +42,15 @@ public class DesktopUI implements UserInterface {
 	@Override
 	public void connectionReady () {
 		mLoginFrame.dispose ();
-		mRoomsFrame = new LobbyFrame (mConnection);
-		mRoomsFrame.setVisible (true);
+		mLobbyFrame = new LobbyFrame (mConnection);
+		mLobbyFrame.setVisible (true);
 	}
 
 	@Override
 	public void connectionDropped () {
 		stopGame ();
 
-		mRoomsFrame.dispose ();
+		mLobbyFrame.dispose ();
 		openLogin ();
 		JOptionPane.showMessageDialog (mLoginFrame, "Disconnected from the server!", "Connection lost!", JOptionPane.ERROR_MESSAGE);
 
@@ -64,12 +64,12 @@ public class DesktopUI implements UserInterface {
 			allRoomData.add (new RoomData (jsonAllRoomData.getJSONObject (i)));
 		}
 
-		mRoomsFrame.loadRoomData (allRoomData);
+		mLobbyFrame.loadRoomData (allRoomData);
 	}
 
 	@Override
 	public void setIsInRoom (boolean isInRoom) {
-		mRoomsFrame.setIsInRoom (isInRoom);
+		mLobbyFrame.setIsInRoom (isInRoom);
 	}
 
 	@Override
@@ -84,6 +84,11 @@ public class DesktopUI implements UserInterface {
 			mGameFrame.stopGameFrame ();
 			mGameFrame = null;
 		}
+	}
+
+	@Override
+	public void receiveMessage(int uid, String uname, int roomIndex, String message) {
+		mLobbyFrame.receiveMessage(uid, uname, roomIndex, message);
 	}
 
 	/**

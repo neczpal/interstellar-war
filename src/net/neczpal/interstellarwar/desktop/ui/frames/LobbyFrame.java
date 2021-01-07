@@ -3,6 +3,7 @@ package net.neczpal.interstellarwar.desktop.ui.frames;
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.common.connection.RoomData;
 import net.neczpal.interstellarwar.desktop.Loader;
+import net.neczpal.interstellarwar.desktop.ui.models.MessageListModel;
 import net.neczpal.interstellarwar.desktop.ui.models.RoomsDataTableModel;
 import net.neczpal.interstellarwar.desktop.ui.models.UserListModel;
 
@@ -17,18 +18,27 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 public class LobbyFrame extends JFrame {
 	private JTable mRoomsTable;
+
 	private JList mRoomUserList;
+
 	private JButton mJoinOrLeaveButton;
 	private JButton mStartButton;
 	private JButton mFillRoomWithAIButton;
 
+	private JList mMessageList;
+	private JTextField mMessageTextField;
+	private JButton mSendMessageButton;
+
 	private RoomsDataTableModel mRoomsDataTableModel;
 	private UserListModel mUserListModel;
+	private MessageListModel mMessageListModel;
 
 	private ClientConnection mConnection;
 
@@ -56,7 +66,7 @@ public class LobbyFrame extends JFrame {
 	    setLayout (new BorderLayout ());
 	    setLocationByPlatform (true);
 	    setDefaultCloseOperation (WindowConstants.EXIT_ON_CLOSE);
-	    setSize (820, 500);
+	    setSize (876, 524);
 	    setResizable (false);
 	    addWindowListener (new WindowAdapter () {
 		    @Override
@@ -66,7 +76,7 @@ public class LobbyFrame extends JFrame {
 	    });
 
 	    JPanel leftPanel = new JPanel ();
-	    leftPanel.setBorder (BorderFactory.createEmptyBorder (20, 20, 20, 10));
+	    leftPanel.setBorder (BorderFactory.createEmptyBorder (20, 20, 20, 5));
 
 	    mRoomsDataTableModel = new RoomsDataTableModel ();
 
@@ -100,14 +110,14 @@ public class LobbyFrame extends JFrame {
 		leftPanel.add (new JScrollPane (mRoomsTable));
 
 		JPanel rightPanel = new JPanel ();
-		rightPanel.setBorder (BorderFactory.createEmptyBorder (20, 10, 20, 20));
+		rightPanel.setBorder (BorderFactory.createEmptyBorder (20, 5, 20, 20));
 		rightPanel.setLayout (new GridLayout (3, 1));
 
 		mUserListModel = new UserListModel ();
 
 		mRoomUserList = new JList <> (mUserListModel);
 		mRoomUserList.setEnabled (false);
-		mRoomUserList.setFixedCellWidth (190);
+		mRoomUserList.setFixedCellWidth (180);
 
 		JPanel roomButtonsPanel = new JPanel ();
 		roomButtonsPanel.setLayout (new FlowLayout ());
@@ -147,11 +157,41 @@ public class LobbyFrame extends JFrame {
 	    roomButtonsPanel.add (mStartButton);
 	    roomButtonsPanel.add (mFillRoomWithAIButton);
 
-	    //		rightPanel.add (mRoomPicture);
-	    rightPanel.add (new
 
-			    JScrollPane (mRoomUserList));
+		JPanel chatPanel = new JPanel ();
+		chatPanel.setLayout(new GridLayout(3,2));
+
+		mMessageListModel = new MessageListModel();
+
+		mMessageList = new JList<>(mMessageListModel);
+		mMessageList.setFixedCellWidth (180);
+
+
+		mMessageTextField = new JTextField("", 20);
+
+		mSendMessageButton = new JButton("Send");
+		mSendMessageButton.addActionListener (new ActionListener () {
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				mConnection.sendMessage(mMessageTextField.getText());
+				mMessageTextField.setText("");
+			}
+		});
+		chatPanel.add(new JScrollPane(mMessageList));
+
+		JPanel chatButtonsPanel = new JPanel();
+		chatButtonsPanel.setLayout (new FlowLayout ());
+
+		chatButtonsPanel.add(mMessageTextField);
+		chatButtonsPanel.add(mSendMessageButton);
+
+		chatPanel.add(chatButtonsPanel);
+
+
+	    //		rightPanel.add (mRoomPicture);
+	    rightPanel.add (new JScrollPane (mRoomUserList));
 	    rightPanel.add (roomButtonsPanel);
+	    rightPanel.add (chatPanel);
 
 	    add (leftPanel, BorderLayout.LINE_START);
 
@@ -215,6 +255,14 @@ public class LobbyFrame extends JFrame {
 			mRoomsTable.setEnabled (true);
 			mJoinOrLeaveButton.setText ("Join");
 		}
+	}
+
+	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+	public void receiveMessage(int uid, String uname, int roomIndex, String message) {
+		Date date = new Date();
+
+		mMessageListModel.addMessage(uname+" ["+formatter.format(date)+"]: "+message);
+		System.out.println(message);
 	}
 
 	private class RoomTableCellRenderer extends DefaultTableCellRenderer {

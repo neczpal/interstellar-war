@@ -150,6 +150,10 @@ public class ClientConnection extends Thread {
 		mLogger.log (Level.INFO, "-> Started the game with Map (" + mapName + ")");
 	}
 
+	private void messageReceived (int uid, String uname, int roomIndex, String message) {
+		mUserInterface.receiveMessage(uid, uname, roomIndex, message);
+	}
+
 	/**
 	 * Bekommt ein Spielbefehl
 	 *
@@ -190,6 +194,16 @@ public class ClientConnection extends Thread {
 				startGame (mapName);
 				break;
 			}
+			case SEND_CHAT_COMMAND: {
+				int roomIndex = command.getInt (ROOM_INDEX_KEY);
+				int userId = command.getInt (USER_ID_KEY);
+				String userName = command.getString (USER_NAME_KEY);
+				String message = command.getString(MESSAGE_KEY);
+
+				messageReceived(userId, userName, roomIndex, message);
+				break;
+			}
+
 			case GAME_COMMAND: {
 				gameCommand (command);
 				break;
@@ -198,6 +212,16 @@ public class ClientConnection extends Thread {
 	}
 
 	//SEND
+
+	public void sendMessage (String message) {
+		JSONObject command = new JSONObject ();
+		command.put (COMMAND_TYPE_KEY, SEND_CHAT_COMMAND);
+		command.put (USER_ID_KEY, mConnectionId);
+		command.put (MESSAGE_KEY, message);
+		send (command);
+
+		mLogger.log (Level.INFO, "<- Sending message { "+ message +" } to the server Username (" + mUserName + ")");
+	}
 
 	/**
 	 * Eintritt in dem Server

@@ -13,6 +13,7 @@ public class CommandParamKey {
     public static final String MAX_USER_COUNT_KEY = "max-user-count";
     public static final String IS_ROOM_RUNNING_KEY = "is-room-running";
 
+    public static final String MESSAGE_KEY = "message";
 
     public static final String USER_LIST_KEY = "user-list";
 

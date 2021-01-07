@@ -2,7 +2,6 @@ package net.neczpal.interstellarwar.ai;
 
 import net.neczpal.interstellarwar.clientcommon.ClientConnection;
 import net.neczpal.interstellarwar.clientcommon.InterstellarWarClient;
-import net.neczpal.interstellarwar.clientcommon.NoUserInterface;
 import net.neczpal.interstellarwar.clientcommon.UserInterface;
 import net.neczpal.interstellarwar.common.game.Planet;
 import org.json.JSONArray;
@@ -19,7 +18,6 @@ public class InterstellarWarAI extends Thread implements UserInterface {
 
     private int mRoomId;
     private int mUserId;
-    private NoUserInterface mNoUserInterface = new NoUserInterface ();
     private volatile boolean mIsRunning;
 
     public InterstellarWarAI (String host, String userName, int roomId) {
@@ -165,6 +163,11 @@ public class InterstellarWarAI extends Thread implements UserInterface {
     @Override
     public void stopGame () {
         mIsRunning = false;
+    }
+
+    @Override
+    public void receiveMessage(int uid, String uname, int roomIndex, String message) {
+//        if(message.equals(""));# TODO AI message commands mb?
     }
 
     public void stopAI () {

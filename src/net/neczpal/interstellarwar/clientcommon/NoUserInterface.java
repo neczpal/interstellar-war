@@ -33,4 +33,9 @@ public class NoUserInterface implements UserInterface {
     public void stopGame () {
 
     }
+
+    @Override
+    public void receiveMessage(int uid, String uname, int roomIndex, String message) {
+
+    }
 }

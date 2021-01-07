@@ -11,5 +11,6 @@ public class CommandType {
     public static final String LEAVE_ROOM = "LEAVE_ROOM";
     public static final String START_ROOM = "START_ROOM";
     public static final String GET_MAP_DATA = "GET_MAP_DATA";
+    public static final String SEND_CHAT_COMMAND = "SEND_CHAT_COMMAND";
     public static final String GAME_COMMAND = "GAME_COMMAND";
 }

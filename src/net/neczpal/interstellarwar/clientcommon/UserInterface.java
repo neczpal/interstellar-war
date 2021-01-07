@@ -38,4 +38,6 @@ public interface UserInterface {
 	 * Beendet das Spiel
 	 */
 	void stopGame ();
+
+	void receiveMessage(int uid, String uname, int roomIndex, String message);
 }
