@@ -127,45 +127,46 @@ class GameScene: SKScene {
                         y = point.y
                         
                     } else {
-                        let planets = mCore!.getPlanets ();
-                        let realX = point.x - worldNode!.position.x
-                        let realY = point.y - worldNode!.position.y
-                        
-                        for (_, planet) in planets {
-                            if (planet.isInside (Double(realX), Double(realY)) &&
-                                planet.isNeighbor (
-                                    planets[mSelectedPlanetId]!)
-                                ) {
-                                if (planets[mSelectedPlanetId]!.getOwnedBy () == mInterstellarWarClient!.getRoomIndex ()) {
-                                    
-                                    if ( selectedToPlanetNode == nil) {
-                                        
-                                    selectedToPlanetNode = SKShapeNode(circleOfRadius: CGFloat(planet.getRadius()))
-                                    selectedToPlanetNode!.strokeColor = COLOR[planets[mSelectedPlanetId]!.getOwnedBy()]
-                                    selectedToPlanetNode!.lineWidth = 1.25
-                                    selectedToPlanetNode!.zPosition = 10
-                                    selectedToPlanetNode!.position = planet.getNode().position
-                                    
-                                    
-                                        //Line NODE
-                                        let path = CGMutablePath()
-                                        path.move(to: CGPoint(x: planets[mSelectedPlanetId]!.getX(), y: planets[mSelectedPlanetId]!.getY()))
-                                        path.addLine(to: CGPoint(x: planet.getX(), y: planet.getY()))
-                                        
-
-                                        selectedToArrowNode = SKShapeNode(path: path)
-                                        selectedToArrowNode!.lineWidth = 1.65
-                                        selectedToArrowNode!.strokeColor = COLOR[planets[mSelectedPlanetId]!.getOwnedBy()]
-                                        
-                                        
-                                        worldNode!.addChild(selectedToArrowNode!)
-                                        worldNode!.addChild(selectedToPlanetNode!)
-                                    
-                                    }
-                                }
-                                break;
-                            }
-                        }
+                        //#TODO
+//                        let planets = mCore!.getPlanets ();
+//                        let realX = point.x - worldNode!.position.x
+//                        let realY = point.y - worldNode!.position.y
+//
+//                        for (_, planet) in planets {
+//                            if (planet.isInside (Double(realX), Double(realY)) &&
+//                                planet.isNeighbor (
+//                                    planets[mSelectedPlanetId]!)
+//                                ) {
+//                                if (planets[mSelectedPlanetId]!.getOwnedBy () == mInterstellarWarClient!.getRoomIndex ()) {
+//
+//                                    if ( selectedToPlanetNode == nil) {
+//
+//                                    selectedToPlanetNode = SKShapeNode(circleOfRadius: CGFloat(planet.getRadius()))
+//                                    selectedToPlanetNode!.strokeColor = COLOR[planets[mSelectedPlanetId]!.getOwnedBy()]
+//                                    selectedToPlanetNode!.lineWidth = 1.25
+//                                    selectedToPlanetNode!.zPosition = 10
+//                                    selectedToPlanetNode!.position = planet.getNode().position
+//
+//
+//                                        //Line NODE
+//                                        let path = CGMutablePath()
+//                                        path.move(to: CGPoint(x: planets[mSelectedPlanetId]!.getX(), y: planets[mSelectedPlanetId]!.getY()))
+//                                        path.addLine(to: CGPoint(x: planet.getX(), y: planet.getY()))
+//
+//
+//                                        selectedToArrowNode = SKShapeNode(path: path)
+//                                        selectedToArrowNode!.lineWidth = 1.65
+//                                        selectedToArrowNode!.strokeColor = COLOR[planets[mSelectedPlanetId]!.getOwnedBy()]
+//
+//
+//                                        worldNode!.addChild(selectedToArrowNode!)
+//                                        worldNode!.addChild(selectedToPlanetNode!)
+//
+//                                    }
+//                                }
+//                                break;
+//                            }
+//                        }
                     }
 //                    print("finger \(index+1): x=\(point.x) , y=\(point.y)")
                     break

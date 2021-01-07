@@ -8,7 +8,10 @@
 
 import Foundation
 
-
+enum ClientConnectionError : Error {
+    case invalidJSON
+    
+}
 
 public class ClientConnection {
 
@@ -51,7 +54,7 @@ public class ClientConnection {
         }
     }
     
-    private  let bufferSize = 4048;
+    private  let bufferSize = 8096;
 
     private func run () {
         mIsRunning = true;
@@ -64,7 +67,10 @@ public class ClientConnection {
                 
                 
                 let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-                defer { buffer.deallocate() }
+                defer {
+                    buffer.deallocate()
+                }
+                
                 while (mIn!.hasBytesAvailable) {
                     let read = mIn!.read(buffer, maxLength: bufferSize)
                     if (read == 0) {
@@ -86,7 +92,7 @@ public class ClientConnection {
                 for linesub in lines {
                     let line = String(linesub)
                     if(!line.isEmpty) {
-                        print("Read line: \(line)")
+//                        print("Read line: \(line)")
                         if "}" == line.last && "{" == line.first {
                             let jsonObject = JSON(parseJSON: line)
                             self.receive (jsonObject);
@@ -157,7 +163,7 @@ public class ClientConnection {
     }
 
     public func receive (_ command : JSON) {
-        if !command.exists() {
+        if !command.exists() || command.dictionary == nil || command.dictionary!.isEmpty {
             return;
         }
         
