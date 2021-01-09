@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-//    id 'maven-publish'
 }
 
 repositories {
@@ -18,23 +17,14 @@ dependencies {
     implementation project(':desktop')
     implementation project(':ai')
     implementation 'org.json:json:20201115'
-    implementation 'org.lwjgl.lwjgl:lwjgl:2.9.1'
-    testImplementation 'junit:junit:4.12'
+    implementation 'org.lwjgl.lwjgl:lwjgl:2.9.3'
+    testImplementation 'junit:junit:4.13.1'
 }
 
 group 'net.neczpal.interstellarwar'
 version '1.0-SNAPSHOT'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 java.targetCompatibility = JavaVersion.VERSION_1_8
-description 'core'
-
-//publishing {
-//    publications {
-//        maven(MavenPublication) {
-//            from(components.java)
-//        }
-//    }
-//}
 
 test {
     useJUnitPlatform()
