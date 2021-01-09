@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: interstellar-war.server.server-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/server/build/libs/server-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Desktop-WIN" type="Application" factoryName="Application" singleton="false">
+    <option name="MAIN_CLASS_NAME" value="net.neczpal.interstellarwar.desktop.ui.DesktopUI" />
+    <module name="interstellar-war" />
+    <option name="VM_PARAMETERS" value="-Djava.library.path=natives/win" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

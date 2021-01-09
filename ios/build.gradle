@@ -1,0 +1,8 @@
+plugins {
+    id "org.openbakery.xcode-plugin" version "0.20.1"
+}
+
+xcodebuild {
+    scheme = 'InterstellarWar'
+    target = 'InterstellarWar'
+}

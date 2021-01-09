@@ -2,7 +2,7 @@
   <configuration default="false" name="Server" type="Application" factoryName="Application">
     <option name="ALTERNATIVE_JRE_PATH" value="adopt-openj9-1.8" />
     <option name="MAIN_CLASS_NAME" value="net.neczpal.interstellarwar.server.Server" />
-    <module name="interstellar-war" />
+    <module name="interstellar-war.server" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

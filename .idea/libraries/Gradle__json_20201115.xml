@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: json-20201115">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/json/json/20201115/json-20201115.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
