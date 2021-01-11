@@ -366,7 +366,7 @@ public class InterstellarWarCore extends Thread {
 	 * Incrementiert die Zeitvariable von allem Raumschiff, und entfernt, falls es angekommt ist.
 	 */
 	private void moveSpaceShips () {
-		for (SpaceShip spaceShip : mSpaceShips.values ()) {
+		for (SpaceShip spaceShip : mSpaceShips.values ()) {//#TODO Concurrent mod ex
 			spaceShip.tick ();
 		}
 
