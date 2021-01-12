@@ -352,7 +352,7 @@ public class ServerConnection extends Thread {
 		    Set<Integer> ids = mUsers.keySet();
 
 		    for(Integer id : ids) {
-		    	if (mUsers.get(id).getRoomId() != 0) {
+		    	if (mUsers.get(id).getRoomId() == 0) {
 					recipients.add(id);
 				}
 			}
