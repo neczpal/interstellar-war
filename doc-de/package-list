@@ -1,0 +1,10 @@
+net.neczpal.interstellarwar.clientcommon
+net.neczpal.interstellarwar.common.connection
+net.neczpal.interstellarwar.common.game
+net.neczpal.interstellarwar.desktop
+net.neczpal.interstellarwar.desktop.geom
+net.neczpal.interstellarwar.desktop.ui
+net.neczpal.interstellarwar.desktop.ui.frames
+net.neczpal.interstellarwar.desktop.ui.models
+net.neczpal.interstellarwar.server
+net.neczpal.interstellarwar.tests
