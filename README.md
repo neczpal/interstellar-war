@@ -20,6 +20,7 @@ Client-Server multiplayer application game written for desktop and mobile (iOS, 
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_lobby.png" width="250" />
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_game.png" width="250" />
 </p>
+
 ### iOS
 <p float="left">
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_login.png" width="250" />
@@ -27,12 +28,14 @@ Client-Server multiplayer application game written for desktop and mobile (iOS, 
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_room.png" width="250" />
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_game.png" width="250" />
 </p>
+
 ### Desktop
 <p float="left">
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_login.png" width="250" />
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_lobby.png" width="600" />
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_game.png" width="600" />
 </p>
+
 ## Server
 
 It runs in a console the available commands are:
