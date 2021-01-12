@@ -16,13 +16,35 @@ Client-Server multiplayer application game written for desktop and mobile (iOS, 
 
 ### Android
 
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_login.png" width="300" />
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_lobby.png" width="300" />
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_game.png" width="300" />
+
 ### iOS
+
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_login.png" width="300" />
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_lobby.png" width="300" />
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_room.png" width="300" />
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_game.png" width="300" />
 
 ### Desktop
 
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_login.png" width="600" />
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_lobby.png" width="600" />
+<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_game.png" width="600" />
+
 ## Server
 
+It runs in a console the available commands are:
+
+* `stop` - stops the server
+* `list [rooms|users]` - lists rooms and users
+* `add ['mapname']` - adds a room to the server
+* `log [off|verbose|info|warning|error|all]` - sets log level
+
 ## Documentation
+
+* German [program dokumentation](https://neczpal.github.io/interstellar-war/)
 
 ## License
 
