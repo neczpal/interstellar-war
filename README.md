@@ -6,7 +6,10 @@ Client-Server multiplayer application game written for desktop and mobile (iOS, 
 ## Setup
 
 
-* The project needs [JDK8+](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) to run
+* The project needs 
+  * [JDK8+](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) to run Desktop App/Server
+  * [Android SDK](https://developer.android.com/) for Android
+  * [xCode](https://developer.apple.com/xcode/) for iOS
 
 * Clone or download the repository.
 
@@ -14,11 +17,11 @@ Client-Server multiplayer application game written for desktop and mobile (iOS, 
 
 ## Compatible Platforms
 
-### Android
+### Desktop
 <p float="left">
-    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_login.png" width="250" />
-    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_lobby.png" width="250" />
-    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_game.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_login.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_lobby.png" width="600" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_game.png" width="600" />
 </p>
 
 ### iOS
@@ -29,11 +32,11 @@ Client-Server multiplayer application game written for desktop and mobile (iOS, 
     <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_game.png" width="250" />
 </p>
 
-### Desktop
+### Android
 <p float="left">
-    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_login.png" width="250" />
-    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_lobby.png" width="600" />
-    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_game.png" width="600" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_login.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_lobby.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_game.png" width="250" />
 </p>
 
 ## Server
