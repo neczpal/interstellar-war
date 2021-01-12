@@ -15,24 +15,24 @@ Client-Server multiplayer application game written for desktop and mobile (iOS, 
 ## Compatible Platforms
 
 ### Android
-
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_login.png" width="300" />
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_lobby.png" width="300" />
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_game.png" width="300" />
-
+<p float="left">
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_login.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_lobby.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/android_game.png" width="250" />
+</p>
 ### iOS
-
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_login.png" width="300" />
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_lobby.png" width="300" />
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_room.png" width="300" />
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_game.png" width="300" />
-
+<p float="left">
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_login.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_lobby.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_room.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/ios_game.png" width="250" />
+</p>
 ### Desktop
-
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_login.png" width="600" />
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_lobby.png" width="600" />
-<img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_game.png" width="600" />
-
+<p float="left">
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_login.png" width="250" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_lobby.png" width="600" />
+    <img src="https://github.com/neczpal/interstellar-war/raw/master/res/screenshots/desktop_game.png" width="600" />
+</p>
 ## Server
 
 It runs in a console the available commands are:
