@@ -65,4 +65,4 @@ The project is uploaded for educational purpose. Contribution and fair use of th
 
 Neczpál Ábel - [neczpal@gmail.com](mailto:neczpal@gmail.com)
 
-Project Link: [https://github.com/neczpal/interstellar-war](https://github.com/neczpal/interstellar-war)
+Project Link - [https://github.com/neczpal/interstellar-war](https://github.com/neczpal/interstellar-war)
